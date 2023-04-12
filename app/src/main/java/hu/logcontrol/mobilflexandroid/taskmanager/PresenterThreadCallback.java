@@ -1,4 +1,4 @@
-package hu.logcontrol.tekomalogin.taskmanager;
+package hu.logcontrol.mobilflexandroid.taskmanager;
 
 import android.os.Message;
 
