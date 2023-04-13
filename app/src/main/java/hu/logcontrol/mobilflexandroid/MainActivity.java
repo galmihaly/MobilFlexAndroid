@@ -6,9 +6,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import hu.logcontrol.mobilflexandroid.adapters.LanguagesSpinnerAdapter;
 import hu.logcontrol.mobilflexandroid.enums.WindowSizeTypes;
 import hu.logcontrol.mobilflexandroid.helpers.Helper;
 import hu.logcontrol.mobilflexandroid.interfaces.IMainActivity;
@@ -19,23 +23,46 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     private MainActivityPresenter mainActivityPresenter;
 
     private TextView messageTV;
+    private Spinner languageSelector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initView();
         initPresenter();
+        initSettingsPreferenceFile();
+        initLanguagesSpinner();
         initFunctions();
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
     /* SettingsActivity fügvényei */
 
-    private void getBaseValuesFromSettingsFile() {
+    private void initLanguagesSpinner() {
+        if(languageSelector != null) {
 
+            LanguagesSpinnerAdapter adapter = mainActivityPresenter.getSpinnerAdapter();
+
+            languageSelector.setAdapter(adapter);
+            mainActivityPresenter.initPublicSharedPreferenceFiles();
+
+            int currentLanguage = mainActivityPresenter.getCurrentLanguageFromSettingsFile();
+            if(currentLanguage != -1) languageSelector.setSelection(currentLanguage);
+
+            languageSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                    int languageID = Integer.parseInt(parent.getItemAtPosition(position).toString());
+
+                    mainActivityPresenter.saveLanguageToSettingsFile(languageID);
+                    mainActivityPresenter.translateTextBySelectedLanguage(languageID);
+                }
+
+                @Override  public void onNothingSelected(AdapterView<?> parent) {}
+            });
+        }
     }
-
-//    private void initSharedPreferenceFile() { settingsActivityPresenter.initSharedPreferenceFile(); }
 
     private void initFunctions() {
 
@@ -44,6 +71,12 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     private void initPresenter() {
         mainActivityPresenter = new MainActivityPresenter(this, getApplicationContext());
         mainActivityPresenter.initTaskManager();
+    }
+
+    private void initSettingsPreferenceFile() {
+        if(mainActivityPresenter != null) {
+            mainActivityPresenter.initSettingsPreferenceFile();
+        }
     }
 
     void initView(){
@@ -59,21 +92,25 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
 
             setContentView(R.layout.main_activity_mobile_portrait);
             messageTV = findViewById(R.id.messageTV_mobile_portrait);
+            languageSelector = findViewById(R.id.languageSelector_mobile_portrait);
         }
         else if(wst[0] == WindowSizeTypes.MEDIUM && wst[1] == WindowSizeTypes.COMPACT){
 
             setContentView(R.layout.main_activity_mobile_landscape);
             messageTV = findViewById(R.id.messageTV_mobile_landscape);
+            languageSelector = findViewById(R.id.languageSelector_mobile_landscape);
         }
-        else if(wst[0] == WindowSizeTypes.COMPACT && wst[1] == WindowSizeTypes.EXPANDED){
+        else if(wst[0] == WindowSizeTypes.MEDIUM && wst[1] == WindowSizeTypes.EXPANDED){
 
             setContentView(R.layout.main_activity_tablet_portrait);
             messageTV = findViewById(R.id.messageTV_tablet_portrait);
+            languageSelector = findViewById(R.id.languageSelector_tablet_portrait);
         }
-        else if(wst[0] == WindowSizeTypes.EXPANDED && wst[1] == WindowSizeTypes.COMPACT){
+        else if(wst[0] == WindowSizeTypes.EXPANDED && wst[1] == WindowSizeTypes.MEDIUM){
 
             setContentView(R.layout.main_activity_tablet_landscape);
             messageTV = findViewById(R.id.messageTV_tablet_landscape);
+            languageSelector = findViewById(R.id.languageSelector_tablet_landscape);
         }
     }
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -89,6 +126,14 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     public void getMessageFromPresenter(String message) {
         if(message == null) return;
         new Handler(Looper.getMainLooper()).post(() -> { Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show(); });
+    }
+
+    @Override
+    public void setTextToMessageTV(String message) {
+        if(message == null) return;
+        if(messageTV == null) return;
+
+        messageTV.setText(message);
     }
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
 }
