@@ -170,20 +170,16 @@ public class MainActivityPresenter implements IMainActivityPresenter, PresenterT
     }
 
     @Override
-    public void saveStartedLanguageToSettingsFile(int selectedItem) {
-        if(preferences == null) return;
-        preferences.putInt("CurrentSelectedLanguage", selectedItem);
-    }
-
-    @Override
     public int getCurrentLanguageFromSettingsFile() {
         if(preferences == null) return -1;
         int preferenceLanguage = preferences.getInt("CurrentSelectedLanguage");
         int currentLanguagePosition = -1;
 
         for (int i = 0; i < languagesImages.length; i++) {
-            if(preferenceLanguage == languagesImages[i]) currentLanguagePosition = i;
-            break;
+            if(preferenceLanguage == languagesImages[i]) {
+                currentLanguagePosition = i;
+                break;
+            }
         }
 
         if(currentLanguagePosition == -1) return -1;
@@ -202,7 +198,6 @@ public class MainActivityPresenter implements IMainActivityPresenter, PresenterT
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
     private static class MainActivityHandler extends Handler {
-
 
         private WeakReference<IMainActivityPresenter> iMainActivityPresenterWeakReference;
 

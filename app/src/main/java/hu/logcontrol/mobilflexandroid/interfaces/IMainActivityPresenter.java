@@ -11,6 +11,5 @@ public interface IMainActivityPresenter {
     void initPublicSharedPreferenceFiles();
     void saveLanguageToSettingsFile(int languageID);
     void initSettingsPreferenceFile();
-    void saveStartedLanguageToSettingsFile(int selectedItem);
     int getCurrentLanguageFromSettingsFile();
 }
