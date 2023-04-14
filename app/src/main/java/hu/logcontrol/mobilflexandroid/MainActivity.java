@@ -9,11 +9,13 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import hu.logcontrol.mobilflexandroid.adapters.LanguagesSpinnerAdapter;
+import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
 import hu.logcontrol.mobilflexandroid.enums.WindowSizeTypes;
 import hu.logcontrol.mobilflexandroid.helpers.Helper;
 import hu.logcontrol.mobilflexandroid.interfaces.IMainActivity;
@@ -25,6 +27,8 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
 
     private TextView messageTV;
     private Spinner languageSelector;
+
+    private Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +70,11 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     }
 
     private void initFunctions() {
-
+        if(button != null){
+            button.setOnClickListener(v -> {
+                mainActivityPresenter.openActivityByEnum(ViewEnums.LOGIN_ACTIVITY);
+            });
+        }
     }
 
     private void initPresenter() {
@@ -94,6 +102,8 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
             setContentView(R.layout.main_activity_mobile_portrait);
             messageTV = findViewById(R.id.messageTV_mobile_portrait);
             languageSelector = findViewById(R.id.languageSelector_mobile_portrait);
+
+            button = findViewById(R.id.button);
         }
         else if(wst[0] == WindowSizeTypes.MEDIUM && wst[1] == WindowSizeTypes.COMPACT){
 
@@ -133,7 +143,6 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     public void setTextToMessageTV(String message) {
         if(message == null) return;
         if(messageTV == null) return;
-
         messageTV.setText(message);
     }
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */

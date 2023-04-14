@@ -3,11 +3,17 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Munka/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/activity_background.xml" value="0.2985" />
+        <entry key="..\:/Munka/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/circle_background.xml" value="0.2985" />
+        <entry key="..\:/Munka/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/ic_android_logo.xml" value="0.2985" />
+        <entry key="..\:/Munka/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/ic_rfid.xml" value="0.2985" />
         <entry key="..\:/Munka/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/spinner_background.xml" value="0.2985" />
         <entry key="..\:/Munka/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/spinner_circle_background.xml" value="0.2985" />
         <entry key="..\:/Munka/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/spinner_popup_background.xml" value="0.2985" />
+        <entry key="..\:/Munka/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/activity_login.xml" value="0.27853260869565216" />
         <entry key="..\:/Munka/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/activity_main.xml" value="0.27853260869565216" />
         <entry key="..\:/Munka/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/language_icon.xml" value="0.27853260869565216" />
+        <entry key="..\:/Munka/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/login_activity_mobile_portrait.xml" value="0.27853260869565216" />
         <entry key="..\:/Munka/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/main_activity_mobile_landscape.xml" value="0.27853260869565216" />
         <entry key="..\:/Munka/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/main_activity_mobile_portrait.xml" value="0.27853260869565216" />
         <entry key="..\:/Munka/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/main_activity_tablet_landscape.xml" value="0.27853260869565216" />

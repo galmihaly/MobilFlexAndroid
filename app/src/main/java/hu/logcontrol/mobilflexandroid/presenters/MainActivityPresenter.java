@@ -14,6 +14,7 @@ import androidx.security.crypto.MasterKeys;
 
 import java.lang.ref.WeakReference;
 
+import hu.logcontrol.mobilflexandroid.LoginActivity;
 import hu.logcontrol.mobilflexandroid.MainActivity;
 import hu.logcontrol.mobilflexandroid.R;
 import hu.logcontrol.mobilflexandroid.adapters.LanguagesSpinnerAdapter;
@@ -68,23 +69,19 @@ public class MainActivityPresenter implements IMainActivityPresenter, PresenterT
     @Override
     public void openActivityByEnum(ViewEnums viewEnum) {
         if(viewEnum == null) return;
-//        if(loginActivity == null) return;
-//
-//        Intent intent = null;
-//
-//        switch (viewEnum){
-//            case SETTINGS_ACTIVITY:{
-//                intent = new Intent(context, SettingsActivity.class);
-//                break;
-//            }
-//            case WEBVIEW_ACTIVITY:{
-//                intent = new Intent(context, WebViewActivity.class);
-//                break;
-//            }
-//        }
-//
-//        if(intent == null) return;
-//        if(loginActivity != null) loginActivity.openViewByIntent(intent);
+        if(iMainActivity == null) return;
+
+        Intent intent = null;
+
+        switch (viewEnum){
+            case LOGIN_ACTIVITY:{
+                intent = new Intent(context, LoginActivity.class);
+                break;
+            }
+        }
+
+        if(intent == null) return;
+        if(iMainActivity != null) iMainActivity.openViewByIntent(intent);
     }
 
     @Override
@@ -103,28 +100,31 @@ public class MainActivityPresenter implements IMainActivityPresenter, PresenterT
 
     @Override
     public void translateTextBySelectedLanguage(int languageID) {
+
+        String m;
+
         switch (languageID){
             case R.drawable.ic_hu2:{
                 if(hungaryWCPrefFile != null){
 
-                    String m = hungaryWCPrefFile.getStringValueByKey("HU$WC_MessageTextView");
-                    iMainActivity.setTextToMessageTV(m);
+                    m = hungaryWCPrefFile.getStringValueByKey("HU$WC_MessageTextView");
+                    if(m != null) iMainActivity.setTextToMessageTV(m);
                 }
                 break;
             }
             case R.drawable.ic_brit:{
                 if(englishWCPrefFile != null){
 
-                    String m = englishWCPrefFile.getStringValueByKey("EN$WC_MessageTextView");
-                    iMainActivity.setTextToMessageTV(m);
+                    m = englishWCPrefFile.getStringValueByKey("EN$WC_MessageTextView");
+                    if(m != null) iMainActivity.setTextToMessageTV(m);
                 }
                 break;
             }
             case R.drawable.ic_german:{
                 if(germanWCPrefFile != null){
 
-                    String m = germanWCPrefFile.getStringValueByKey("DE$WC_MessageTextView");
-                    iMainActivity.setTextToMessageTV(m);
+                    m = germanWCPrefFile.getStringValueByKey("DE$WC_MessageTextView");
+                    if(m != null) iMainActivity.setTextToMessageTV(m);
                 }
                 break;
             }
@@ -187,15 +187,12 @@ public class MainActivityPresenter implements IMainActivityPresenter, PresenterT
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
-
-    /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
     /* PresenterThreadCallback interfész függvénye */
     @Override
     public void sendResultToPresenter(Message message) {
         if(mainActivityHandler == null) return;
         mainActivityHandler.sendMessage(message);
     }
-    /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
     private static class MainActivityHandler extends Handler {
 

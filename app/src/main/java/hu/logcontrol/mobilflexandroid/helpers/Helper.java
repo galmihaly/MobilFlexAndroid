@@ -1,9 +1,12 @@
 package hu.logcontrol.mobilflexandroid.helpers;
 
+import android.os.Bundle;
+import android.os.Message;
 import android.util.DisplayMetrics;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import hu.logcontrol.mobilflexandroid.enums.MessageIdentifiers;
 import hu.logcontrol.mobilflexandroid.enums.WindowSizeTypes;
 
 public class Helper {
@@ -30,5 +33,15 @@ public class Helper {
         else { widthWindowSizeClass[1] = WindowSizeTypes.EXPANDED; }
 
         return widthWindowSizeClass;
+    }
+
+    public static Message createMessage(int id, String dataString) {
+        Bundle bundle = new Bundle();
+        bundle.putString(MessageIdentifiers.MESSAGE_BODY, dataString);
+        Message message = new Message();
+        message.what = id;
+        message.setData(bundle);
+
+        return message;
     }
 }
