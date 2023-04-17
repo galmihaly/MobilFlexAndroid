@@ -1,10 +1,11 @@
 package hu.logcontrol.mobilflexandroid.models;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-public class SettingsObject {
+public class SettingsObject implements Serializable {
 
     private String deviceIdentifier;
     private String deviceName;

@@ -2,6 +2,8 @@ package hu.logcontrol.mobilflexandroid;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -9,22 +11,29 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.button.MaterialButton;
+
 import java.util.List;
 
+import hu.logcontrol.mobilflexandroid.adapters.LoginModesPagerAdapter;
+import hu.logcontrol.mobilflexandroid.enums.FragmentTypes;
 import hu.logcontrol.mobilflexandroid.enums.MessageIdentifiers;
-import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
 import hu.logcontrol.mobilflexandroid.enums.WindowSizeTypes;
+import hu.logcontrol.mobilflexandroid.fragments.BarcodeFragment;
+import hu.logcontrol.mobilflexandroid.fragments.PinCodeFragment;
+import hu.logcontrol.mobilflexandroid.fragments.RFIDFragment;
+import hu.logcontrol.mobilflexandroid.fragments.UserPassFragment;
 import hu.logcontrol.mobilflexandroid.helpers.Helper;
 import hu.logcontrol.mobilflexandroid.interfaces.ILoginActivity;
+import hu.logcontrol.mobilflexandroid.listeners.LoginButtonListener;
+import hu.logcontrol.mobilflexandroid.listeners.ViewPagerListener;
 import hu.logcontrol.mobilflexandroid.presenters.LoginActivityPresenter;
-import hu.logcontrol.mobilflexandroid.presenters.MainActivityPresenter;
 
 public class LoginActivity extends AppCompatActivity implements ILoginActivity {
 
@@ -40,9 +49,20 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
     private ImageButton loginPinButton;
     private ImageButton loginRFIDButton;
     private ImageButton loginBarcodeButton;
+
+    private MaterialButton loginButton;
+
     private LinearLayout llay;
 
-    private int loginModesNumber = 15;
+    private ViewPager2 loginModesPager;
+    private ViewPagerListener viewPagerListener;
+
+    private LoginButtonListener userPassLogButListener;
+    private LoginButtonListener pinCodeLogButListener;
+    private LoginButtonListener rfidLogButListener;
+    private LoginButtonListener barcodeLogButListener;
+
+    private LoginModesPagerAdapter loginModesPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,18 +70,29 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
         initView();
         initPresenter();
         initSettingsPreferenceFile();
+        initSettingsDataFromWebAPI();
+        setControlsValuesBySettings();
         initLoginButtons();
-        initFunctions();
+        initPagerFunctions();
+    }
+
+    private void setControlsValuesBySettings() {
+        if(loginActivityPresenter == null) return;
+        loginActivityPresenter.setControlsValuesBySettings();
+    }
+
+    private void initSettingsDataFromWebAPI() {
+        if(loginActivityPresenter == null) return;
+        loginActivityPresenter.saveSettingsToPreferences(getIntent());
     }
 
     private void initLoginButtons() {
         if(loginActivityPresenter != null && wst != null){
-            int[] colors = {Color.parseColor("#FFFF0000"),Color.parseColor("#FF00FFFF")};
-            loginActivityPresenter.initButtonsByLoginModesNumber(loginModesNumber, wst, colors);
+            loginActivityPresenter.initButtonsByLoginModesNumber(wst);
         }
     }
 
-    private void initFunctions() {
+    private void initPagerFunctions() {
 
     }
 
@@ -92,25 +123,12 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
             loginTV = findViewById(R.id.loginTV_mobile_portrait);
             loginLogo = findViewById(R.id.loginLogo_mobile_portrait);
             llay = findViewById(R.id.logButtonsCL_mobile_portrait);
+            loginModesPager = findViewById(R.id.loginModes_mobile_portrait);
+
             changeStateMainActivityCL("#000000", "#FFFFFFFF");
             changeStateLoginTV("Belépés", "#FFFF0000");
             changeStateLoginLogo(R.drawable.ic_baseline_album);
         }
-//        else if(wst[0] == WindowSizeTypes.MEDIUM && wst[1] == WindowSizeTypes.COMPACT){
-//
-//            setContentView(R.layout.main_activity_mobile_landscape);
-//            activityCL = findViewById(R.id.activityCL_mobile_portrait);
-//        }
-//        else if(wst[0] == WindowSizeTypes.MEDIUM && wst[1] == WindowSizeTypes.EXPANDED){
-//
-//            setContentView(R.layout.main_activity_tablet_portrait);
-//            activityCL = findViewById(R.id.activityCL_mobile_portrait);
-//        }
-//        else if(wst[0] == WindowSizeTypes.EXPANDED && wst[1] == WindowSizeTypes.MEDIUM){
-//
-//            setContentView(R.layout.main_activity_tablet_landscape);
-//            activityCL = findViewById(R.id.activityCL_mobile_portrait);
-//        }
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -142,6 +160,8 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
         loginLogo.setImageResource(logoID);
     }
 
+
+
     @Override
     public void changeStateMainActivityCL(String startedGradientColor, String endedGradientColor) {
         if(startedGradientColor == null) return;
@@ -160,48 +180,87 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
         if(createdButtons == null) return;
         llay.invalidate();
 
-        Log.e("x", "beléptem ide");
+        loginModesPagerAdapter = new LoginModesPagerAdapter(getSupportFragmentManager(), getLifecycle());
 
         for (int i = 0; i < createdButtons.size(); i++) {
-
             switch (createdButtons.get(i).getId()){
                 case MessageIdentifiers.BUTTON_USER_PASS:{
                     loginAccAndPassButton = createdButtons.get(i);
-                    Log.e("loginAccAndPassButton", "beléptem ide");
+                    Fragment fragment = new UserPassFragment();
+
                     llay.addView(loginAccAndPassButton);
-//                    fragmentPagerAdapter.addButtonToList(imageButton);
+                    loginModesPagerAdapter.addButtonToList(loginAccAndPassButton);
+                    loginModesPagerAdapter.addFragment(fragment);
+                    loginModesPagerAdapter.addItemToHashMap(FragmentTypes.USERPASSFRAGMENT, fragment);
+
                     break;
                 }
                 case MessageIdentifiers.BUTTON_PINCODE:{
                     loginPinButton = createdButtons.get(i);
-                    Log.e("loginPinButton", "beléptem ide");
+                    Fragment fragment = new PinCodeFragment();
+
                     llay.addView(loginPinButton);
-//                    fragmentPagerAdapter.addButtonToList(imageButton);
+                    loginModesPagerAdapter.addButtonToList(loginPinButton);
+                    loginModesPagerAdapter.addFragment(fragment);
+                    loginModesPagerAdapter.addItemToHashMap(FragmentTypes.PINCODEFRAGMENT, fragment);
+
                     break;
                 }
                 case MessageIdentifiers.BUTTON_RFID:{
                     loginRFIDButton = createdButtons.get(i);
-                    Log.e("loginRFIDButton", "beléptem ide");
+                    Fragment fragment = new RFIDFragment();
+
                     llay.addView(loginRFIDButton);
-//                    fragmentPagerAdapter.addButtonToList(imageButton);
+                    loginModesPagerAdapter.addButtonToList(loginRFIDButton);
+                    loginModesPagerAdapter.addFragment(fragment);
+                    loginModesPagerAdapter.addItemToHashMap(FragmentTypes.RFIDFRAGMENT, fragment);
+
                     break;
                 }
                 case MessageIdentifiers.BUTTON_BARCODE:{
                     loginBarcodeButton = createdButtons.get(i);
-                    Log.e("loginBarcodeButton", "beléptem ide");
+                    Fragment fragment = new BarcodeFragment();
+
                     llay.addView(loginBarcodeButton);
-//                    fragmentPagerAdapter.addButtonToList(imageButton);
+                    loginModesPagerAdapter.addButtonToList(loginBarcodeButton);
+                    loginModesPagerAdapter.addFragment(fragment);
+                    loginModesPagerAdapter.addItemToHashMap(FragmentTypes.BARCODEFRAGMENT, fragment);
+
                     break;
                 }
             }
         }
 
-        initLoginButtonsListeners();
+        if(loginModesPager != null) loginModesPager.setAdapter(loginModesPagerAdapter);
+        viewPagerListener = new ViewPagerListener(loginModesPagerAdapter);
+
+        initLoginButtonFunctions();
     }
 
-    private void initLoginButtonsListeners(){
-    }
+    private void initLoginButtonFunctions() {
 
+        if(loginModesPager != null && viewPagerListener != null) { loginModesPager.registerOnPageChangeCallback(viewPagerListener); }
+
+        if(loginAccAndPassButton != null){
+            userPassLogButListener = new LoginButtonListener(loginModesPagerAdapter, loginModesPager, FragmentTypes.USERPASSFRAGMENT);
+            loginAccAndPassButton.setOnClickListener(userPassLogButListener);
+        }
+
+        if(loginPinButton != null){
+            pinCodeLogButListener = new LoginButtonListener(loginModesPagerAdapter, loginModesPager, FragmentTypes.PINCODEFRAGMENT);
+            loginPinButton.setOnClickListener(pinCodeLogButListener);
+        }
+
+        if(loginBarcodeButton != null){
+            barcodeLogButListener = new LoginButtonListener(loginModesPagerAdapter, loginModesPager, FragmentTypes.BARCODEFRAGMENT);
+            loginBarcodeButton.setOnClickListener(barcodeLogButListener);
+        }
+
+        if(loginRFIDButton != null){
+            rfidLogButListener = new LoginButtonListener(loginModesPagerAdapter, loginModesPager, FragmentTypes.RFIDFRAGMENT);
+            loginRFIDButton.setOnClickListener(rfidLogButListener);
+        }
+    }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
 }

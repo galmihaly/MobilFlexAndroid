@@ -1,10 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.MobilFlexAndroid" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="DeviceLogon_portrait" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
+        <item name="android:screenOrientation">portrait</item>
+        <item name="android:visible">false</item>
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/black</item>
+        <item name="colorPrimary">@color/purple_200</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
@@ -13,6 +15,7 @@
         <item name="colorOnSecondary">@color/black</item>
         <item name="android:navigationBarColor">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">#6A6C73</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/black</item>
+        <!-- Customize your theme here. -->
     </style>
 </resources>

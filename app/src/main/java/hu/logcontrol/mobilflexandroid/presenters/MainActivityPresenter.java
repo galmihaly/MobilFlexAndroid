@@ -13,6 +13,10 @@ import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 import hu.logcontrol.mobilflexandroid.LoginActivity;
 import hu.logcontrol.mobilflexandroid.MainActivity;
@@ -25,6 +29,7 @@ import hu.logcontrol.mobilflexandroid.logger.ApplicationLogger;
 import hu.logcontrol.mobilflexandroid.logger.LogLevel;
 import hu.logcontrol.mobilflexandroid.models.LanguagesSharedPreferences;
 import hu.logcontrol.mobilflexandroid.models.LocalEncryptedPreferences;
+import hu.logcontrol.mobilflexandroid.models.SettingsObject;
 import hu.logcontrol.mobilflexandroid.taskmanager.CustomThreadPoolManager;
 import hu.logcontrol.mobilflexandroid.taskmanager.PresenterThreadCallback;
 
@@ -76,6 +81,51 @@ public class MainActivityPresenter implements IMainActivityPresenter, PresenterT
         switch (viewEnum){
             case LOGIN_ACTIVITY:{
                 intent = new Intent(context, LoginActivity.class);
+
+                List<String> languages = new ArrayList<>();
+                languages.add("HU");
+                languages.add("EN");
+                languages.add("DE");
+
+                List<String> wordCodes = new ArrayList<>();
+                wordCodes.add("WordCode1");
+                wordCodes.add("WordCode2");
+                wordCodes.add("WordCode3");
+
+                HashMap<String, String> translations = new HashMap<>();
+                translations.put(languages.get(0) + "$" + wordCodes.get(0), "ok1");
+                translations.put(languages.get(1) + "$" + wordCodes.get(1), "ok2");
+                translations.put(languages.get(2) + "$" + wordCodes.get(2), "ok3");
+
+                SettingsObject settingsObject = new SettingsObject(
+                        "1",
+                        "name",
+                        UUID.randomUUID(),
+                        "s",
+                        "Bejelentkezés",
+                        "1",
+                        "Ezen a felületen lehet bejelentkezni!!!",
+                        "1.0",
+                        15,
+                        "logoImageUrl",
+                        "loginWebApiUrl",
+                        "mainWebApiUrl",
+                        "settingsWebApiUrl",
+                        "helpWebApiUrl",
+                        languages,
+                        wordCodes,
+                        translations,
+                        "#FF9A3A2A",
+                        "#FFF1EDCA",
+                        "#FFFFFFFF",
+                        "FFFF00FF",
+                        "FF00FF00",
+                        "FFFFFFFF",
+                        "#FFFFFFFF"
+                );
+
+                intent.putExtra("settingsObject", settingsObject);
+
                 break;
             }
         }
