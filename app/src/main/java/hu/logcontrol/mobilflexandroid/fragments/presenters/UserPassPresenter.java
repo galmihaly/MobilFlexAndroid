@@ -78,19 +78,71 @@ public class UserPassPresenter implements IUserPassFrPresenter, PresenterThreadC
     }
 
     @Override
+    public void initLanguageSharedPreferenceFiles() {
+        hungaryWCPrefFile = new LanguagesSharedPreferences(context, "HungaryWCPrefFile");
+        englishWCPrefFile = new LanguagesSharedPreferences(context, "EnglishWCPrefFile");
+        germanWCPrefFile = new LanguagesSharedPreferences(context, "GermanWCPrefFile");
+    }
+
+    @Override
     public void setControlsValuesBySettings() {
         if(iUserPassFragment == null) return;
         if(preferences == null) return;
-
-        Log.e("setControlsValuesBySettings", "beléptem ide");
+        if(hungaryWCPrefFile == null) return;
+        if(englishWCPrefFile == null) return;
+        if(germanWCPrefFile == null) return;
 
         String controlColor = preferences.getStringValueByKey("controlColor");
         String textColor = preferences.getStringValueByKey("foregroundColor");
 
-        Log.e("controlColor", controlColor);
-        Log.e("textColor", textColor);
+        String buttonBackgroundColor = preferences.getStringValueByKey("buttonBackgroundColor");
+        String buttonBackgroundGradientColor = preferences.getStringValueByKey("buttonBackgroundGradientColor");
+        String buttonForeGroundColor = preferences.getStringValueByKey("buttonForegroundColor");
 
-        if(controlColor != null && textColor != null) iUserPassFragment.changeStateTextInputEditText(controlColor, textColor);
+        String currentLanguage = preferences.getStringValueByKey("CurrentSelectedLanguage");
+
+        String buttonLabel = null;
+        String usernameTVLabel = null;
+        String passwordTVLabel = null;
+
+        switch (currentLanguage){
+            case "HU":{
+                buttonLabel = hungaryWCPrefFile.getStringValueByKey("HU$WC_ApplicationLoginButtonTitle");
+                usernameTVLabel = hungaryWCPrefFile.getStringValueByKey("HU$WC_ApplicationUsernameTitle");
+                passwordTVLabel = hungaryWCPrefFile.getStringValueByKey("HU$WC_ApplicationPasswordTitle");
+                break;
+            }
+            case "EN":{
+                buttonLabel = englishWCPrefFile.getStringValueByKey("EN$WC_ApplicationLoginButtonTitle");
+                usernameTVLabel = englishWCPrefFile.getStringValueByKey("EN$WC_ApplicationUsernameTitle");
+                passwordTVLabel = englishWCPrefFile.getStringValueByKey("EN$WC_ApplicationPasswordTitle");
+                break;
+            }
+            case "DE":{
+                buttonLabel = germanWCPrefFile.getStringValueByKey("DE$WC_ApplicationLoginButtonTitle");
+                usernameTVLabel = germanWCPrefFile.getStringValueByKey("DE$WC_ApplicationUsernameTitle");
+                passwordTVLabel = germanWCPrefFile.getStringValueByKey("DE$WC_ApplicationPasswordTitle");
+                break;
+            }
+        }
+
+        if(controlColor != null && textColor != null && usernameTVLabel != null && passwordTVLabel != null) {
+            iUserPassFragment.changeStateTextInputEditText(
+                    controlColor,
+                    textColor,
+                    usernameTVLabel,
+                    passwordTVLabel
+            );
+        }
+
+        if(buttonBackgroundColor != null && buttonBackgroundGradientColor != null && buttonForeGroundColor != null && buttonLabel != null) {
+            iUserPassFragment.changeStateLoginButton(
+                    buttonBackgroundColor,
+                    buttonBackgroundGradientColor,
+                    buttonForeGroundColor,
+                    buttonLabel
+            );
+        }
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */

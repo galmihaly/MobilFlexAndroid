@@ -7,9 +7,9 @@ public interface IMainActivityPresenter {
     void initTaskManager();
     void openActivityByEnum(ViewEnums viewEnum);
     LanguagesSpinnerAdapter getSpinnerAdapter();
-    void translateTextBySelectedLanguage(int languageID);
+    void translateTextBySelectedLanguage(String languageID);
     void initPublicSharedPreferenceFiles();
-    void saveLanguageToSettingsFile(int languageID);
+    void saveLanguageToSettingsFile(String languageID);
     void initSettingsPreferenceFile();
     int getCurrentLanguageFromSettingsFile();
 }

@@ -2,6 +2,7 @@ package hu.logcontrol.mobilflexandroid;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -55,13 +56,29 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
             if(currentLanguage != -1) languageSelector.setSelection(currentLanguage);
 
             languageSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @SuppressLint("NonConstantResourceId")
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                     int languageID = Integer.parseInt(parent.getItemAtPosition(position).toString());
 
-                    mainActivityPresenter.saveLanguageToSettingsFile(languageID);
-                    mainActivityPresenter.translateTextBySelectedLanguage(languageID);
+                    switch (languageID){
+                        case R.drawable.ic_hu2:{
+                            mainActivityPresenter.saveLanguageToSettingsFile("HU");
+                            mainActivityPresenter.translateTextBySelectedLanguage("HU");
+                            break;
+                        }
+                        case R.drawable.ic_brit:{
+                            mainActivityPresenter.saveLanguageToSettingsFile("EN");
+                            mainActivityPresenter.translateTextBySelectedLanguage("EN");
+                            break;
+                        }
+                        case R.drawable.ic_german:{
+                            mainActivityPresenter.saveLanguageToSettingsFile("DE");
+                            mainActivityPresenter.translateTextBySelectedLanguage("DE");
+                            break;
+                        }
+                    }
                 }
 
                 @Override  public void onNothingSelected(AdapterView<?> parent) {}

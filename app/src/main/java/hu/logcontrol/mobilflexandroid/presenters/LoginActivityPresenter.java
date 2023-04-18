@@ -23,8 +23,6 @@ import hu.logcontrol.mobilflexandroid.enums.MessageIdentifiers;
 import hu.logcontrol.mobilflexandroid.enums.WindowSizeTypes;
 import hu.logcontrol.mobilflexandroid.interfaces.ILoginActivity;
 import hu.logcontrol.mobilflexandroid.interfaces.ILoginActivityPresenter;
-import hu.logcontrol.mobilflexandroid.interfaces.IMainActivity;
-import hu.logcontrol.mobilflexandroid.interfaces.IMainActivityPresenter;
 import hu.logcontrol.mobilflexandroid.logger.ApplicationLogger;
 import hu.logcontrol.mobilflexandroid.logger.LogLevel;
 import hu.logcontrol.mobilflexandroid.models.LanguagesSharedPreferences;
@@ -83,6 +81,13 @@ public class LoginActivityPresenter implements ILoginActivityPresenter, Presente
     }
 
     @Override
+    public void initLanguageSharedPreferenceFiles() {
+        hungaryWCPrefFile = new LanguagesSharedPreferences(context, "HungaryWCPrefFile");
+        englishWCPrefFile = new LanguagesSharedPreferences(context, "EnglishWCPrefFile");
+        germanWCPrefFile = new LanguagesSharedPreferences(context, "GermanWCPrefFile");
+    }
+
+    @Override
     public void initButtonsByLoginModesNumber(WindowSizeTypes[] wsc) {
         try {
             if(preferences != null){
@@ -109,50 +114,6 @@ public class LoginActivityPresenter implements ILoginActivityPresenter, Presente
         }
     }
 
-//    @Override
-//    public void initTextsByCurrentValue() {
-//        if(preferences == null) return;
-//
-//        hungaryWCPrefFile = new LanguagesSharedPreferences(context, "HungaryWCPrefFile");
-//        englishWCPrefFile = new LanguagesSharedPreferences(context, "EnglishWCPrefFile");
-//        germanWCPrefFile = new LanguagesSharedPreferences(context, "GermanWCPrefFile");
-//
-//        int currentLanguageID = preferences.getIntValueByKey("CurrentSelectedLanguage");
-//
-//        String message;
-//        String color;
-//
-//        switch (currentLanguageID){
-//            case R.drawable.ic_hu2:{
-//                if(hungaryWCPrefFile != null){
-//
-//                    message = hungaryWCPrefFile.getStringValueByKey("HU$WC_MessageTextView");
-//                    color = hungaryWCPrefFile.getStringValueByKey("HU$WC_MessageColor");
-//                    if(message != null) iLoginActivity.changeStateLoginTV(message, color);
-//                }
-//                break;
-//            }
-//            case R.drawable.ic_brit:{
-//                if(englishWCPrefFile != null){
-//
-//                    message = hungaryWCPrefFile.getStringValueByKey("EN$WC_MessageTextView");
-//                    color = hungaryWCPrefFile.getStringValueByKey("EN$WC_MessageColor");
-//                    if(message != null) iLoginActivity.changeStateLoginTV(message, color);
-//                }
-//                break;
-//            }
-//            case R.drawable.ic_german:{
-//                if(germanWCPrefFile != null){
-//
-//                    message = hungaryWCPrefFile.getStringValueByKey("DE$WC_MessageTextView");
-//                    color = hungaryWCPrefFile.getStringValueByKey("DE$WC_MessageColor");
-//                    if(message != null) iLoginActivity.changeStateLoginTV(message, color);
-//                }
-//                break;
-//            }
-//        }
-//    }
-
     @Override
     public void sendMessageToView(String message) {
         if(message == null) return;
@@ -168,6 +129,10 @@ public class LoginActivityPresenter implements ILoginActivityPresenter, Presente
     @Override
     public void saveSettingsToPreferences(Intent intent) {
         if(intent == null) return;
+        if(preferences == null) return;
+        if(hungaryWCPrefFile == null) return;
+        if(englishWCPrefFile == null) return;
+        if(germanWCPrefFile == null) return;
 
         SettingsObject s = (SettingsObject) intent.getSerializableExtra("settingsObject");
 
@@ -208,10 +173,10 @@ public class LoginActivityPresenter implements ILoginActivityPresenter, Presente
         Log.e("settingsWebApiUrl", preferences.getStringValueByKey("settingsWebApiUrl"));
         Log.e("helpWebApiUrl", preferences.getStringValueByKey("helpWebApiUrl"));
 
-//        List<String> languages = s.getLanguages();
-//        List<String> wordCodes = s.getWordCodes();
-//
-//        HashMap<String, String> translations = s.getTranslations();
+        List<String> languages = s.getLanguages();
+        List<String> wordCodes = s.getWordCodes();
+
+        HashMap<String, String> translations = s.getTranslations();
 
         Log.e("backgroundColor", preferences.getStringValueByKey("backgroundColor"));
         Log.e("backgroundGradientColor", preferences.getStringValueByKey("backgroundGradientColor"));
@@ -221,17 +186,24 @@ public class LoginActivityPresenter implements ILoginActivityPresenter, Presente
         Log.e("buttonForegroundColor", preferences.getStringValueByKey("buttonForegroundColor"));
         Log.e("controlColor", preferences.getStringValueByKey("controlColor"));
 
-//        for (int i = 0; i < languages.size(); i++) {
-//            Log.e("languages", languages.get(i));
-//        }
-//
-//        for (int i = 0; i < wordCodes.size(); i++) {
-//            Log.e("wordCodes", wordCodes.get(i));
-//        }
-//
-//        for (Map.Entry<String, String> entry : translations.entrySet()){
-//            Log.e("translations", entry.getKey() + "   " + entry.getValue());
-//        }
+        for (int i = 0; i < languages.size(); i++) {
+            Log.e("languages", languages.get(i));
+        }
+
+        for (int i = 0; i < wordCodes.size(); i++) {
+            Log.e("wordCodes", wordCodes.get(i));
+        }
+
+        for (Map.Entry<String, String> entry : translations.entrySet()){
+
+            String language = entry.getKey().split("\\$")[0];
+
+            switch (language){
+                case "HU":{ hungaryWCPrefFile.putString(entry.getKey(), entry.getValue()); break; }
+                case "EN":{ englishWCPrefFile.putString(entry.getKey(), entry.getValue()); break; }
+                case "DE":{ germanWCPrefFile.putString(entry.getKey(), entry.getValue()); break; }
+            }
+        }
     }
 
     @Override
@@ -239,17 +211,43 @@ public class LoginActivityPresenter implements ILoginActivityPresenter, Presente
         if(iLoginActivity == null) return;
         if(preferences == null) return;
 
-        String message = preferences.getStringValueByKey("applicationTitle");
-        String foreGroundColor = preferences.getStringValueByKey("foregroundColor");
+        String currentLanguage = preferences.getStringValueByKey("CurrentSelectedLanguage");
+        Log.e("currentLanguage", currentLanguage);
 
-        if(message != null && foreGroundColor != null) iLoginActivity.changeStateLoginTV(message, foreGroundColor);
-
-        iLoginActivity.changeStateLoginLogo(R.drawable.ic_baseline_album);
+        String message = null;
+        String applicationDescription = null;
 
         String backgroundColor = preferences.getStringValueByKey("backgroundColor");
         String backgroundGradientColor = preferences.getStringValueByKey("backgroundGradientColor");
+        String foreGroundColor = preferences.getStringValueByKey("foregroundColor");
+        String applicationName = preferences.getStringValueByKey("applicationTitle");
 
+        switch (currentLanguage){
+            case "HU":{
+                message = hungaryWCPrefFile.getStringValueByKey("HU$WC_ApplicationLoginButtonTitle");
+                applicationDescription = hungaryWCPrefFile.getStringValueByKey("HU$WC_ApplicationLead");
+                break;
+            }
+            case "EN":{
+                message = englishWCPrefFile.getStringValueByKey("EN$WC_ApplicationLoginButtonTitle");
+                applicationDescription = englishWCPrefFile.getStringValueByKey("EN$WC_ApplicationLead");
+                break;
+            }
+            case "DE":{
+                message = germanWCPrefFile.getStringValueByKey("DE$WC_ApplicationLoginButtonTitle");
+                applicationDescription = germanWCPrefFile.getStringValueByKey("DE$WC_ApplicationLead");
+                break;
+            }
+        }
+
+        // TODO ezt majd le kell tölteni egy URL-ről
+        iLoginActivity.changeStateLoginLogo(R.drawable.ic_baseline_album);
+
+        if(message != null && foreGroundColor != null) iLoginActivity.changeStateLoginTV(message, foreGroundColor);
         if(backgroundColor != null && backgroundGradientColor != null) iLoginActivity.changeStateMainActivityCL(backgroundColor, backgroundGradientColor);
+        if(applicationDescription != null && foreGroundColor != null) iLoginActivity.changeStateApplicationLeadTextbox(applicationDescription, foreGroundColor);
+        if(applicationName != null && foreGroundColor != null) iLoginActivity.changeStateApplicationTitleTextbox(applicationName, foreGroundColor);
+
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */

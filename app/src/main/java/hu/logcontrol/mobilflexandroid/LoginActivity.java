@@ -5,20 +5,22 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.button.MaterialButton;
-
+import java.lang.reflect.Method;
 import java.util.List;
 
 import hu.logcontrol.mobilflexandroid.adapters.LoginModesPagerAdapter;
@@ -50,7 +52,8 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
     private ImageButton loginRFIDButton;
     private ImageButton loginBarcodeButton;
 
-    private MaterialButton loginButton;
+    private TextView applicationLeadTV;
+    private TextView applicationTitleTV;
 
     private LinearLayout llay;
 
@@ -64,16 +67,42 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
 
     private LoginModesPagerAdapter loginModesPagerAdapter;
 
+    @SuppressLint("HardwareIds")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initView();
         initPresenter();
         initSettingsPreferenceFile();
+        initLanguagePreferenceFiles();
         initSettingsDataFromWebAPI();
         setControlsValuesBySettings();
         initLoginButtons();
-        initPagerFunctions();
+
+        String serialNumber;
+
+        try {
+            Class<?> c = Class.forName("android.os.SystemProperties");
+            Method get = c.getMethod("get", String.class);
+
+            serialNumber = (String) get.invoke(c, "gsm.sn1");
+            if (serialNumber.equals(""))
+                serialNumber = (String) get.invoke(c, "ril.serialnumber");
+            if (serialNumber.equals(""))
+                serialNumber = (String) get.invoke(c, "ro.serialno");
+            if (serialNumber.equals(""))
+                serialNumber = (String) get.invoke(c, "sys.serialnumber");
+            if (serialNumber.equals(""))
+                serialNumber = Build.SERIAL;
+
+            Log.e("ser", serialNumber);
+
+            // If none of the methods above worked
+            if (serialNumber.equals("")) serialNumber = null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            serialNumber = null;
+        }
     }
 
     private void setControlsValuesBySettings() {
@@ -92,10 +121,6 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
         }
     }
 
-    private void initPagerFunctions() {
-
-    }
-
     private void initPresenter() {
         loginActivityPresenter = new LoginActivityPresenter(this, getApplicationContext());
         loginActivityPresenter.initTaskManager();
@@ -104,6 +129,12 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
     private void initSettingsPreferenceFile() {
         if(loginActivityPresenter != null) {
             loginActivityPresenter.initSettingsPreferenceFile();
+        }
+    }
+
+    private void initLanguagePreferenceFiles() {
+        if(loginActivityPresenter != null) {
+            loginActivityPresenter.initLanguageSharedPreferenceFiles();
         }
     }
 
@@ -125,8 +156,9 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
             llay = findViewById(R.id.logButtonsCL_mobile_portrait);
             loginModesPager = findViewById(R.id.loginModes_mobile_portrait);
 
-            changeStateMainActivityCL("#000000", "#FFFFFFFF");
-            changeStateLoginTV("Belépés", "#FFFF0000");
+            applicationLeadTV = findViewById(R.id.applicationLead_mobile_portrait);
+            applicationTitleTV = findViewById(R.id.applicationTitle_mobile_portrait);
+
             changeStateLoginLogo(R.drawable.ic_baseline_album);
         }
     }
@@ -160,8 +192,6 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
         loginLogo.setImageResource(logoID);
     }
 
-
-
     @Override
     public void changeStateMainActivityCL(String startedGradientColor, String endedGradientColor) {
         if(startedGradientColor == null) return;
@@ -172,6 +202,26 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
         GradientDrawable g = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
 
         activityCL.setBackground(g);
+    }
+
+    @Override
+    public void changeStateApplicationLeadTextbox(String applicationDescription, String textColor) {
+        if(applicationDescription == null) return;
+        if(textColor == null) return;
+        if(applicationLeadTV == null) return;
+
+        applicationLeadTV.setTextColor(Color.parseColor(textColor));
+        applicationLeadTV.setText(applicationDescription);
+    }
+
+    @Override
+    public void changeStateApplicationTitleTextbox(String applicationName, String textColor) {
+        if(applicationName == null) return;
+        if(textColor == null) return;
+        if(applicationTitleTV == null) return;
+
+        applicationTitleTV.setTextColor(Color.parseColor(textColor));
+        applicationTitleTV.setText(applicationName);
     }
 
     @Override

@@ -4,5 +4,5 @@ public interface IUserPassFrPresenter {
     void initTaskManager();
     void initSettingsPreferenceFile();
     void setControlsValuesBySettings();
-
+    void initLanguageSharedPreferenceFiles();
 }

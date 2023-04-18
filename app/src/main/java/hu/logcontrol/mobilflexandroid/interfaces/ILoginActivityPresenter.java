@@ -10,6 +10,7 @@ import hu.logcontrol.mobilflexandroid.enums.WindowSizeTypes;
 public interface ILoginActivityPresenter {
     void initTaskManager();
     void initSettingsPreferenceFile();
+    void initLanguageSharedPreferenceFiles();
     void initButtonsByLoginModesNumber(WindowSizeTypes[] wsc);
     void sendMessageToView(String message);
     void sendCreatedButtonsToView(List<ImageButton> createdButtons);

@@ -88,23 +88,35 @@ public class MainActivityPresenter implements IMainActivityPresenter, PresenterT
                 languages.add("DE");
 
                 List<String> wordCodes = new ArrayList<>();
-                wordCodes.add("WordCode1");
-                wordCodes.add("WordCode2");
-                wordCodes.add("WordCode3");
+                wordCodes.add("WC_ApplicationLead");
+                wordCodes.add("WC_ApplicationUsernameTitle");
+                wordCodes.add("WC_ApplicationPasswordTitle");
+                wordCodes.add("WC_ApplicationLoginButtonTitle");
 
                 HashMap<String, String> translations = new HashMap<>();
-                translations.put(languages.get(0) + "$" + wordCodes.get(0), "ok1");
-                translations.put(languages.get(1) + "$" + wordCodes.get(1), "ok2");
-                translations.put(languages.get(2) + "$" + wordCodes.get(2), "ok3");
+                translations.put(languages.get(0) + "$" + wordCodes.get(0), "Ezen az oldalon lehet bejelentkezni!");
+                translations.put(languages.get(0) + "$" + wordCodes.get(1), "Felhasználónév");
+                translations.put(languages.get(0) + "$" + wordCodes.get(2), "Jelszó");
+                translations.put(languages.get(0) + "$" + wordCodes.get(3), "Bejelentkezés");
+
+                translations.put(languages.get(1) + "$" + wordCodes.get(0), "You can log in on this page!");
+                translations.put(languages.get(1) + "$" + wordCodes.get(1), "Username");
+                translations.put(languages.get(1) + "$" + wordCodes.get(2), "Password");
+                translations.put(languages.get(1) + "$" + wordCodes.get(3), "Login");
+
+                translations.put(languages.get(2) + "$" + wordCodes.get(0), "Auf dieser Seite können Sie sich einloggen!");
+                translations.put(languages.get(2) + "$" + wordCodes.get(1), "Nutzername");
+                translations.put(languages.get(2) + "$" + wordCodes.get(2), "Passwort");
+                translations.put(languages.get(2) + "$" + wordCodes.get(3), "Anmeldung");
 
                 SettingsObject settingsObject = new SettingsObject(
                         "1",
                         "name",
                         UUID.randomUUID(),
-                        "s",
-                        "Bejelentkezés",
+                        "MobileFlexAndroid",
+                        "MobileFlexAndroid",
+                        "Ezen a felületen lehet bejelentkezni!",
                         "1",
-                        "Ezen a felületen lehet bejelentkezni!!!",
                         "1.0",
                         15,
                         "logoImageUrl",
@@ -118,9 +130,9 @@ public class MainActivityPresenter implements IMainActivityPresenter, PresenterT
                         "#FF9A3A2A",
                         "#FFF1EDCA",
                         "#FFFFFFFF",
-                        "FFFF00FF",
-                        "FF00FF00",
-                        "FFFFFFFF",
+                        "#FFFF00FF",
+                        "#FF00FF00",
+                        "#FFFFFFFF",
                         "#FFFFFFFF"
                 );
 
@@ -149,12 +161,15 @@ public class MainActivityPresenter implements IMainActivityPresenter, PresenterT
     }
 
     @Override
-    public void translateTextBySelectedLanguage(int languageID) {
+    public void translateTextBySelectedLanguage(String languageID) {
+        if(hungaryWCPrefFile == null) return;
+        if(englishWCPrefFile == null) return;
+        if(germanWCPrefFile == null) return;
 
         String m;
 
         switch (languageID){
-            case R.drawable.ic_hu2:{
+            case "HU":{
                 if(hungaryWCPrefFile != null){
 
                     m = hungaryWCPrefFile.getStringValueByKey("HU$WC_MessageTextView");
@@ -162,7 +177,7 @@ public class MainActivityPresenter implements IMainActivityPresenter, PresenterT
                 }
                 break;
             }
-            case R.drawable.ic_brit:{
+            case "EN":{
                 if(englishWCPrefFile != null){
 
                     m = englishWCPrefFile.getStringValueByKey("EN$WC_MessageTextView");
@@ -170,7 +185,7 @@ public class MainActivityPresenter implements IMainActivityPresenter, PresenterT
                 }
                 break;
             }
-            case R.drawable.ic_german:{
+            case "DE":{
                 if(germanWCPrefFile != null){
 
                     m = germanWCPrefFile.getStringValueByKey("DE$WC_MessageTextView");
@@ -194,17 +209,18 @@ public class MainActivityPresenter implements IMainActivityPresenter, PresenterT
 
     @SuppressLint("NonConstantResourceId")
     @Override
-    public void saveLanguageToSettingsFile(int languageID) {
-        int oldLanguageID = -1;
+    public void saveLanguageToSettingsFile(String languageID) {
+        if(preferences == null) return;
 
-        if(preferences != null){
-            oldLanguageID = preferences.getInt("CurrentSelectedLanguage");
+        String oldLanguageID = preferences.getStringValueByKey("CurrentSelectedLanguage");
 
-            if(oldLanguageID != -1){
-                if(oldLanguageID != languageID){
-                    preferences.replaceInt("CurrentSelectedLanguage", languageID);
-                }
+        if(oldLanguageID != null){
+            if(!oldLanguageID.equals(languageID)){
+                preferences.replaceString("CurrentSelectedLanguage", languageID);
             }
+        }
+        else {
+            preferences.putString("CurrentSelectedLanguage", languageID);
         }
     }
 
@@ -221,14 +237,32 @@ public class MainActivityPresenter implements IMainActivityPresenter, PresenterT
 
     @Override
     public int getCurrentLanguageFromSettingsFile() {
-        if(preferences == null) return -1;
-        int preferenceLanguage = preferences.getInt("CurrentSelectedLanguage");
+        if(preferences == null) return -2;
+        String preferenceLanguage = preferences.getStringValueByKey("CurrentSelectedLanguage");
         int currentLanguagePosition = -1;
 
-        for (int i = 0; i < languagesImages.length; i++) {
-            if(preferenceLanguage == languagesImages[i]) {
-                currentLanguagePosition = i;
-                break;
+        if(preferenceLanguage != null){
+            for (int i = 0; i < languagesImages.length; i++) {
+                switch (preferenceLanguage){
+                    case "HU":{
+                        for (int j = 0; j < languagesImages.length; j++) {
+                            if(languagesImages[i] == R.drawable.ic_hu2) currentLanguagePosition = i;
+                        }
+                        break;
+                    }
+                    case "EN":{
+                        for (int j = 0; j < languagesImages.length; j++) {
+                            if(languagesImages[i] == R.drawable.ic_brit) currentLanguagePosition = i;
+                        }
+                        break;
+                    }
+                    case "DE":{
+                        for (int j = 0; j < languagesImages.length; j++) {
+                            if(languagesImages[i] == R.drawable.ic_german) currentLanguagePosition = i;
+                        }
+                        break;
+                    }
+                }
             }
         }
 
