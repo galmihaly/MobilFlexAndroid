@@ -7,25 +7,120 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import hu.logcontrol.mobilflexandroid.R;
+import hu.logcontrol.mobilflexandroid.enums.FragmentTypes;
+import hu.logcontrol.mobilflexandroid.enums.WindowSizeTypes;
+import hu.logcontrol.mobilflexandroid.fragments.interfaces.ILoginFragments;
+import hu.logcontrol.mobilflexandroid.fragments.presenters.LoginFragmentsPresenter;
+import hu.logcontrol.mobilflexandroid.helpers.StateChangeHelper;
 
-public class BarcodeFragment extends Fragment {
+public class BarcodeFragment extends Fragment implements ILoginFragments {
 
     private View view;
+    private LoginFragmentsPresenter loginFragmentsPresenter;
 
-    private TextInputEditText loginBarcode;
+    private TextInputLayout loginBarCode1;
+    private TextInputEditText loginBarCode2;
+
+    private Button loginButton;
+    private WindowSizeTypes[] wsc = new WindowSizeTypes[2];
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        view = inflater.inflate(R.layout.fragment_barcode_mobile_portrait, container, false);
+        wsc[0]  = (WindowSizeTypes) getArguments().getSerializable("windowHeightEnum");
+        wsc[1] =  (WindowSizeTypes) getArguments().getSerializable("windowWidthEnum");
 
-        loginBarcode = view.findViewById(R.id.loginBarcode_ET_mobile_portrait);
+        if(wsc[0] != null && wsc[1] != null){
+            if((wsc[0] == WindowSizeTypes.COMPACT && wsc[1] == WindowSizeTypes.MEDIUM) ||
+                    (wsc[0] == WindowSizeTypes.MEDIUM && wsc[1] == WindowSizeTypes.COMPACT)){
+
+                view = inflater.inflate(R.layout.fragment_barcode_mobile, container, false);
+
+                loginBarCode1 = view.findViewById(R.id.loginBarcode_TL_mobile_portrait);
+                loginBarCode2 = view.findViewById(R.id.loginBarcode_ET_mobile_portrait);
+                loginButton = view.findViewById(R.id.barcodeLogBut_mobile_portrait);
+            }
+            else if((wsc[0] == WindowSizeTypes.MEDIUM && wsc[1] == WindowSizeTypes.EXPANDED) ||
+                    (wsc[0] == WindowSizeTypes.EXPANDED && wsc[1] == WindowSizeTypes.MEDIUM)){
+
+                view = inflater.inflate(R.layout.fragment_barcode_tablet, container, false);
+
+                loginBarCode1 = view.findViewById(R.id.loginBarcode_TL_tablet_portrait);
+                loginBarCode2 = view.findViewById(R.id.loginBarcode_ET_tablet_portrait);
+                loginButton = view.findViewById(R.id.barcodeLogBut_tablet_portrait);
+            }
+        }
+
+        initPresenter();
+        initSettingsPreferenceFile();
+        initLanguagesPreferenceFiles();
+        setControlsValuesBySettings();
+        setControlsTextsBySettings();
+        initButtonListeners();
 
         return view;
+    }
+
+    private void initPresenter() {
+        loginFragmentsPresenter = new LoginFragmentsPresenter(this, getContext());
+        loginFragmentsPresenter.initTaskManager();
+    }
+
+    private void initSettingsPreferenceFile() {
+        if(loginFragmentsPresenter == null) return;
+        loginFragmentsPresenter.initSettingsPreferenceFile();
+    }
+
+    private void initLanguagesPreferenceFiles(){
+        if(loginFragmentsPresenter == null) return;
+        loginFragmentsPresenter.initLanguageSharedPreferenceFiles();
+    }
+
+    private void setControlsValuesBySettings() {
+        if(loginFragmentsPresenter == null) return;
+        loginFragmentsPresenter.setControlsValuesBySettings();
+    }
+
+    private void setControlsTextsBySettings() {
+        if(loginFragmentsPresenter == null) return;
+        loginFragmentsPresenter.setControlsTextBySettings(FragmentTypes.BARCODEFRAGMENT);
+    }
+
+    private void initButtonListeners(){
+        if(loginButton == null) return;
+
+        loginButton.setOnClickListener(v -> {
+
+        });
+    }
+
+    @Override
+    public void changeStateUserPassElements(String controlColor, String textColor) {
+        if(loginBarCode1 == null) return;
+        if(loginBarCode2 == null) return;
+
+        StateChangeHelper.changeStateTextInputEditText(loginBarCode1, loginBarCode2, controlColor, textColor);
+    }
+
+    @Override
+    public void changeStateLoginButton(String buttonBackgroundColor, String buttonBackgroundGradientColor, String buttonForeGroundColor, String buttonLabel) {
+        if(buttonBackgroundColor == null) return;
+        if(buttonBackgroundGradientColor == null) return;
+        if(buttonForeGroundColor == null) return;
+        if(loginButton == null) return;
+
+        StateChangeHelper.changeStateLoginButton(loginButton, buttonBackgroundColor, buttonBackgroundGradientColor, buttonForeGroundColor, buttonLabel);
+    }
+
+    @Override
+    public void changeTextInputElemenets(String barCodeText, String changeText) {
+        if(loginBarCode1 == null) return;
+        loginBarCode1.setHint(barCodeText);
     }
 }

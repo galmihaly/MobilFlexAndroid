@@ -26,7 +26,7 @@
             app:layout_constraintTop_toBottomOf="@+id/cl2_mobile_portrait">
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/button_mobile_portrait"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tovább"
@@ -34,6 +34,16 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/constraintLayout3" />
+
+            <Button
+                android:id="@+id/button_mobile_portrait2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tovább"
+                app:layout_constraintBottom_toTopOf="@+id/constraintLayout3"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraintLayout3"

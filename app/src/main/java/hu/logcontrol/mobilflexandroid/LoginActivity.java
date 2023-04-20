@@ -9,11 +9,12 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -86,19 +87,12 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
             Method get = c.getMethod("get", String.class);
 
             serialNumber = (String) get.invoke(c, "gsm.sn1");
-            if (serialNumber.equals(""))
-                serialNumber = (String) get.invoke(c, "ril.serialnumber");
-            if (serialNumber.equals(""))
-                serialNumber = (String) get.invoke(c, "ro.serialno");
-            if (serialNumber.equals(""))
-                serialNumber = (String) get.invoke(c, "sys.serialnumber");
-            if (serialNumber.equals(""))
-                serialNumber = Build.SERIAL;
+            if (serialNumber.equals("")) serialNumber = (String) get.invoke(c, "ril.serialnumber");
+            if (serialNumber.equals("")) serialNumber = (String) get.invoke(c, "ro.serialno");
+            if (serialNumber.equals("")) serialNumber = (String) get.invoke(c, "sys.serialnumber");
+            if (serialNumber.equals("")) serialNumber = null;
 
             Log.e("ser", serialNumber);
-
-            // If none of the methods above worked
-            if (serialNumber.equals("")) serialNumber = null;
         } catch (Exception e) {
             e.printStackTrace();
             serialNumber = null;
@@ -158,6 +152,48 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
 
             applicationLeadTV = findViewById(R.id.applicationLead_mobile_portrait);
             applicationTitleTV = findViewById(R.id.applicationTitle_mobile_portrait);
+
+            changeStateLoginLogo(R.drawable.ic_baseline_album);
+        }
+        else if(wst[0] == WindowSizeTypes.MEDIUM && wst[1] == WindowSizeTypes.COMPACT){
+
+            setContentView(R.layout.login_activity_mobile_landscape);
+            activityCL = findViewById(R.id.activityCL_mobile_landscape);
+            loginTV = findViewById(R.id.loginTV_mobile_landscape);
+            loginLogo = findViewById(R.id.loginLogo_mobile_landscape);
+            llay = findViewById(R.id.logButtonsCL_mobile_landscape);
+            loginModesPager = findViewById(R.id.loginModesCL1_mobile_landscape);
+
+            applicationLeadTV = findViewById(R.id.applicationLead_mobile_landscape);
+            applicationTitleTV = findViewById(R.id.applicationTitle_mobile_landscape);
+
+            changeStateLoginLogo(R.drawable.ic_baseline_album);
+        }
+        else if(wst[0] == WindowSizeTypes.MEDIUM && wst[1] == WindowSizeTypes.EXPANDED){
+
+            setContentView(R.layout.login_activity_tablet_portrait);
+            activityCL = findViewById(R.id.activityCL_tablet_portrait);
+            loginTV = findViewById(R.id.loginTV_tablet_portrait);
+            loginLogo = findViewById(R.id.loginLogo_tablet_portrait);
+            llay = findViewById(R.id.logButtonsCL_tablet_portrait);
+            loginModesPager = findViewById(R.id.loginModes_tablet_portrait);
+
+            applicationLeadTV = findViewById(R.id.applicationLead_tablet_portrait);
+            applicationTitleTV = findViewById(R.id.applicationTitle_tablet_portrait);
+
+            changeStateLoginLogo(R.drawable.ic_baseline_album);
+        }
+        else if(wst[0] == WindowSizeTypes.EXPANDED && wst[1] == WindowSizeTypes.MEDIUM){
+
+            setContentView(R.layout.login_activity_tablet_landscape);
+            activityCL = findViewById(R.id.activityCL_tablet_landscape);
+            loginTV = findViewById(R.id.loginTV_tablet_landscape);
+            loginLogo = findViewById(R.id.loginLogo_tablet_landscape);
+            llay = findViewById(R.id.logButtonsCL_tablet_landscape);
+            loginModesPager = findViewById(R.id.loginModesCL1_tablet_landscape);
+
+            applicationLeadTV = findViewById(R.id.applicationLead_tablet_landscape);
+            applicationTitleTV = findViewById(R.id.applicationTitle_tablet_landscape);
 
             changeStateLoginLogo(R.drawable.ic_baseline_album);
         }
@@ -225,6 +261,15 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
     }
 
     @Override
+    public void changeMobileBarsColors(String statusBarColor, String navigationBarColor){
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(Color.parseColor(statusBarColor));
+        window.setNavigationBarColor(Color.parseColor(navigationBarColor));
+    }
+
+    @Override
     public void sendCreatedButtonsToView(List<ImageButton> createdButtons) {
         if(llay == null) return;
         if(createdButtons == null) return;
@@ -238,6 +283,8 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
                     loginAccAndPassButton = createdButtons.get(i);
                     Fragment fragment = new UserPassFragment();
 
+                    if(wst != null) Helper.sendDisplaySizesToFragments(fragment, wst);
+
                     llay.addView(loginAccAndPassButton);
                     loginModesPagerAdapter.addButtonToList(loginAccAndPassButton);
                     loginModesPagerAdapter.addFragment(fragment);
@@ -248,6 +295,8 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
                 case MessageIdentifiers.BUTTON_PINCODE:{
                     loginPinButton = createdButtons.get(i);
                     Fragment fragment = new PinCodeFragment();
+
+                    if(wst != null) Helper.sendDisplaySizesToFragments(fragment, wst);
 
                     llay.addView(loginPinButton);
                     loginModesPagerAdapter.addButtonToList(loginPinButton);
@@ -260,6 +309,8 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
                     loginRFIDButton = createdButtons.get(i);
                     Fragment fragment = new RFIDFragment();
 
+                    if(wst != null) Helper.sendDisplaySizesToFragments(fragment, wst);
+
                     llay.addView(loginRFIDButton);
                     loginModesPagerAdapter.addButtonToList(loginRFIDButton);
                     loginModesPagerAdapter.addFragment(fragment);
@@ -270,6 +321,8 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
                 case MessageIdentifiers.BUTTON_BARCODE:{
                     loginBarcodeButton = createdButtons.get(i);
                     Fragment fragment = new BarcodeFragment();
+
+                    if(wst != null) Helper.sendDisplaySizesToFragments(fragment, wst);
 
                     llay.addView(loginBarcodeButton);
                     loginModesPagerAdapter.addButtonToList(loginBarcodeButton);

@@ -14,4 +14,5 @@ public interface ILoginActivity {
     void changeStateApplicationLeadTextbox(String applicationDescription, String textColor);
     void changeStateApplicationTitleTextbox(String applicationName, String textColor);
     void sendCreatedButtonsToView(List<ImageButton> createdButtons);
+    void changeMobileBarsColors(String statusBarColor, String navigationBarColor);
 }

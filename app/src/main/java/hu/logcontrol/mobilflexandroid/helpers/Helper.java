@@ -72,11 +72,11 @@ public class Helper {
         }
     }
 
-    public static void sendDisplaySizesToFragments(Fragment fragment, WindowSizeTypes[] windowSizeClasses, FragmentTypes fragmentTypes) {
+    public static void sendDisplaySizesToFragments(Fragment fragment, WindowSizeTypes[] windowSizeClasses) {
         Bundle bundle = new Bundle();
         bundle.putSerializable("windowHeightEnum", windowSizeClasses[0]);
         bundle.putSerializable("windowWidthEnum", windowSizeClasses[1]);
-        bundle.putSerializable("fragmentType", fragmentTypes);
+//        bundle.putSerializable("fragmentType", fragmentTypes);
 
         fragment.setArguments(bundle);
     }

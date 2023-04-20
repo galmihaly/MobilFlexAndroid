@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -30,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     private Spinner languageSelector;
 
     private Button button;
+    private Button button2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +92,12 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
                 mainActivityPresenter.openActivityByEnum(ViewEnums.LOGIN_ACTIVITY);
             });
         }
+
+        if(button2 != null){
+            button2.setOnClickListener(v -> {
+                mainActivityPresenter.openActivityByEnum(ViewEnums.MAIN_ACTIVITY);
+            });
+        }
     }
 
     private void initPresenter() {
@@ -120,25 +126,32 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
             messageTV = findViewById(R.id.messageTV_mobile_portrait);
             languageSelector = findViewById(R.id.languageSelector_mobile_portrait);
 
-            button = findViewById(R.id.button);
+            button = findViewById(R.id.button_mobile_portrait);
+            button2 = findViewById(R.id.button_mobile_portrait2);
         }
         else if(wst[0] == WindowSizeTypes.MEDIUM && wst[1] == WindowSizeTypes.COMPACT){
 
             setContentView(R.layout.main_activity_mobile_landscape);
             messageTV = findViewById(R.id.messageTV_mobile_landscape);
             languageSelector = findViewById(R.id.languageSelector_mobile_landscape);
+
+            button = findViewById(R.id.button_mobile_landscape);
         }
         else if(wst[0] == WindowSizeTypes.MEDIUM && wst[1] == WindowSizeTypes.EXPANDED){
 
             setContentView(R.layout.main_activity_tablet_portrait);
             messageTV = findViewById(R.id.messageTV_tablet_portrait);
             languageSelector = findViewById(R.id.languageSelector_tablet_portrait);
+
+            button = findViewById(R.id.button_tablet_portrait);
         }
         else if(wst[0] == WindowSizeTypes.EXPANDED && wst[1] == WindowSizeTypes.MEDIUM){
 
             setContentView(R.layout.main_activity_tablet_landscape);
             messageTV = findViewById(R.id.messageTV_tablet_landscape);
             languageSelector = findViewById(R.id.languageSelector_tablet_landscape);
+
+            button = findViewById(R.id.button_tablet_landscape);
         }
     }
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */

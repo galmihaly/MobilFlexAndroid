@@ -247,6 +247,7 @@ public class LoginActivityPresenter implements ILoginActivityPresenter, Presente
         if(backgroundColor != null && backgroundGradientColor != null) iLoginActivity.changeStateMainActivityCL(backgroundColor, backgroundGradientColor);
         if(applicationDescription != null && foreGroundColor != null) iLoginActivity.changeStateApplicationLeadTextbox(applicationDescription, foreGroundColor);
         if(applicationName != null && foreGroundColor != null) iLoginActivity.changeStateApplicationTitleTextbox(applicationName, foreGroundColor);
+        if(backgroundColor != null) iLoginActivity.changeMobileBarsColors(backgroundColor, backgroundGradientColor);
 
     }
 

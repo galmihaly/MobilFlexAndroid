@@ -91,23 +91,35 @@ public class MainActivityPresenter implements IMainActivityPresenter, PresenterT
                 wordCodes.add("WC_ApplicationLead");
                 wordCodes.add("WC_ApplicationUsernameTitle");
                 wordCodes.add("WC_ApplicationPasswordTitle");
+                wordCodes.add("WC_ApplicationBarCodeTitle");
+                wordCodes.add("WC_ApplicationPinCodeTitle");
+                wordCodes.add("WC_ApplicationRFIDTitle");
                 wordCodes.add("WC_ApplicationLoginButtonTitle");
 
                 HashMap<String, String> translations = new HashMap<>();
                 translations.put(languages.get(0) + "$" + wordCodes.get(0), "Ezen az oldalon lehet bejelentkezni!");
                 translations.put(languages.get(0) + "$" + wordCodes.get(1), "Felhasználónév");
                 translations.put(languages.get(0) + "$" + wordCodes.get(2), "Jelszó");
-                translations.put(languages.get(0) + "$" + wordCodes.get(3), "Bejelentkezés");
+                translations.put(languages.get(0) + "$" + wordCodes.get(3), "Vonalkód");
+                translations.put(languages.get(0) + "$" + wordCodes.get(4), "PINkód");
+                translations.put(languages.get(0) + "$" + wordCodes.get(5), "RFID");
+                translations.put(languages.get(0) + "$" + wordCodes.get(6), "Bejelentkezés");
 
                 translations.put(languages.get(1) + "$" + wordCodes.get(0), "You can log in on this page!");
                 translations.put(languages.get(1) + "$" + wordCodes.get(1), "Username");
                 translations.put(languages.get(1) + "$" + wordCodes.get(2), "Password");
-                translations.put(languages.get(1) + "$" + wordCodes.get(3), "Login");
+                translations.put(languages.get(1) + "$" + wordCodes.get(3), "Barcode");
+                translations.put(languages.get(1) + "$" + wordCodes.get(4), "PINcode");
+                translations.put(languages.get(1) + "$" + wordCodes.get(5), "RFID");
+                translations.put(languages.get(1) + "$" + wordCodes.get(6), "Login");
 
                 translations.put(languages.get(2) + "$" + wordCodes.get(0), "Auf dieser Seite können Sie sich einloggen!");
                 translations.put(languages.get(2) + "$" + wordCodes.get(1), "Nutzername");
                 translations.put(languages.get(2) + "$" + wordCodes.get(2), "Passwort");
-                translations.put(languages.get(2) + "$" + wordCodes.get(3), "Anmeldung");
+                translations.put(languages.get(2) + "$" + wordCodes.get(3), "Strichkode");
+                translations.put(languages.get(2) + "$" + wordCodes.get(4), "Geheimzahl");
+                translations.put(languages.get(2) + "$" + wordCodes.get(5), "RFID");
+                translations.put(languages.get(2) + "$" + wordCodes.get(6), "Anmeldung");
 
                 SettingsObject settingsObject = new SettingsObject(
                         "1",
@@ -134,6 +146,79 @@ public class MainActivityPresenter implements IMainActivityPresenter, PresenterT
                         "#FF00FF00",
                         "#FFFFFFFF",
                         "#FFFFFFFF"
+                );
+
+                intent.putExtra("settingsObject", settingsObject);
+
+                break;
+            }
+            case MAIN_ACTIVITY:{
+                intent = new Intent(context, LoginActivity.class);
+
+                List<String> languages = new ArrayList<>();
+                languages.add("HU");
+                languages.add("EN");
+                languages.add("DE");
+
+                List<String> wordCodes = new ArrayList<>();
+                wordCodes.add("WC_ApplicationLead");
+                wordCodes.add("WC_ApplicationUsernameTitle");
+                wordCodes.add("WC_ApplicationPasswordTitle");
+                wordCodes.add("WC_ApplicationBarCodeTitle");
+                wordCodes.add("WC_ApplicationPinCodeTitle");
+                wordCodes.add("WC_ApplicationRFIDTitle");
+                wordCodes.add("WC_ApplicationLoginButtonTitle");
+
+                HashMap<String, String> translations = new HashMap<>();
+                translations.put(languages.get(0) + "$" + wordCodes.get(0), "Ezen az oldalon lehet bejelentkezni!");
+                translations.put(languages.get(0) + "$" + wordCodes.get(1), "Felhasználónév");
+                translations.put(languages.get(0) + "$" + wordCodes.get(2), "Jelszó");
+                translations.put(languages.get(0) + "$" + wordCodes.get(3), "Vonalkód");
+                translations.put(languages.get(0) + "$" + wordCodes.get(4), "PINkód");
+                translations.put(languages.get(0) + "$" + wordCodes.get(5), "RFID");
+                translations.put(languages.get(0) + "$" + wordCodes.get(6), "Bejelentkezés");
+
+                translations.put(languages.get(1) + "$" + wordCodes.get(0), "You can log in on this page!");
+                translations.put(languages.get(1) + "$" + wordCodes.get(1), "Username");
+                translations.put(languages.get(1) + "$" + wordCodes.get(2), "Password");
+                translations.put(languages.get(1) + "$" + wordCodes.get(3), "Barcode");
+                translations.put(languages.get(1) + "$" + wordCodes.get(4), "PINcode");
+                translations.put(languages.get(1) + "$" + wordCodes.get(5), "RFID");
+                translations.put(languages.get(1) + "$" + wordCodes.get(6), "Login");
+
+                translations.put(languages.get(2) + "$" + wordCodes.get(0), "Auf dieser Seite können Sie sich einloggen!");
+                translations.put(languages.get(2) + "$" + wordCodes.get(1), "Nutzername");
+                translations.put(languages.get(2) + "$" + wordCodes.get(2), "Passwort");
+                translations.put(languages.get(2) + "$" + wordCodes.get(3), "Strichkode");
+                translations.put(languages.get(2) + "$" + wordCodes.get(4), "Geheimzahl");
+                translations.put(languages.get(2) + "$" + wordCodes.get(5), "RFID");
+                translations.put(languages.get(2) + "$" + wordCodes.get(6), "Anmeldung");
+
+                SettingsObject settingsObject = new SettingsObject(
+                        "1",
+                        "name",
+                        UUID.randomUUID(),
+                        "MobileFlexAndroid",
+                        "MobileFlexAndroid",
+                        "Ezen a felületen lehet bejelentkezni!",
+                        "1",
+                        "1.0",
+                        15,
+                        "logoImageUrl",
+                        "loginWebApiUrl",
+                        "mainWebApiUrl",
+                        "settingsWebApiUrl",
+                        "helpWebApiUrl",
+                        languages,
+                        wordCodes,
+                        translations,
+                        "#FF66CA9B",
+                        "#FFEAD261",
+                        "#FF000000",
+                        "#FF3087D8",
+                        "#FFC4F6F7",
+                        "#FF000000",
+                        "#FF000000"
                 );
 
                 intent.putExtra("settingsObject", settingsObject);
@@ -170,27 +255,18 @@ public class MainActivityPresenter implements IMainActivityPresenter, PresenterT
 
         switch (languageID){
             case "HU":{
-                if(hungaryWCPrefFile != null){
-
-                    m = hungaryWCPrefFile.getStringValueByKey("HU$WC_MessageTextView");
-                    if(m != null) iMainActivity.setTextToMessageTV(m);
-                }
+                m = hungaryWCPrefFile.getStringValueByKey("HU$WC_MessageTextView");
+                if(m != null) iMainActivity.setTextToMessageTV(m);
                 break;
             }
             case "EN":{
-                if(englishWCPrefFile != null){
-
-                    m = englishWCPrefFile.getStringValueByKey("EN$WC_MessageTextView");
-                    if(m != null) iMainActivity.setTextToMessageTV(m);
-                }
+                m = englishWCPrefFile.getStringValueByKey("EN$WC_MessageTextView");
+                if(m != null) iMainActivity.setTextToMessageTV(m);
                 break;
             }
             case "DE":{
-                if(germanWCPrefFile != null){
-
-                    m = germanWCPrefFile.getStringValueByKey("DE$WC_MessageTextView");
-                    if(m != null) iMainActivity.setTextToMessageTV(m);
-                }
+                m = germanWCPrefFile.getStringValueByKey("DE$WC_MessageTextView");
+                if(m != null) iMainActivity.setTextToMessageTV(m);
                 break;
             }
         }
