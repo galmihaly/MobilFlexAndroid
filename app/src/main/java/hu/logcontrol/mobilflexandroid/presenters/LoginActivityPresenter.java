@@ -134,74 +134,76 @@ public class LoginActivityPresenter implements ILoginActivityPresenter, Presente
         if(englishWCPrefFile == null) return;
         if(germanWCPrefFile == null) return;
 
-        SettingsObject s = (SettingsObject) intent.getSerializableExtra("settingsObject");
+        s = (SettingsObject) intent.getSerializableExtra("settingsObject");
 
-        preferences.replaceString("deviceIdentifier", s.getDeviceIdentifier());
-        preferences.replaceString("deviceName", s.getDeviceName());
-        preferences.replaceString("applicationIdentifier", s.getApplicationIdentifier().toString());
-        preferences.replaceString("applicationName", s.getApplicationName());
-        preferences.replaceString("applicationTitle", s.getApplicationTitle());
-        preferences.replaceString("applicationLead", s.getApplicationLead());
-        preferences.replaceString("applicationDescription", s.getApplicationDescription());
-        preferences.replaceString("applicationVersion", s.getApplicationVersion());
-        preferences.replaceInt("applicationEnabledLoginFlag", s.getApplicationEnabledLoginFlag());
-        preferences.replaceString("logoImageUrl", s.getLogoImageUrl());
-        preferences.replaceString("loginWebApiUrl", s.getLoginWebApiUrl());
-        preferences.replaceString("mainWebApiUrl", s.getMainWebApiUrl());
-        preferences.replaceString("settingsWebApiUrl", s.getSettingsWebApiUrl());
-        preferences.replaceString("helpWebApiUrl", s.getHelpWebApiUrl());
-        preferences.replaceString("backgroundColor", s.getBackgroundColor());
-        preferences.replaceString("backgroundGradientColor", s.getBackgroundGradientColor());
-        preferences.replaceString("foregroundColor", s.getForegroundColor());
-        preferences.replaceString("buttonBackgroundColor", s.getButtonBackgroundColor());
-        preferences.replaceString("buttonBackgroundGradientColor", s.getButtonBackgroundGradientColor());
-        preferences.replaceString("buttonForegroundColor", s.getForegroundColor());
-        preferences.replaceString("controlColor", s.getControlColor());
+        if(s != null) {
+            preferences.replaceString("deviceIdentifier", s.getDeviceIdentifier());
+            preferences.replaceString("deviceName", s.getDeviceName());
+            preferences.replaceString("applicationIdentifier", s.getApplicationIdentifier().toString());
+            preferences.replaceString("applicationName", s.getApplicationName());
+            preferences.replaceString("applicationTitle", s.getApplicationTitle());
+            preferences.replaceString("applicationLead", s.getApplicationLead());
+            preferences.replaceString("applicationDescription", s.getApplicationDescription());
+            preferences.replaceString("applicationVersion", s.getApplicationVersion());
+            preferences.replaceInt("applicationEnabledLoginFlag", s.getApplicationEnabledLoginFlag());
+            preferences.replaceString("logoImageUrl", s.getLogoImageUrl());
+            preferences.replaceString("loginWebApiUrl", s.getLoginWebApiUrl());
+            preferences.replaceString("mainWebApiUrl", s.getMainWebApiUrl());
+            preferences.replaceString("settingsWebApiUrl", s.getSettingsWebApiUrl());
+            preferences.replaceString("helpWebApiUrl", s.getHelpWebApiUrl());
+            preferences.replaceString("backgroundColor", s.getBackgroundColor());
+            preferences.replaceString("backgroundGradientColor", s.getBackgroundGradientColor());
+            preferences.replaceString("foregroundColor", s.getForegroundColor());
+            preferences.replaceString("buttonBackgroundColor", s.getButtonBackgroundColor());
+            preferences.replaceString("buttonBackgroundGradientColor", s.getButtonBackgroundGradientColor());
+            preferences.replaceString("buttonForegroundColor", s.getForegroundColor());
+            preferences.replaceString("controlColor", s.getControlColor());
 
-        Log.e("deviceIdentifier", preferences.getStringValueByKey("deviceIdentifier"));
-        Log.e("deviceName", preferences.getStringValueByKey("deviceName"));
-        Log.e("applicationIdentifier", preferences.getStringValueByKey("applicationIdentifier"));
-        Log.e("applicationName", preferences.getStringValueByKey("applicationName"));
-        Log.e("applicationTitle", preferences.getStringValueByKey("applicationTitle"));
-        Log.e("applicationLead", preferences.getStringValueByKey("applicationLead"));
-        Log.e("applicationDescription", preferences.getStringValueByKey("applicationDescription"));
-        Log.e("applicationVersion", preferences.getStringValueByKey("applicationVersion"));
-        Log.e("applicationEnabledLoginFlag", preferences.getStringValueByKey("applicationEnabledLoginFlag"));
-        Log.e("logoImageUrl", preferences.getStringValueByKey("logoImageUrl"));
-        Log.e("loginWebApiUrl", preferences.getStringValueByKey("loginWebApiUrl"));
-        Log.e("mainWebApiUrl", preferences.getStringValueByKey("mainWebApiUrl"));
-        Log.e("settingsWebApiUrl", preferences.getStringValueByKey("settingsWebApiUrl"));
-        Log.e("helpWebApiUrl", preferences.getStringValueByKey("helpWebApiUrl"));
+            Log.e("deviceIdentifier", preferences.getStringValueByKey("deviceIdentifier"));
+            Log.e("deviceName", preferences.getStringValueByKey("deviceName"));
+            Log.e("applicationIdentifier", preferences.getStringValueByKey("applicationIdentifier"));
+            Log.e("applicationName", preferences.getStringValueByKey("applicationName"));
+            Log.e("applicationTitle", preferences.getStringValueByKey("applicationTitle"));
+            Log.e("applicationLead", preferences.getStringValueByKey("applicationLead"));
+            Log.e("applicationDescription", preferences.getStringValueByKey("applicationDescription"));
+            Log.e("applicationVersion", preferences.getStringValueByKey("applicationVersion"));
+            Log.e("applicationEnabledLoginFlag", preferences.getStringValueByKey("applicationEnabledLoginFlag"));
+            Log.e("logoImageUrl", preferences.getStringValueByKey("logoImageUrl"));
+            Log.e("loginWebApiUrl", preferences.getStringValueByKey("loginWebApiUrl"));
+            Log.e("mainWebApiUrl", preferences.getStringValueByKey("mainWebApiUrl"));
+            Log.e("settingsWebApiUrl", preferences.getStringValueByKey("settingsWebApiUrl"));
+            Log.e("helpWebApiUrl", preferences.getStringValueByKey("helpWebApiUrl"));
 
-        List<String> languages = s.getLanguages();
-        List<String> wordCodes = s.getWordCodes();
+            List<String> languages = s.getLanguages();
+            List<String> wordCodes = s.getWordCodes();
 
-        HashMap<String, String> translations = s.getTranslations();
+            HashMap<String, String> translations = s.getTranslations();
 
-        Log.e("backgroundColor", preferences.getStringValueByKey("backgroundColor"));
-        Log.e("backgroundGradientColor", preferences.getStringValueByKey("backgroundGradientColor"));
-        Log.e("foregroundColor", preferences.getStringValueByKey("foregroundColor"));
-        Log.e("buttonBackgroundColor", preferences.getStringValueByKey("buttonBackgroundColor"));
-        Log.e("buttonBackgroundGradientColor", preferences.getStringValueByKey("buttonBackgroundGradientColor"));
-        Log.e("buttonForegroundColor", preferences.getStringValueByKey("buttonForegroundColor"));
-        Log.e("controlColor", preferences.getStringValueByKey("controlColor"));
+            Log.e("backgroundColor", preferences.getStringValueByKey("backgroundColor"));
+            Log.e("backgroundGradientColor", preferences.getStringValueByKey("backgroundGradientColor"));
+            Log.e("foregroundColor", preferences.getStringValueByKey("foregroundColor"));
+            Log.e("buttonBackgroundColor", preferences.getStringValueByKey("buttonBackgroundColor"));
+            Log.e("buttonBackgroundGradientColor", preferences.getStringValueByKey("buttonBackgroundGradientColor"));
+            Log.e("buttonForegroundColor", preferences.getStringValueByKey("buttonForegroundColor"));
+            Log.e("controlColor", preferences.getStringValueByKey("controlColor"));
 
-        for (int i = 0; i < languages.size(); i++) {
-            Log.e("languages", languages.get(i));
-        }
+            for (int i = 0; i < languages.size(); i++) {
+                Log.e("languages", languages.get(i));
+            }
 
-        for (int i = 0; i < wordCodes.size(); i++) {
-            Log.e("wordCodes", wordCodes.get(i));
-        }
+            for (int i = 0; i < wordCodes.size(); i++) {
+                Log.e("wordCodes", wordCodes.get(i));
+            }
 
-        for (Map.Entry<String, String> entry : translations.entrySet()){
+            for (Map.Entry<String, String> entry : translations.entrySet()){
 
-            String language = entry.getKey().split("\\$")[0];
+                String language = entry.getKey().split("\\$")[0];
 
-            switch (language){
-                case "HU":{ hungaryWCPrefFile.putString(entry.getKey(), entry.getValue()); break; }
-                case "EN":{ englishWCPrefFile.putString(entry.getKey(), entry.getValue()); break; }
-                case "DE":{ germanWCPrefFile.putString(entry.getKey(), entry.getValue()); break; }
+                switch (language){
+                    case "HU":{ hungaryWCPrefFile.putString(entry.getKey(), entry.getValue()); break; }
+                    case "EN":{ englishWCPrefFile.putString(entry.getKey(), entry.getValue()); break; }
+                    case "DE":{ germanWCPrefFile.putString(entry.getKey(), entry.getValue()); break; }
+                }
             }
         }
     }

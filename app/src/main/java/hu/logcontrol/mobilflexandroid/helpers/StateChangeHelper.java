@@ -4,6 +4,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -23,6 +24,18 @@ public class StateChangeHelper {
         button.setTextColor(Color.parseColor(buttonForeGroundColor));
         button.setText(buttonLabel);
         button.setBackground(g);
+    }
+
+    public static void changeStateLogoutButton(ImageButton logoutBut, String buttonBackgroundColor, String buttonBackgroundGradientColor) {
+        if(logoutBut == null) return;
+        if(buttonBackgroundColor == null) return;
+        if(buttonBackgroundGradientColor == null) return;
+
+        int[] colors = {Color.parseColor(buttonBackgroundColor),Color.parseColor(buttonBackgroundGradientColor)};
+        GradientDrawable g = new GradientDrawable(GradientDrawable.Orientation.RIGHT_LEFT, colors);
+        g.setCornerRadius(20);
+
+        logoutBut.setBackground(g);
     }
 
     public static void changeStateTextInputEditText(TextInputLayout til1, TextInputEditText tiet1, String controlColor, String textColor) {

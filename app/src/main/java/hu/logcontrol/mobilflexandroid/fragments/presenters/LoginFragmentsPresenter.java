@@ -1,6 +1,7 @@
 package hu.logcontrol.mobilflexandroid.fragments.presenters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -11,9 +12,16 @@ import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
+import hu.logcontrol.mobilflexandroid.LoginActivity;
+import hu.logcontrol.mobilflexandroid.WebViewActivity;
 import hu.logcontrol.mobilflexandroid.enums.FragmentTypes;
 import hu.logcontrol.mobilflexandroid.enums.MessageIdentifiers;
+import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
 import hu.logcontrol.mobilflexandroid.fragments.interfaces.ILoginFragmentsPresenter;
 import hu.logcontrol.mobilflexandroid.fragments.interfaces.ILoginFragments;
 import hu.logcontrol.mobilflexandroid.logger.ApplicationLogger;
@@ -150,6 +158,25 @@ public class LoginFragmentsPresenter implements ILoginFragmentsPresenter, Presen
         if(rfidTextlabel != null) { iLoginFragments.changeTextInputElemenets(rfidTextlabel, null); }
         if(barcodeTextLabel != null) { iLoginFragments.changeTextInputElemenets(barcodeTextLabel, null); }
         if(pincodeTextLabel != null) { iLoginFragments.changeTextInputElemenets(pincodeTextLabel, null); }
+
+    }
+
+    @Override
+    public void openActivityByEnum(ViewEnums viewEnum) {
+        if(viewEnum == null) return;
+        if(iLoginFragments == null) return;
+
+        Intent intent = null;
+
+        switch (viewEnum){
+            case WEBVIEW_ACTIVITY:{
+                intent = new Intent(context, WebViewActivity.class);
+                break;
+            }
+        }
+
+        if(intent == null) return;
+        if(iLoginFragments != null) iLoginFragments.openViewByIntent(intent);
 
     }
 

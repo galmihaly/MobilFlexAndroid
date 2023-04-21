@@ -1,5 +1,6 @@
 package hu.logcontrol.mobilflexandroid.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -14,6 +15,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import hu.logcontrol.mobilflexandroid.R;
 import hu.logcontrol.mobilflexandroid.enums.FragmentTypes;
+import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
 import hu.logcontrol.mobilflexandroid.enums.WindowSizeTypes;
 import hu.logcontrol.mobilflexandroid.fragments.interfaces.ILoginFragments;
 import hu.logcontrol.mobilflexandroid.fragments.presenters.LoginFragmentsPresenter;
@@ -94,10 +96,8 @@ public class BarcodeFragment extends Fragment implements ILoginFragments {
 
     private void initButtonListeners(){
         if(loginButton == null) return;
-
-        loginButton.setOnClickListener(v -> {
-
-        });
+        if(loginFragmentsPresenter == null) return;
+        loginButton.setOnClickListener(v -> { loginFragmentsPresenter.openActivityByEnum(ViewEnums.WEBVIEW_ACTIVITY); });
     }
 
     @Override
@@ -122,5 +122,10 @@ public class BarcodeFragment extends Fragment implements ILoginFragments {
     public void changeTextInputElemenets(String barCodeText, String changeText) {
         if(loginBarCode1 == null) return;
         loginBarCode1.setHint(barCodeText);
+    }
+
+    @Override
+    public void openViewByIntent(Intent intent) {
+        startActivity(intent);
     }
 }
