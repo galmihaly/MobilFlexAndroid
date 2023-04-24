@@ -25,4 +25,5 @@ public class MessageIdentifiers {
 
     //ERROR identifiers
     public static final int EXCEPTION = -2;
+    public static final int HARDWARE_ID_FAILED = -3;
 }
