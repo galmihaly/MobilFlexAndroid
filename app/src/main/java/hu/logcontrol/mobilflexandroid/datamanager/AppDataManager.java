@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 
 import java.lang.ref.WeakReference;
 
@@ -168,7 +167,7 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
     /* IAppDataManager interfész függvénye */
     @Override
-    public void sendResultToPresenter(String resultMessage) {
+    public void sendResultFromWebAPICallingTask(String resultMessage) {
         if(resultMessage == null) return;
         if(iMainActivityPresenter == null) return;
 
@@ -190,7 +189,7 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
 
             switch (msg.what) {
                 case MessageIdentifiers.HARDWARE_ID_FAILED:{
-                    iAppDataManagerHandler.get().sendResultToPresenter(getWeakReferenceNotification(msg));
+                    iAppDataManagerHandler.get().sendResultFromWebAPICallingTask(getWeakReferenceNotification(msg));
                     break;
                 }
             }

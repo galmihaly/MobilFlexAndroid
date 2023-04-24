@@ -127,6 +127,6 @@ public class MainActivityPresenter implements IMainActivityPresenter {
     @Override
     public void sendResultToPresenter(String resultMessage) {
         if(resultMessage == null) return;
-        Log.e("sendResultToPresenter", resultMessage);
+        Log.e("sendResultFromWebAPICallingTask", resultMessage);
     }
 }
