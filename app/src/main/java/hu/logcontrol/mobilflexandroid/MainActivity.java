@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         super.onCreate(savedInstanceState);
         initView();
         initPresenter();
+        initAppDataManager();
         initSettingsPreferenceFile();
         initLanguagesSpinner();
         initFunctions();
@@ -44,13 +45,17 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
     /* SettingsActivity fügvényei */
 
+    private void initAppDataManager() {
+        if(mainActivityPresenter == null) return;
+        mainActivityPresenter.initAppDataManager();
+    }
+
     private void initLanguagesSpinner() {
         if(languageSelector != null) {
 
             LanguagesSpinnerAdapter adapter = mainActivityPresenter.getSpinnerAdapter();
 
             languageSelector.setAdapter(adapter);
-            mainActivityPresenter.initPublicSharedPreferenceFiles();
 
             int currentLanguage = mainActivityPresenter.getCurrentLanguageFromSettingsFile();
             if(currentLanguage != -1) languageSelector.setSelection(currentLanguage);
@@ -107,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
 
     private void initSettingsPreferenceFile() {
         if(mainActivityPresenter != null) {
-            mainActivityPresenter.initSettingsPreferenceFile();
+//            mainActivityPresenter.initSettingsPreferenceFile();
         }
     }
 

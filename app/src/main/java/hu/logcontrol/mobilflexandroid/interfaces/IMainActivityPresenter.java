@@ -8,8 +8,9 @@ public interface IMainActivityPresenter {
     void openActivityByEnum(ViewEnums viewEnum);
     LanguagesSpinnerAdapter getSpinnerAdapter();
     void translateTextBySelectedLanguage(String languageID);
-    void initPublicSharedPreferenceFiles();
+//    void initPublicSharedPreferenceFiles();
     void saveLanguageToSettingsFile(String languageID);
-    void initSettingsPreferenceFile();
+//    void initSettingsPreferenceFile();
     int getCurrentLanguageFromSettingsFile();
+    void initAppDataManager();
 }
