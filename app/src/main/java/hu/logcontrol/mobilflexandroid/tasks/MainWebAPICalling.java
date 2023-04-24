@@ -63,7 +63,7 @@ public class MainWebAPICalling implements Callable {
                 break;
             }
             case HARDWARE_ID_FAILED:{
-                message = Helper.createMessage(MessageIdentifiers.HARDWARE_ID_FAILED, "Eszköz azonosítójának lekérdezése során hiba keletkezett!");
+                message = Helper.createMessage(MessageIdentifiers.THREAD_INTERRUPTED, "Eszköz azonosítójának lekérdezése során hiba keletkezett!");
                 break;
             }
         }

@@ -188,7 +188,8 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
             super.handleMessage(msg);
 
             switch (msg.what) {
-                case MessageIdentifiers.HARDWARE_ID_FAILED:{
+                case MessageIdentifiers.HARDWARE_ID_FAILED:
+                case MessageIdentifiers.THREAD_INTERRUPTED: {
                     iAppDataManagerHandler.get().sendResultFromWebAPICallingTask(getWeakReferenceNotification(msg));
                     break;
                 }
