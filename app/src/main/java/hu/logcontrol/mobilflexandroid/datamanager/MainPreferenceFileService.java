@@ -1,6 +1,7 @@
 package hu.logcontrol.mobilflexandroid.datamanager;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
@@ -21,14 +22,17 @@ public class MainPreferenceFileService {
     private LanguagesSharedPreferences hungaryWCPrefFile;
     private LanguagesSharedPreferences germanWCPrefFile;
     private LanguagesSharedPreferences englishWCPrefFile;
+    private LocalEncryptedPreferences preferences;
+
+    private String serviceHungaryFileName;
+    private String serviceEnglsihFileName;
+    private String serviceGermanFileName;
 
     private static final int[] languagesFlags = new int[] {
             R.drawable.ic_hu2,
             R.drawable.ic_brit,
             R.drawable.ic_german
     };
-
-    private LocalEncryptedPreferences preferences;
 
     private Context context;
 
@@ -37,9 +41,13 @@ public class MainPreferenceFileService {
     }
 
     public void initPublicSharedPreferenceFiles(String hungaryFileName, String englsihFileName, String germanFileName) {
-        hungaryWCPrefFile = new LanguagesSharedPreferences(context, hungaryFileName);
-        englishWCPrefFile = new LanguagesSharedPreferences(context, englsihFileName);
-        germanWCPrefFile = new LanguagesSharedPreferences(context, germanFileName);
+        this.hungaryWCPrefFile = new LanguagesSharedPreferences(context, hungaryFileName);
+        this.englishWCPrefFile = new LanguagesSharedPreferences(context, englsihFileName);
+        this.germanWCPrefFile = new LanguagesSharedPreferences(context, germanFileName);
+
+        this.serviceHungaryFileName = hungaryFileName;
+        this.serviceEnglsihFileName = englsihFileName;
+        this.serviceGermanFileName = germanFileName;
 
         hungaryWCPrefFile.putString("HU$WC_MessageTextView", "Üzenet");
         englishWCPrefFile.putString("EN$WC_MessageTextView", "Message");
@@ -47,7 +55,7 @@ public class MainPreferenceFileService {
     }
 
     public void initSettingsPreferenceFile(String encryptedFileName) {
-        preferences = LocalEncryptedPreferences.getInstance(
+        this.preferences = LocalEncryptedPreferences.getInstance(
                 encryptedFileName,
                 MasterKeys.AES256_GCM_SPEC,
                 context,
@@ -130,20 +138,26 @@ public class MainPreferenceFileService {
         if(preferences == null) return;
         if(prefStringKey == null) return;
         if(languageID == null) return;
+
         preferences.replaceString(prefStringKey, languageID);
     }
 
-    public String getValueFromLanguageFile(RepositoryType type, String prefStringKey){
-        if(type == null) return null;
+    public String getValueFromLanguageFile(String fileName, String prefStringKey){
         if(prefStringKey == null) return null;
+
+        if(hungaryWCPrefFile == null) return null;
+        if(englishWCPrefFile == null) return null;
+        if(germanWCPrefFile == null) return null;
+
+        if(serviceHungaryFileName == null) return null;
+        if(serviceEnglsihFileName == null) return null;
+        if(serviceGermanFileName == null) return null;
 
         String result = null;
 
-        switch (type){
-            case HUNGARY_PREFERENCES_FILE:{ result = hungaryWCPrefFile.getStringValueByKey(prefStringKey); break; }
-            case ENGLISH_PREFERENCES_FILE:{ result = englishWCPrefFile.getStringValueByKey(prefStringKey); break; }
-            case GERMAN_PREFERENCES_FILE:{ result = germanWCPrefFile.getStringValueByKey(prefStringKey); break; }
-        }
+        if(fileName.equals(serviceHungaryFileName)) result = hungaryWCPrefFile.getStringValueByKey(prefStringKey);
+        if(fileName.equals(serviceEnglsihFileName)) result =englishWCPrefFile.getStringValueByKey(prefStringKey);
+        if(fileName.equals(serviceGermanFileName)) result = germanWCPrefFile.getStringValueByKey(prefStringKey);
 
         if(result == null) return null;
         return result;

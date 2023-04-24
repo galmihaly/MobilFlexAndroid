@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -29,7 +30,6 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     private Spinner languageSelector;
 
     private Button button;
-    private Button button2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         initView();
         initPresenter();
         initAppDataManager();
-        initSettingsPreferenceFile();
+
         initLanguagesSpinner();
         initFunctions();
     }
@@ -94,27 +94,15 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     private void initFunctions() {
         if(button != null){
             button.setOnClickListener(v -> {
-                mainActivityPresenter.openActivityByEnum(ViewEnums.LOGIN_ACTIVITY);
-            });
-        }
-
-        if(button2 != null){
-            button2.setOnClickListener(v -> {
-                mainActivityPresenter.openActivityByEnum(ViewEnums.MAIN_ACTIVITY);
+                mainActivityPresenter.startProgram();
             });
         }
     }
 
     private void initPresenter() {
         mainActivityPresenter = new MainActivityPresenter(this, getApplicationContext());
-        mainActivityPresenter.initTaskManager();
     }
 
-    private void initSettingsPreferenceFile() {
-        if(mainActivityPresenter != null) {
-//            mainActivityPresenter.initSettingsPreferenceFile();
-        }
-    }
 
     void initView(){
         WindowSizeTypes[] wst = Helper.getWindowSizes(this);
@@ -132,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
             languageSelector = findViewById(R.id.languageSelector_mobile_portrait);
 
             button = findViewById(R.id.button_mobile_portrait);
-            button2 = findViewById(R.id.button_mobile_portrait2);
         }
         else if(wst[0] == WindowSizeTypes.MEDIUM && wst[1] == WindowSizeTypes.COMPACT){
 

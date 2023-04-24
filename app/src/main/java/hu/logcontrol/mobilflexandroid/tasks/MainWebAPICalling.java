@@ -44,28 +44,24 @@ public class MainWebAPICalling implements Callable {
 
             if (Thread.interrupted()) throw new InterruptedException();
 
+            Log.e("Callable", "Callable");
 
-
-
-            if(ctpmw != null && ctpmw.get() != null && message != null) {
-                ctpmw.get().sendResultToPresenter(message);
-            }
+            sendMessageToPresenterHandler(MainWebAPICallingEnums.HARDWARE_ID_FAILED);
 
         } catch (Exception e){
-            savingGlobalMessageHandling(-2, e.getMessage());
+            sendMessageToPresenterHandler(MainWebAPICallingEnums.THREAD_INTERRUPTED);
         }
 
         return null;
     }
 
-    private void savingGlobalMessageHandling(int messageID, String exceptionMessage) {
-        switch (messageID){
-        }
-    }
-
     private void sendMessageToPresenterHandler(MainWebAPICallingEnums e){
 
         switch (e){
+            case THREAD_INTERRUPTED:{
+                message = Helper.createMessage(MessageIdentifiers.HARDWARE_ID_FAILED, "A szál létrehozása során hiba kelettkezett!");
+                break;
+            }
             case HARDWARE_ID_FAILED:{
                 message = Helper.createMessage(MessageIdentifiers.HARDWARE_ID_FAILED, "Eszköz azonosítójának lekérdezése során hiba keletkezett!");
                 break;
@@ -78,6 +74,7 @@ public class MainWebAPICalling implements Callable {
     }
 
     private enum MainWebAPICallingEnums{
+        THREAD_INTERRUPTED,
         HARDWARE_ID_FAILED,
     }
 }
