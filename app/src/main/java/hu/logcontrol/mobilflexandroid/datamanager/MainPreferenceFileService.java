@@ -64,113 +64,101 @@ public class MainPreferenceFileService {
         );
     }
 
-    public SettingsObject initSettinsObject(){
-        List<String> languages = new ArrayList<>();
-        languages.add("HU");
-        languages.add("EN");
-        languages.add("DE");
+//    public void saveValueToEncryptedPrefFile(String prefStringKey, String languageID) {
+//        if(preferences == null) return;
+//        if(prefStringKey == null) return;
+//        if(languageID == null) return;
+//
+//        preferences.replaceString(prefStringKey, languageID);
+//    }
 
-        List<String> wordCodes = new ArrayList<>();
-        wordCodes.add("WC_ApplicationLead");
-        wordCodes.add("WC_ApplicationUsernameTitle");
-        wordCodes.add("WC_ApplicationPasswordTitle");
-        wordCodes.add("WC_ApplicationBarCodeTitle");
-        wordCodes.add("WC_ApplicationPinCodeTitle");
-        wordCodes.add("WC_ApplicationRFIDTitle");
-        wordCodes.add("WC_ApplicationLoginButtonTitle");
+//    public String getValueFromLanguageFile(String fileName, String prefStringKey){
+//        if(prefStringKey == null) return null;
+//
+//        if(hungaryWCPrefFile == null) return null;
+//        if(englishWCPrefFile == null) return null;
+//        if(germanWCPrefFile == null) return null;
+//
+//        if(serviceHungaryFileName == null) return null;
+//        if(serviceEnglsihFileName == null) return null;
+//        if(serviceGermanFileName == null) return null;
+//
+//        String result = null;
+//
+//        if(fileName.equals(serviceHungaryFileName)) result = hungaryWCPrefFile.getStringValueByKey(prefStringKey);
+//        if(fileName.equals(serviceEnglsihFileName)) result =englishWCPrefFile.getStringValueByKey(prefStringKey);
+//        if(fileName.equals(serviceGermanFileName)) result = germanWCPrefFile.getStringValueByKey(prefStringKey);
+//
+//        if(result == null) return null;
+//        return result;
+//    }
 
-        HashMap<String, String> translations = new HashMap<>();
-        translations.put(languages.get(0) + "$" + wordCodes.get(0), "Ezen az oldalon lehet bejelentkezni!");
-        translations.put(languages.get(0) + "$" + wordCodes.get(1), "Felhasználónév");
-        translations.put(languages.get(0) + "$" + wordCodes.get(2), "Jelszó");
-        translations.put(languages.get(0) + "$" + wordCodes.get(3), "Vonalkód");
-        translations.put(languages.get(0) + "$" + wordCodes.get(4), "PINkód");
-        translations.put(languages.get(0) + "$" + wordCodes.get(5), "RFID");
-        translations.put(languages.get(0) + "$" + wordCodes.get(6), "Bejelentkezés");
-
-        translations.put(languages.get(1) + "$" + wordCodes.get(0), "You can log in on this page!");
-        translations.put(languages.get(1) + "$" + wordCodes.get(1), "Username");
-        translations.put(languages.get(1) + "$" + wordCodes.get(2), "Password");
-        translations.put(languages.get(1) + "$" + wordCodes.get(3), "Barcode");
-        translations.put(languages.get(1) + "$" + wordCodes.get(4), "PINcode");
-        translations.put(languages.get(1) + "$" + wordCodes.get(5), "RFID");
-        translations.put(languages.get(1) + "$" + wordCodes.get(6), "Login");
-
-        translations.put(languages.get(2) + "$" + wordCodes.get(0), "Auf dieser Seite können Sie sich einloggen!");
-        translations.put(languages.get(2) + "$" + wordCodes.get(1), "Nutzername");
-        translations.put(languages.get(2) + "$" + wordCodes.get(2), "Passwort");
-        translations.put(languages.get(2) + "$" + wordCodes.get(3), "Strichkode");
-        translations.put(languages.get(2) + "$" + wordCodes.get(4), "Geheimzahl");
-        translations.put(languages.get(2) + "$" + wordCodes.get(5), "RFID");
-        translations.put(languages.get(2) + "$" + wordCodes.get(6), "Anmeldung");
-
-        SettingsObject settingsObject = new SettingsObject(
-                "1",
-                "name",
-                UUID.randomUUID(),
-                "MobileFlexAndroid",
-                "MobileFlexAndroid",
-                "Ezen a felületen lehet bejelentkezni!",
-                "1",
-                "1.0",
-                15,
-                "logoImageUrl",
-                "https://index.hu",
-                "mainWebApiUrl",
-                "settingsWebApiUrl",
-                "helpWebApiUrl",
-                languages,
-                wordCodes,
-                translations,
-                "#FF9A3A2A",
-                "#FFF1EDCA",
-                "#FFFFFFFF",
-                "#FFFF00FF",
-                "#FF00FF00",
-                "#FFFFFFFF",
-                "#FFFFFFFF"
-        );
-
-        return settingsObject;
-    }
-
-    public void saveValueToEncryptedPrefFile(String prefStringKey, String languageID) {
-        if(preferences == null) return;
-        if(prefStringKey == null) return;
-        if(languageID == null) return;
-
-        preferences.replaceString(prefStringKey, languageID);
-    }
-
-    public String getValueFromLanguageFile(String fileName, String prefStringKey){
-        if(prefStringKey == null) return null;
-
+    public String getValueFromHungaryPrefFile(String key){
+        if(key == null) return null;
         if(hungaryWCPrefFile == null) return null;
+
+        String value = hungaryWCPrefFile.getStringValueByKey(key);
+
+        if(value == null) return null;
+        return value;
+    }
+
+    public String getValueFromEnglishPrefFile(String key){
+        if(key == null) return null;
         if(englishWCPrefFile == null) return null;
+
+        String value = englishWCPrefFile.getStringValueByKey(key);
+
+        if(value == null) return null;
+        return value;
+    }
+
+    public String getValueFromGermanPrefFile(String key){
+        if(key == null) return null;
         if(germanWCPrefFile == null) return null;
 
-        if(serviceHungaryFileName == null) return null;
-        if(serviceEnglsihFileName == null) return null;
-        if(serviceGermanFileName == null) return null;
+        String value = germanWCPrefFile.getStringValueByKey(key);
 
-        String result = null;
-
-        if(fileName.equals(serviceHungaryFileName)) result = hungaryWCPrefFile.getStringValueByKey(prefStringKey);
-        if(fileName.equals(serviceEnglsihFileName)) result =englishWCPrefFile.getStringValueByKey(prefStringKey);
-        if(fileName.equals(serviceGermanFileName)) result = germanWCPrefFile.getStringValueByKey(prefStringKey);
-
-        if(result == null) return null;
-        return result;
+        if(value == null) return null;
+        return value;
     }
 
-    public String getValueFromEncryptedPreferenceFile(String prefStringKey){
-        if(prefStringKey == null) return null;
+    public String getValueFromSettingsPrefFile(String key){
+        if(key == null) return null;
         if(preferences == null) return null;
 
-        String result = preferences.getStringValueByKey(prefStringKey);
+        String value = preferences.getStringValueByKey(key);
 
-        if(result == null) return null;
-        return result;
+        if(value == null) return null;
+        return value;
+    }
+
+    public void saveValueToHungaryPrefFile(String key, String value){
+        if(key == null) return;
+        if(value == null) return;
+        if(hungaryWCPrefFile == null) return;
+        hungaryWCPrefFile.replaceString(key, value);
+     }
+
+    public void saveValueToEnglishPrefFile(String key, String value){
+        if(key == null) return;
+        if(value == null) return;
+        if(englishWCPrefFile == null) return;
+        englishWCPrefFile.replaceString(key, value);
+    }
+
+    public void saveValueToGermanPrefFile(String key, String value){
+        if(key == null) return;
+        if(value == null) return;
+        if(germanWCPrefFile == null) return;
+        germanWCPrefFile.replaceString(key, value);
+    }
+
+    public void saveValueToSettingsPrefFile(String key, String value){
+        if(key == null) return;
+        if(value == null) return;
+        if(preferences == null) return;
+        preferences.replaceString(key, value);
     }
 
     public int[] getLanguagesFlags(){ return languagesFlags; }

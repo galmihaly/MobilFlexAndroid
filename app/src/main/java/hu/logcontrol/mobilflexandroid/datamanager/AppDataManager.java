@@ -7,18 +7,22 @@ import android.os.Looper;
 import android.os.Message;
 
 import java.lang.ref.WeakReference;
+import java.util.UUID;
 
 import hu.logcontrol.mobilflexandroid.R;
 import hu.logcontrol.mobilflexandroid.enums.MessageIdentifiers;
 import hu.logcontrol.mobilflexandroid.enums.RepositoryType;
 import hu.logcontrol.mobilflexandroid.interfaces.IAppDataManagerHandler;
 import hu.logcontrol.mobilflexandroid.interfaces.IMainActivityPresenter;
+import hu.logcontrol.mobilflexandroid.interfaces.IMainWebAPIService;
 import hu.logcontrol.mobilflexandroid.logger.ApplicationLogger;
 import hu.logcontrol.mobilflexandroid.logger.LogLevel;
-import hu.logcontrol.mobilflexandroid.models.SettingsObject;
+import hu.logcontrol.mobilflexandroid.models.Device;
+import hu.logcontrol.mobilflexandroid.models.DeviceRequest;
 import hu.logcontrol.mobilflexandroid.taskmanager.CustomThreadPoolManager;
 import hu.logcontrol.mobilflexandroid.taskmanager.PresenterThreadCallback;
 import hu.logcontrol.mobilflexandroid.tasks.MainWebAPICalling;
+import retrofit2.Call;
 
 public class AppDataManager implements PresenterThreadCallback, IAppDataManagerHandler {
 
@@ -28,6 +32,7 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
     private CustomThreadPoolManager mCustomThreadPoolManager;
     private AppDataManagerHandler appDataManagerHandler;
     private static MainPreferenceFileService mainPreferenceFileService;
+    private static MainWebAPIService mainWebAPIService;
 
     private static int[] languagesImages;
 
@@ -48,6 +53,10 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
         mainPreferenceFileService.initSettingsPreferenceFile("MobileFlexAndroidSettings");
     }
 
+    public void createMainWebAPIService(){
+        mainWebAPIService = MainWebAPIService.getRetrofitInstance("https://api.mobileflex.hu/");
+    }
+
     public void initTaskManager() {
         try {
             ApplicationLogger.logging(LogLevel.INFORMATION, "A feladatkezelő létrehozása megkezdődött.");
@@ -63,14 +72,12 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
         }
     }
 
-    public SettingsObject getBaseSettingsObjectFromPrefFile(){
-        if(mainPreferenceFileService == null) return null;
-        return mainPreferenceFileService.initSettinsObject();
-    }
-
-    public void saveLanguageIDToPrefFile(String prefStringKey, String languageID){
+    public void saveValueToSettinsPrefFile(String key, String value){
+        if(key == null) return;
+        if(value == null) return;
         if(mainPreferenceFileService == null) return;
-        mainPreferenceFileService.saveValueToEncryptedPrefFile(prefStringKey, languageID);
+
+        mainPreferenceFileService.saveValueToSettingsPrefFile(key, value);
     }
 
     public String getMessageText(RepositoryType hungaryPreferencesFile, String translateCode) {
@@ -81,18 +88,9 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
         String result = null;
 
         switch (hungaryPreferencesFile){
-            case HUNGARY_PREFERENCES_FILE:{
-                result = mainPreferenceFileService.getValueFromLanguageFile("HungaryWCPrefFile", translateCode);
-                break;
-            }
-            case ENGLISH_PREFERENCES_FILE:{
-                result = mainPreferenceFileService.getValueFromLanguageFile("EnglishWCPrefFile", translateCode);
-                break;
-            }
-            case GERMAN_PREFERENCES_FILE:{
-                result = mainPreferenceFileService.getValueFromLanguageFile("GermanWCPrefFile", translateCode);
-                break;
-            }
+            case HUNGARY_PREFERENCES_FILE:{ result = mainPreferenceFileService.getValueFromHungaryPrefFile(translateCode); break; }
+            case ENGLISH_PREFERENCES_FILE:{ result = mainPreferenceFileService.getValueFromEnglishPrefFile(translateCode); break; }
+            case GERMAN_PREFERENCES_FILE:{ result = mainPreferenceFileService.getValueFromGermanPrefFile(translateCode); break; }
         }
 
         if(result == null) return null;
@@ -100,7 +98,10 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
     }
 
     public int[] getLanguagesFlags() {
+        if(mainPreferenceFileService == null) return null;
+
         languagesImages = mainPreferenceFileService.getLanguagesFlags();
+        if(languagesImages == null) return null;
         return languagesImages;
     }
 
@@ -108,7 +109,7 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
         if(mainPreferenceFileService == null) return -1;
         if(languagesImages == null) return -2;
 
-        String r = mainPreferenceFileService.getValueFromEncryptedPreferenceFile("CurrentSelectedLanguage");
+        String r = mainPreferenceFileService.getValueFromSettingsPrefFile("CurrentSelectedLanguage");
         int currentLanguagePosition = -1;
 
         if(r != null){
@@ -145,7 +146,7 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
 
         // valide ???
 
-        String result = mainPreferenceFileService.getValueFromEncryptedPreferenceFile(valueString);
+        String result = mainPreferenceFileService.getValueFromSettingsPrefFile(valueString);
 
         if(result == null) return null;
         return result;
@@ -162,6 +163,11 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
         catch (Exception e){
             ApplicationLogger.logging(LogLevel.FATAL, e.getMessage());
         }
+    }
+
+    public void getDevices(){
+        if(mainWebAPIService == null) return;
+        mainWebAPIService.sendDeviceRequestObject();
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */

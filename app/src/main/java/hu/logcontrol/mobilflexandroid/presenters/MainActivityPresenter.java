@@ -11,7 +11,6 @@ import hu.logcontrol.mobilflexandroid.enums.RepositoryType;
 import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
 import hu.logcontrol.mobilflexandroid.interfaces.IMainActivity;
 import hu.logcontrol.mobilflexandroid.interfaces.IMainActivityPresenter;
-import hu.logcontrol.mobilflexandroid.models.SettingsObject;
 
 public class MainActivityPresenter implements IMainActivityPresenter {
 
@@ -40,9 +39,6 @@ public class MainActivityPresenter implements IMainActivityPresenter {
         switch (viewEnum){
             case LOGIN_ACTIVITY:{
                 intent = new Intent(context, LoginActivity.class);
-
-                SettingsObject settingsObject = appDataManager.getBaseSettingsObjectFromPrefFile();
-                if(settingsObject != null) intent.putExtra("settingsObject", settingsObject);
 
                 break;
             }
@@ -93,7 +89,7 @@ public class MainActivityPresenter implements IMainActivityPresenter {
     @Override
     public void saveLanguageToSettingsFile(String languageID) {
         if(appDataManager == null) return;
-        appDataManager.saveLanguageIDToPrefFile("CurrentSelectedLanguage", languageID);
+        appDataManager.saveValueToSettinsPrefFile("CurrentSelectedLanguage", languageID);
     }
 
     @Override
@@ -110,6 +106,7 @@ public class MainActivityPresenter implements IMainActivityPresenter {
     public void initAppDataManager() {
         appDataManager = new AppDataManager(context, this);
         appDataManager.createPreferenceFileService();
+        appDataManager.createMainWebAPIService();
         appDataManager.initTaskManager();
     }
 
@@ -120,7 +117,8 @@ public class MainActivityPresenter implements IMainActivityPresenter {
         String loginWebApiUrl = appDataManager.getValueFromSettingsFile("loginWebApiUrl");
 
         if(loginWebApiUrl != null){
-            appDataManager.loadWebAPICallingTask();
+            appDataManager.saveValueToSettinsPrefFile("loginWebApiUrl", "https://api.mobileflex.hu/");
+            appDataManager.getDevices();
         }
     }
 
@@ -128,5 +126,10 @@ public class MainActivityPresenter implements IMainActivityPresenter {
     public void sendResultToPresenter(String resultMessage) {
         if(resultMessage == null) return;
         Log.e("sendResultFromWebAPICallingTask", resultMessage);
+    }
+
+    private void connectToWebAPI() {
+        if(appDataManager == null) return;
+        appDataManager.loadWebAPICallingTask();
     }
 }
