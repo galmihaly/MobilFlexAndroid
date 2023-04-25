@@ -2,6 +2,7 @@ package hu.logcontrol.mobilflexandroid.models;
 
 import androidx.annotation.StringRes;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -11,46 +12,60 @@ import hu.logcontrol.mobilflexandroid.enums.LoginMode;
 
 public class Application {
 
-    @SerializedName("Id")
+    @SerializedName("id")
+    @Expose
     private UUID id;
 
-    @SerializedName("ApplicationName")
+    @SerializedName("applicationName")
+    @Expose
     private String applicationName;
 
-    @SerializedName("ApplicationTitle")
+    @SerializedName("applicationTitle")
+    @Expose
     private String applicationTitle;
 
-    @SerializedName("ApplicationLead")
+    @SerializedName("applicationLead")
+    @Expose
     private String applicationLead;
 
-    @SerializedName("ApplicationDescription")
+    @SerializedName("applicationDescription")
+    @Expose
     private String applicationDescription;
 
-    @SerializedName("ApplicationVersion")
+    @SerializedName("applicationVersion")
+    @Expose
     private String applicationVersion;
 
-    @SerializedName("ApplicationEnabledLoginFlag")
+    @SerializedName("applicationEnabledLoginFlag")
+    @Expose
     private LoginMode applicationEnabledLoginFlag;
 
-    @SerializedName("LoginUrl")
+    @SerializedName("loginUrl")
+    @Expose
     private String loginUrl;
 
-    @SerializedName("MainUrl")
+    @SerializedName("mainUrl")
+    @Expose
     private String mainUrl;
 
-    @SerializedName("SettingsUrl")
+    @SerializedName("settingsUrl")
+    @Expose
     private String settingsUrl;
 
-    @SerializedName("HelpUrl")
+    @SerializedName("helpUrl")
+    @Expose
     private String helpUrl;
 
-    @SerializedName("ApplicationThemes")
+    @SerializedName("applicationThemes")
+    @Expose
     private List<ApplicationTheme> applicationThemeList;
 
-    @SerializedName("DefaultThemeId")
+    @SerializedName("defaultThemeId")
+    @Expose
     private int defaultThemeId;
 
-    @SerializedName("LogoUrl")
+    @SerializedName("logoUrl")
+    @Expose
     private String logoUrl;
 
     public Application(UUID id, String applicationName, String applicationTitle, String applicationLead, String applicationDescription, String applicationVersion, LoginMode applicationEnabledLoginFlag, String loginUrl, String mainUrl, String settingsUrl, String helpUrl, List<ApplicationTheme> applicationThemeList, int defaultThemeId, String logoUrl) {
@@ -124,5 +139,25 @@ public class Application {
 
     public String getLogoUrl() {
         return logoUrl;
+    }
+
+    @Override
+    public String toString() {
+        return "Application{" +
+                "id=" + id +
+                ", applicationName='" + applicationName + '\'' +
+                ", applicationTitle='" + applicationTitle + '\'' +
+                ", applicationLead='" + applicationLead + '\'' +
+                ", applicationDescription='" + applicationDescription + '\'' +
+                ", applicationVersion='" + applicationVersion + '\'' +
+                ", applicationEnabledLoginFlag=" + applicationEnabledLoginFlag +
+                ", loginUrl='" + loginUrl + '\'' +
+                ", mainUrl='" + mainUrl + '\'' +
+                ", settingsUrl='" + settingsUrl + '\'' +
+                ", helpUrl='" + helpUrl + '\'' +
+                ", applicationThemeList=" + applicationThemeList +
+                ", defaultThemeId=" + defaultThemeId +
+                ", logoUrl='" + logoUrl + '\'' +
+                '}';
     }
 }

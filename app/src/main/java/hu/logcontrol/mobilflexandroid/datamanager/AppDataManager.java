@@ -22,7 +22,6 @@ import hu.logcontrol.mobilflexandroid.models.DeviceRequest;
 import hu.logcontrol.mobilflexandroid.taskmanager.CustomThreadPoolManager;
 import hu.logcontrol.mobilflexandroid.taskmanager.PresenterThreadCallback;
 import hu.logcontrol.mobilflexandroid.tasks.MainWebAPICalling;
-import retrofit2.Call;
 
 public class AppDataManager implements PresenterThreadCallback, IAppDataManagerHandler {
 

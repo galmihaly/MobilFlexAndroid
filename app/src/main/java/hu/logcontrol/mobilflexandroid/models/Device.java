@@ -1,5 +1,6 @@
 package hu.logcontrol.mobilflexandroid.models;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
@@ -7,22 +8,28 @@ import java.util.List;
 
 public class Device {
 
-    @SerializedName("DeviceId")
+    @SerializedName("deviceId")
+    @Expose
     private String deviceId;
 
-    @SerializedName("DeviceName")
+    @SerializedName("deviceName")
+    @Expose
     private String deviceName;
 
-    @SerializedName("Active")
+    @SerializedName("active")
+    @Expose
     private String active;
 
-    @SerializedName("LastDeviceLoginDate")
+    @SerializedName("lastDeviceLoginDate")
+    @Expose
     private String lastDeviceLoginDate;
 
-    @SerializedName("Comments")
+    @SerializedName("comments")
+    @Expose
     private String comments;
 
-    @SerializedName("Applications")
+    @SerializedName("applications")
+    @Expose
     private List<Application> applicationList;
 
     public Device(String deviceId, String deviceName, String active, String lastDeviceLoginDate, String comments, List<Application> applicationList) {

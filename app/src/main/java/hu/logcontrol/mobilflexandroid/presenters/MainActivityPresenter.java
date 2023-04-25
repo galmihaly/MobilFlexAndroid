@@ -117,8 +117,10 @@ public class MainActivityPresenter implements IMainActivityPresenter {
         String loginWebApiUrl = appDataManager.getValueFromSettingsFile("loginWebApiUrl");
 
         if(loginWebApiUrl != null){
-            appDataManager.saveValueToSettinsPrefFile("loginWebApiUrl", "https://api.mobileflex.hu/");
             appDataManager.getDevices();
+        }
+        else{
+            appDataManager.saveValueToSettinsPrefFile("loginWebApiUrl", "https://api.mobileflex.hu/");
         }
     }
 

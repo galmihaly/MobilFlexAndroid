@@ -1,42 +1,54 @@
 package hu.logcontrol.mobilflexandroid.models;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.UUID;
 
 public class ApplicationTheme {
 
-    @SerializedName("Id")
+    @SerializedName("id")
+    @Expose
     private int id;
 
-    @SerializedName("ApplicationId")
+    @SerializedName("applicationId")
+    @Expose
     private UUID applicationId;
 
-    @SerializedName("LogoUrl")
+    @SerializedName("logoUrl")
+    @Expose
     private String logoUrl;
 
-    @SerializedName("Name")
+    @SerializedName("name")
+    @Expose
     private String name;
 
-    @SerializedName("BackgroundColor")
+    @SerializedName("backgroundColor")
+    @Expose
     private String backgroundColor;
 
-    @SerializedName("BackgroundGradientColor")
+    @SerializedName("backgroundGradientColor")
+    @Expose
     private String backgroundGradientColor;
 
-    @SerializedName("ForegroundColor")
+    @SerializedName("foregroundColor")
+    @Expose
     private String foregroundColor;
 
-    @SerializedName("ButtonBackgroundColor")
+    @SerializedName("buttonBackgroundColor")
+    @Expose
     private String buttonBackgroundColor;
 
-    @SerializedName("ButtonBackgroundGradientColor")
+    @SerializedName("buttonBackgroundGradientColor")
+    @Expose
     private String buttonBackgroundGradientColor;
 
-    @SerializedName("ButtonForegroundColor")
+    @SerializedName("buttonForegroundColor")
+    @Expose
     private String buttonForegroundColor;
 
-    @SerializedName("ControlColor")
+    @SerializedName("controlColor")
+    @Expose
     private String controlColor;
 
     public ApplicationTheme(int id, UUID applicationId, String logoUrl, String name, String backgroundColor, String backgroundGradientColor, String foregroundColor, String buttonBackgroundColor, String buttonBackgroundGradientColor, String buttonForegroundColor, String controlColor) {
@@ -95,5 +107,22 @@ public class ApplicationTheme {
 
     public String getControlColor() {
         return controlColor;
+    }
+
+    @Override
+    public String toString() {
+        return "ApplicationTheme{" +
+                "id=" + id +
+                ", applicationId=" + applicationId +
+                ", logoUrl='" + logoUrl + '\'' +
+                ", name='" + name + '\'' +
+                ", backgroundColor='" + backgroundColor + '\'' +
+                ", backgroundGradientColor='" + backgroundGradientColor + '\'' +
+                ", foregroundColor='" + foregroundColor + '\'' +
+                ", buttonBackgroundColor='" + buttonBackgroundColor + '\'' +
+                ", buttonBackgroundGradientColor='" + buttonBackgroundGradientColor + '\'' +
+                ", buttonForegroundColor='" + buttonForegroundColor + '\'' +
+                ", controlColor='" + controlColor + '\'' +
+                '}';
     }
 }
