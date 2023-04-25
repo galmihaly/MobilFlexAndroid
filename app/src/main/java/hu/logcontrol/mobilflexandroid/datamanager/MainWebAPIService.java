@@ -63,7 +63,7 @@ public class MainWebAPIService {
 
         JSONObject jo = new JSONObject();
         try {
-            jo.put("id", "7a0e0865-08b2-488a-8a20-c327ce28e59d");
+            jo.put("id", UUID.fromString("7a0e0865-08b2-488a-8a20-c327ce28e59d"));
             jo.put("deviceId", "TESZT");
             jo.put("deviceName", "bármi");
 
