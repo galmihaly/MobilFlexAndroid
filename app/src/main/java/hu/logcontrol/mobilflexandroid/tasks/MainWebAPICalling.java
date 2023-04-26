@@ -7,7 +7,23 @@ import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -44,11 +60,45 @@ public class MainWebAPICalling implements Callable {
 
             if (Thread.interrupted()) throw new InterruptedException();
 
-            Log.e("Callable", "Callable");
+            URL url = new URL("https://api.mobileflex.hu/device"); //Enter URL here
+            HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+            httpURLConnection.setDoOutput(true);
+            httpURLConnection.setRequestMethod("POST"); // here you are telling that it is a POST request, which can be changed into "PUT", "GET", "DELETE" etc.
+            httpURLConnection.setRequestProperty("Content-Type", "application/json"); // here you are setting the `Content-Type` for the data you are sending which is `application/json`
+            httpURLConnection.connect();
 
-            sendMessageToPresenterHandler(MainWebAPICallingEnums.HARDWARE_ID_FAILED);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("id", "7a0e0865-08b2-488a-8a20-c327ce28e59d");
+            jsonObject.put("deviceId", "TESZT");
+            jsonObject.put("deviceName", "s");
+
+            DataOutputStream wr = new DataOutputStream(httpURLConnection.getOutputStream());
+            wr.writeBytes(jsonObject.toString());
+            wr.flush();
+            wr.close();
+
+            InputStream response = httpURLConnection.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(response));
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+            try {
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line + "\n");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            Log.e("result", sb.toString());
 
         } catch (Exception e){
+            Log.e("exception", e.getMessage());
             sendMessageToPresenterHandler(MainWebAPICallingEnums.THREAD_INTERRUPTED);
         }
 

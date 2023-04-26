@@ -38,7 +38,7 @@ public class Application {
 
     @SerializedName("applicationEnabledLoginFlag")
     @Expose
-    private LoginMode applicationEnabledLoginFlag;
+    private int applicationEnabledLoginFlag;
 
     @SerializedName("loginUrl")
     @Expose
@@ -68,7 +68,7 @@ public class Application {
     @Expose
     private String logoUrl;
 
-    public Application(UUID id, String applicationName, String applicationTitle, String applicationLead, String applicationDescription, String applicationVersion, LoginMode applicationEnabledLoginFlag, String loginUrl, String mainUrl, String settingsUrl, String helpUrl, List<ApplicationTheme> applicationThemeList, int defaultThemeId, String logoUrl) {
+    public Application(UUID id, String applicationName, String applicationTitle, String applicationLead, String applicationDescription, String applicationVersion, int applicationEnabledLoginFlag, String loginUrl, String mainUrl, String settingsUrl, String helpUrl, List<ApplicationTheme> applicationThemeList, int defaultThemeId, String logoUrl) {
         this.id = id;
         this.applicationName = applicationName;
         this.applicationTitle = applicationTitle;
@@ -109,7 +109,7 @@ public class Application {
         return applicationVersion;
     }
 
-    public LoginMode getApplicationEnabledLoginFlag() {
+    public int getApplicationEnabledLoginFlag() {
         return applicationEnabledLoginFlag;
     }
 

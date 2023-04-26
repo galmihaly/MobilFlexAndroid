@@ -24,10 +24,6 @@ public class MainPreferenceFileService {
     private LanguagesSharedPreferences englishWCPrefFile;
     private LocalEncryptedPreferences preferences;
 
-    private String serviceHungaryFileName;
-    private String serviceEnglsihFileName;
-    private String serviceGermanFileName;
-
     private static final int[] languagesFlags = new int[] {
             R.drawable.ic_hu2,
             R.drawable.ic_brit,
@@ -35,7 +31,6 @@ public class MainPreferenceFileService {
     };
 
     private Context context;
-
     public MainPreferenceFileService(Context context) {
         this.context = context.getApplicationContext();
     }
@@ -44,10 +39,6 @@ public class MainPreferenceFileService {
         this.hungaryWCPrefFile = new LanguagesSharedPreferences(context, hungaryFileName);
         this.englishWCPrefFile = new LanguagesSharedPreferences(context, englsihFileName);
         this.germanWCPrefFile = new LanguagesSharedPreferences(context, germanFileName);
-
-        this.serviceHungaryFileName = hungaryFileName;
-        this.serviceEnglsihFileName = englsihFileName;
-        this.serviceGermanFileName = germanFileName;
 
         hungaryWCPrefFile.putString("HU$WC_MessageTextView", "Üzenet");
         englishWCPrefFile.putString("EN$WC_MessageTextView", "Message");
@@ -63,35 +54,6 @@ public class MainPreferenceFileService {
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
         );
     }
-
-//    public void saveValueToEncryptedPrefFile(String prefStringKey, String languageID) {
-//        if(preferences == null) return;
-//        if(prefStringKey == null) return;
-//        if(languageID == null) return;
-//
-//        preferences.replaceString(prefStringKey, languageID);
-//    }
-
-//    public String getValueFromLanguageFile(String fileName, String prefStringKey){
-//        if(prefStringKey == null) return null;
-//
-//        if(hungaryWCPrefFile == null) return null;
-//        if(englishWCPrefFile == null) return null;
-//        if(germanWCPrefFile == null) return null;
-//
-//        if(serviceHungaryFileName == null) return null;
-//        if(serviceEnglsihFileName == null) return null;
-//        if(serviceGermanFileName == null) return null;
-//
-//        String result = null;
-//
-//        if(fileName.equals(serviceHungaryFileName)) result = hungaryWCPrefFile.getStringValueByKey(prefStringKey);
-//        if(fileName.equals(serviceEnglsihFileName)) result =englishWCPrefFile.getStringValueByKey(prefStringKey);
-//        if(fileName.equals(serviceGermanFileName)) result = germanWCPrefFile.getStringValueByKey(prefStringKey);
-//
-//        if(result == null) return null;
-//        return result;
-//    }
 
     public String getValueFromHungaryPrefFile(String key){
         if(key == null) return null;
@@ -123,13 +85,21 @@ public class MainPreferenceFileService {
         return value;
     }
 
-    public String getValueFromSettingsPrefFile(String key){
+    public String getStringValueFromSettingsPrefFile(String key){
         if(key == null) return null;
         if(preferences == null) return null;
 
         String value = preferences.getStringValueByKey(key);
 
         if(value == null) return null;
+        return value;
+    }
+
+    public int getIntValueFromSettingsPrefFile(String key){
+        if(key == null) return 0;
+        if(preferences == null) return 0;
+
+        int value = preferences.getIntValueByKey(key);
         return value;
     }
 
@@ -159,6 +129,12 @@ public class MainPreferenceFileService {
         if(value == null) return;
         if(preferences == null) return;
         preferences.replaceString(key, value);
+    }
+
+    public void saveValueToSettingsPrefFile(String key, int value){
+        if(key == null) return;
+        if(preferences == null) return;
+        preferences.replaceInt(key, value);
     }
 
     public int[] getLanguagesFlags(){ return languagesFlags; }
