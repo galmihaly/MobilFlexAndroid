@@ -118,7 +118,7 @@ public class WebViewActivityPresenter implements IWebViewActivityPresenter, Pres
     /* PresenterThreadCallback interfész függvénye */
 
     @Override
-    public void sendResultToPresenter(Message message) {
+    public void sendMessageToHandler(Message message) {
         if(mWebViewActivityHandler == null) return;
         mWebViewActivityHandler.sendMessage(message);
     }

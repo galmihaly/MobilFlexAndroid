@@ -2,13 +2,13 @@ package hu.logcontrol.mobilflexandroid.presenters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import hu.logcontrol.mobilflexandroid.LoginActivity;
 import hu.logcontrol.mobilflexandroid.adapters.LanguagesSpinnerAdapter;
 import hu.logcontrol.mobilflexandroid.datamanager.AppDataManager;
 import hu.logcontrol.mobilflexandroid.enums.RepositoryType;
 import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
+import hu.logcontrol.mobilflexandroid.helpers.Helper;
 import hu.logcontrol.mobilflexandroid.interfaces.IMainActivity;
 import hu.logcontrol.mobilflexandroid.interfaces.IMainActivityPresenter;
 
@@ -107,31 +107,70 @@ public class MainActivityPresenter implements IMainActivityPresenter {
         appDataManager = new AppDataManager(context, this);
         appDataManager.createPreferenceFileService();
         appDataManager.createMainWebAPIService();
-        appDataManager.initTaskManager();
+        appDataManager.initLanguagesPrefFile();
+        appDataManager.initSettingsPrefFile();
+        appDataManager.initBaseMessagesPrefFile();
     }
 
     @Override
     public void startProgram() {
         if(appDataManager == null) return;
+        if(iMainActivity == null) return;
 
-        String loginWebApiUrl = appDataManager.getValueFromSettingsFile("loginWebApiUrl");
-
+        String loginWebApiUrl = appDataManager.getStringValueFromSettingsFile("loginWebApiUrl");
         if(loginWebApiUrl != null){
-            appDataManager.getDevices();
+            initCallingWebAPI();
         }
         else{
             appDataManager.saveValueToSettinsPrefFile("loginWebApiUrl", "https://api.mobileflex.hu/");
+
+            loginWebApiUrl = appDataManager.getStringValueFromSettingsFile("loginWebApiUrl");
+            if(loginWebApiUrl != null){
+                initCallingWebAPI();
+            }
+        }
+    }
+
+    private void initCallingWebAPI(){
+
+        String message = null;
+        boolean isNetWokAvailable;
+
+        isNetWokAvailable = Helper.isInternetConnection(context);
+        if(isNetWokAvailable){
+            message = appDataManager.getMessageFromLanguagesFiles("WC_NETWORK_AVAILABLE", "$");
+            if(message != null) iMainActivity.setTextToMessageTV(message);
+
+            message = appDataManager.getMessageFromLanguagesFiles("WC_DATA_RETIREVAL_START", "$");
+            if(message != null) iMainActivity.setTextToMessageTV(message);
+            appDataManager.callSettingsWebAPI();
+        }
+        else {
+            message = appDataManager.getMessageFromLanguagesFiles("WC_NETWORK_NOT_AVAILABLE", "$");
+            if(message != null) iMainActivity.setTextToMessageTV(message);
         }
     }
 
     @Override
-    public void sendResultToPresenter(String resultMessage) {
+    public void sendWebAPIResultToPresenter(String resultMessage) {
         if(resultMessage == null) return;
-        Log.e("sendResultFromWebAPICallingTask", resultMessage);
-    }
+        if(iMainActivity == null) return;
 
-    private void connectToWebAPI() {
-        if(appDataManager == null) return;
-        appDataManager.loadWebAPICallingTask();
+        iMainActivity.setTextToMessageTV(resultMessage);
+
+        int resultCode = appDataManager.getIntValueFromSettingsFile("resultCode");
+        if(resultCode == -99) {
+            openActivityByEnum(ViewEnums.SETTINSG_ACTIVITY);
+        }
+        else {
+
+            int applicationNumber = appDataManager.getIntValueFromSettingsFile("applicationsNumber");
+            if(applicationNumber == 1){
+                openActivityByEnum(ViewEnums.LOGIN_ACTIVITY);
+            }
+            else {
+                openActivityByEnum(ViewEnums.APPLICATIONS_ACTIVITY);
+            }
+        }
     }
 }

@@ -4,10 +4,8 @@ import hu.logcontrol.mobilflexandroid.enums.FragmentTypes;
 import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
 
 public interface ILoginFragmentsPresenter {
-    void initTaskManager();
-    void initSettingsPreferenceFile();
+    void initAppDataManager();
     void setControlsValuesBySettings();
-    void initLanguageSharedPreferenceFiles();
     void setControlsTextBySettings(FragmentTypes fragmentType);
     void openActivityByEnum(ViewEnums viewEnum);
 }

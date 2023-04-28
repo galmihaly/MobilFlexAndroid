@@ -7,18 +7,18 @@ public class ResultObject {
 
     @SerializedName("resultCode")
     @Expose
-    private String resultCode;
+    private int resultCode;
 
     @SerializedName("device")
     @Expose
     private Device device;
 
-    public ResultObject(String resultCode, Device device) {
+    public ResultObject(int resultCode, Device device) {
         this.resultCode = resultCode;
         this.device = device;
     }
 
-    public String getResultCode() {
+    public int getResultCode() {
         return resultCode;
     }
 

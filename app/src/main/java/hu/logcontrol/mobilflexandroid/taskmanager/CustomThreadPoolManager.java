@@ -74,7 +74,7 @@ public class CustomThreadPoolManager {
 
     public void sendResultToPresenter(Message message){
         if(presenterThreadCallbackWeakReference!= null && presenterThreadCallbackWeakReference.get() != null) {
-            presenterThreadCallbackWeakReference.get().sendResultToPresenter(message);
+            presenterThreadCallbackWeakReference.get().sendMessageToHandler(message);
         }
     }
 

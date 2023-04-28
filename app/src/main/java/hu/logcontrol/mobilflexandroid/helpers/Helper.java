@@ -1,7 +1,11 @@
 package hu.logcontrol.mobilflexandroid.helpers;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.DisplayMetrics;
@@ -79,5 +83,32 @@ public class Helper {
 //        bundle.putSerializable("fragmentType", fragmentTypes);
 
         fragment.setArguments(bundle);
+    }
+
+    public static boolean isInternetConnection(Context context){
+
+        boolean isConnected;
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        if(cm != null){
+            Network connectedNetwork = cm.getActiveNetwork();
+            if(connectedNetwork != null){
+                NetworkCapabilities nc = cm.getNetworkCapabilities(connectedNetwork);
+                if(nc != null && nc.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)){
+                    isConnected = true;
+                }
+                else {
+                    isConnected = false;
+                }
+            }
+            else {
+                isConnected = false;
+            }
+        }
+        else {
+            isConnected = false;
+        }
+
+        return isConnected;
     }
 }

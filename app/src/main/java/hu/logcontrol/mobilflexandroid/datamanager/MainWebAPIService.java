@@ -69,5 +69,6 @@ public class MainWebAPIService implements Callback<ResultObject>{
     @Override
     public void onFailure(Call<ResultObject> call, Throwable t) {
         Log.e("onFailure", t.getMessage());
+        iMainWebAPIService.onFailure();
     }
 }

@@ -74,9 +74,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
         super.onCreate(savedInstanceState);
         initView();
         initPresenter();
-        initSettingsPreferenceFile();
-        initLanguagePreferenceFiles();
-        initSettingsDataFromWebAPI();
+        initAppDataManager();
         setControlsValuesBySettings();
         initLoginButtons();
 
@@ -99,37 +97,23 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
         }
     }
 
+    private void initPresenter(){
+        loginActivityPresenter = new LoginActivityPresenter(this, getApplicationContext());
+    }
+
+    private void initAppDataManager(){
+        if(loginActivityPresenter == null) return;
+        loginActivityPresenter.initAppDataManager();
+    }
+
     private void setControlsValuesBySettings() {
         if(loginActivityPresenter == null) return;
         loginActivityPresenter.setControlsValuesBySettings();
     }
 
-    private void initSettingsDataFromWebAPI() {
-        if(loginActivityPresenter == null) return;
-        loginActivityPresenter.saveSettingsToPreferences(getIntent());
-    }
-
     private void initLoginButtons() {
-        if(loginActivityPresenter != null && wst != null){
-            loginActivityPresenter.initButtonsByLoginModesNumber(wst);
-        }
-    }
-
-    private void initPresenter() {
-        loginActivityPresenter = new LoginActivityPresenter(this, getApplicationContext());
-        loginActivityPresenter.initTaskManager();
-    }
-
-    private void initSettingsPreferenceFile() {
-        if(loginActivityPresenter != null) {
-            loginActivityPresenter.initSettingsPreferenceFile();
-        }
-    }
-
-    private void initLanguagePreferenceFiles() {
-        if(loginActivityPresenter != null) {
-            loginActivityPresenter.initLanguageSharedPreferenceFiles();
-        }
+        if(loginActivityPresenter == null && wst == null) return;
+        loginActivityPresenter.initButtonsByLoginModesNumber(wst);
     }
 
     void initView(){

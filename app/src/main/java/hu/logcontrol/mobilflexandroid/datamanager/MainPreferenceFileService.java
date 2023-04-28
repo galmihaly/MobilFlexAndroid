@@ -39,10 +39,6 @@ public class MainPreferenceFileService {
         this.hungaryWCPrefFile = new LanguagesSharedPreferences(context, hungaryFileName);
         this.englishWCPrefFile = new LanguagesSharedPreferences(context, englsihFileName);
         this.germanWCPrefFile = new LanguagesSharedPreferences(context, germanFileName);
-
-        hungaryWCPrefFile.putString("HU$WC_MessageTextView", "Üzenet");
-        englishWCPrefFile.putString("EN$WC_MessageTextView", "Message");
-        germanWCPrefFile.putString("DE$WC_MessageTextView", "Nachricht");
     }
 
     public void initSettingsPreferenceFile(String encryptedFileName) {
@@ -135,6 +131,12 @@ public class MainPreferenceFileService {
         if(key == null) return;
         if(preferences == null) return;
         preferences.replaceInt(key, value);
+    }
+
+    public void saveValueToSettingsPrefFile(String key, boolean value){
+        if(key == null) return;
+        if(preferences == null) return;
+        preferences.replaceBoolean(key, value);
     }
 
     public int[] getLanguagesFlags(){ return languagesFlags; }

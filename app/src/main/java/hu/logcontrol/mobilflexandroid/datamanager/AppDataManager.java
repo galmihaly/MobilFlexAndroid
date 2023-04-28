@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import android.widget.ImageButton;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -13,7 +14,12 @@ import java.util.List;
 import hu.logcontrol.mobilflexandroid.R;
 import hu.logcontrol.mobilflexandroid.enums.MessageIdentifiers;
 import hu.logcontrol.mobilflexandroid.enums.RepositoryType;
+import hu.logcontrol.mobilflexandroid.enums.WindowSizeTypes;
+import hu.logcontrol.mobilflexandroid.fragments.interfaces.ILoginFragments;
+import hu.logcontrol.mobilflexandroid.fragments.interfaces.ILoginFragmentsPresenter;
+import hu.logcontrol.mobilflexandroid.helpers.AppDataManagerHelper;
 import hu.logcontrol.mobilflexandroid.interfaces.IAppDataManagerHandler;
+import hu.logcontrol.mobilflexandroid.interfaces.ILoginActivityPresenter;
 import hu.logcontrol.mobilflexandroid.interfaces.IMainActivityPresenter;
 import hu.logcontrol.mobilflexandroid.interfaces.IMainWebAPIService;
 import hu.logcontrol.mobilflexandroid.logger.ApplicationLogger;
@@ -24,12 +30,14 @@ import hu.logcontrol.mobilflexandroid.models.Device;
 import hu.logcontrol.mobilflexandroid.models.ResultObject;
 import hu.logcontrol.mobilflexandroid.taskmanager.CustomThreadPoolManager;
 import hu.logcontrol.mobilflexandroid.taskmanager.PresenterThreadCallback;
-import hu.logcontrol.mobilflexandroid.tasks.MainWebAPICalling;
+import hu.logcontrol.mobilflexandroid.tasks.CreateLoginButtons;
 
 public class AppDataManager implements PresenterThreadCallback, IAppDataManagerHandler, IMainWebAPIService {
 
     private Context context;
     private IMainActivityPresenter iMainActivityPresenter;
+    private ILoginActivityPresenter iLoginActivityPresenter;
+    private ILoginFragmentsPresenter iLoginFragmentsPresenter;
 
     private CustomThreadPoolManager mCustomThreadPoolManager;
     private AppDataManagerHandler appDataManagerHandler;
@@ -43,16 +51,57 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
         this.iMainActivityPresenter = iMainActivityPresenter;
     }
 
+    public AppDataManager(Context context, ILoginActivityPresenter iLoginActivityPresenter) {
+        this.context = context.getApplicationContext();
+        this.iLoginActivityPresenter = iLoginActivityPresenter;
+    }
+
+    public AppDataManager(Context context, ILoginFragmentsPresenter iLoginFragmentsPresenter) {
+        this.context = context.getApplicationContext();
+        this.iLoginFragmentsPresenter = iLoginFragmentsPresenter;
+    }
+
     public void createPreferenceFileService(){
         mainPreferenceFileService = new MainPreferenceFileService(context);
+    }
+
+    public void initSettingsPrefFile(){
+        if(mainPreferenceFileService == null) return;
+        mainPreferenceFileService.initSettingsPreferenceFile("MobileFlexAndroidSettings");
+    }
+
+    public void initLanguagesPrefFile(){
+        if(mainPreferenceFileService == null) return;
 
         mainPreferenceFileService.initPublicSharedPreferenceFiles(
                 "HungaryWCPrefFile",
                 "EnglishWCPrefFile",
                 "GermanWCPrefFile"
         );
+    }
 
-        mainPreferenceFileService.initSettingsPreferenceFile("MobileFlexAndroidSettings");
+    public void initBaseMessagesPrefFile(){
+        if(mainPreferenceFileService == null) return;
+
+        mainPreferenceFileService.saveValueToHungaryPrefFile("HU$WC_NETWORK_AVAILABLE", "WIFI hálózat elérhető!");
+        mainPreferenceFileService.saveValueToEnglishPrefFile("EN$WC_NETWORK_AVAILABLE", "WIFI network is available!");
+        mainPreferenceFileService.saveValueToGermanPrefFile("DE$WC_NETWORK_AVAILABLE", "WIFI-Netz ist verfügbar!");
+
+        mainPreferenceFileService.saveValueToHungaryPrefFile("HU$WC_NETWORK_NOT_AVAILABLE", "WIFI hálózat nem elérhető!");
+        mainPreferenceFileService.saveValueToEnglishPrefFile("EN$WC_NETWORK_NOT_AVAILABLE", "WIFI network is not available!");
+        mainPreferenceFileService.saveValueToGermanPrefFile("DE$WC_NETWORK_NOT_AVAILABLE", "WIFI-Netz ist nicht verfügbar!");
+
+        mainPreferenceFileService.saveValueToHungaryPrefFile("HU$WC_DATA_RETIREVAL_START", "Az adatok lekérdezése a Web API-ról megkezdődött!");
+        mainPreferenceFileService.saveValueToEnglishPrefFile("EN$WC_DATA_RETIREVAL_START", "Data retrieval has started from the Web API!");
+        mainPreferenceFileService.saveValueToGermanPrefFile("DE$WC_DATA_RETIREVAL_START", "Der Datenabruf von der Web-API hat begonnen!");
+
+        mainPreferenceFileService.saveValueToHungaryPrefFile("HU$WC_DATA_RETIREVAL_END", "Az adatok lekérdezése a Web API-ról befejeződött!");
+        mainPreferenceFileService.saveValueToEnglishPrefFile("EN$WC_DATA_RETIREVAL_END", "Data retrieval from the Web API is complete!");
+        mainPreferenceFileService.saveValueToGermanPrefFile("DE$WC_DATA_RETIREVAL_END", "Der Datenabruf von der Web-API ist abgeschlossen!");
+
+        mainPreferenceFileService.saveValueToHungaryPrefFile("HU$WC_BASE_WEBAPI_NOT_AVAILABLE", "Az alap WEB API nem elérhető!");
+        mainPreferenceFileService.saveValueToEnglishPrefFile("EN$WC_BASE_WEBAPI_NOT_AVAILABLE", "The basic Web API is available!");
+        mainPreferenceFileService.saveValueToGermanPrefFile("DE$WC_BASE_WEBAPI_NOT_AVAILABLE", "Die grundlegende Web-API ist verfügbar!");
     }
 
     public void createMainWebAPIService(){
@@ -142,34 +191,39 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
         return currentLanguagePosition;
     }
 
-    public String getValueFromSettingsFile(String valueString) {
-        if(valueString == null) return null;
+    public String getStringValueFromSettingsFile(String key) {
+        if(key == null) return null;
         if(mainPreferenceFileService == null) return null;
 
-        // valide ???
-
-        String result = mainPreferenceFileService.getStringValueFromSettingsPrefFile(valueString);
+        String result = mainPreferenceFileService.getStringValueFromSettingsPrefFile(key);
 
         if(result == null) return null;
         return result;
     }
 
-    public void loadWebAPICallingTask() {
-        if(mCustomThreadPoolManager == null) return;
+    public int getIntValueFromSettingsFile(String key) {
+        if(key == null) return -1;
+        if(mainPreferenceFileService == null) return -1;
 
+        int result = mainPreferenceFileService.getIntValueFromSettingsPrefFile(key);
+
+        return result;
+    }
+
+    public void callSettingsWebAPI(){
+        if(mainWebAPIService == null) return;
+        mainWebAPIService.sendDeviceDetails("7a0e0865-08b2-488a-8a20-c327ce28e59d", "TESZT", "1");
+    }
+
+    public void initLoginButtons(int loginModesNumber, WindowSizeTypes[] wsc, int[] colors){
         try {
-            MainWebAPICalling callable = new MainWebAPICalling(context);
+            CreateLoginButtons callable = new CreateLoginButtons(context.getApplicationContext(), loginModesNumber, wsc, colors);
             callable.setCustomThreadPoolManager(mCustomThreadPoolManager);
             mCustomThreadPoolManager.addCallableMethod(callable);
         }
         catch (Exception e){
             ApplicationLogger.logging(LogLevel.FATAL, e.getMessage());
         }
-    }
-
-    public void getDevices(){
-        if(mainWebAPIService == null) return;
-        mainWebAPIService.sendDeviceDetails("7a0e0865-08b2-488a-8a20-c327ce28e59d", "TESZT", "1");
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -179,7 +233,7 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
         if(resultMessage == null) return;
         if(iMainActivityPresenter == null) return;
 
-        iMainActivityPresenter.sendResultToPresenter(resultMessage);
+        iMainActivityPresenter.sendWebAPIResultToPresenter(resultMessage);
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -187,260 +241,124 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
     @Override
     public void onSucces(ResultObject resultObject) {
         if(resultObject == null) return;
+        if(iMainActivityPresenter == null ) return;
         if(mainPreferenceFileService == null) return;
 
-        if(resultObject.getResultCode() != null) mainPreferenceFileService.saveValueToSettingsPrefFile("resultCode", resultObject.getResultCode());
+        AppDataManagerHelper.saveIntValueToPrefFile(mainPreferenceFileService, "resultCode", resultObject.getResultCode());
 
         Device device = resultObject.getDevice();
         if(device != null){
-            String value = device.getDeviceId();
-            if(value != null) {
-                mainPreferenceFileService.saveValueToSettingsPrefFile("resultCode", value);
-                Log.e("resultCode", mainPreferenceFileService.getStringValueFromSettingsPrefFile("resultCode"));
-            }
-            else {
-                mainPreferenceFileService.saveValueToSettingsPrefFile("resultCode", "");
-            }
 
-            value = device.getDeviceName();
-            if(value != null) {
-                mainPreferenceFileService.saveValueToSettingsPrefFile("deviceName", device.getDeviceName());
-                Log.e("deviceName", mainPreferenceFileService.getStringValueFromSettingsPrefFile("deviceName"));
-            }
-            else {
-                mainPreferenceFileService.saveValueToSettingsPrefFile("deviceName", "");
-            }
-
-
-            value = device.getActive();
-            if(value != null) {
-                mainPreferenceFileService.saveValueToSettingsPrefFile("active", device.getActive());
-                Log.e("active", mainPreferenceFileService.getStringValueFromSettingsPrefFile("active"));
-            }
-            else {
-                mainPreferenceFileService.saveValueToSettingsPrefFile("active", "");
-            }
-
-            value = device.getLastDeviceLoginDate();
-            if(value != null) {
-                mainPreferenceFileService.saveValueToSettingsPrefFile("lastDeviceLoginDate", device.getLastDeviceLoginDate());
-                Log.e("lastDeviceLoginDate", mainPreferenceFileService.getStringValueFromSettingsPrefFile("lastDeviceLoginDate"));
-            }
-            else {
-                mainPreferenceFileService.saveValueToSettingsPrefFile("lastDeviceLoginDate", "");
-            }
-
-            value = device.getComments();
-            if(value != null) {
-                mainPreferenceFileService.saveValueToSettingsPrefFile("comments", device.getComments());
-                Log.e("comments", mainPreferenceFileService.getStringValueFromSettingsPrefFile("comments"));
-            }
-            else {
-                mainPreferenceFileService.saveValueToSettingsPrefFile("comments", "");
-            }
+            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "deviceId", device.getDeviceId());
+            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "deviceName", device.getDeviceName());
+            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "active", device.getActive());
+            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "lastDeviceLoginDate", device.getLastDeviceLoginDate());
+            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "comments", device.getComments());
 
             List<Application> applications = device.getApplicationList();
+
             if(applications != null) {
+
+                AppDataManagerHelper.saveIntValueToPrefFile(mainPreferenceFileService, "applicationsNumber", device.getApplicationList().size());
+
                 for (int i = 0; i < applications.size(); i++) {
 
-                    value = applications.get(i).getId().toString();
-                    if(value != null) {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("id" + (i + 1), value);
-                        Log.e("id" + (i + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("id" + (i + 1)));
-                    }
-                    else {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("id" + (i + 1), "");
-                    }
-
-                    value = applications.get(i).getApplicationName();
-                    if(value != null) {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("applicationName" + (i + 1), value);
-                        Log.e("applicationName" + (i + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("applicationName" + (i + 1)));
-                    }
-                    else {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("applicationName" + (i + 1), "");
-                    }
-
-                    value = applications.get(i).getApplicationTitle();
-                    if(value != null) {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("applicationTitle" + (i + 1), value);
-                        Log.e("applicationTitle" + (i + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("applicationTitle" + (i + 1)));
-                    }
-                    else {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("applicationTitle" + (i + 1), "");
-                    }
-
-                    value = applications.get(i).getApplicationLead();
-                    if(value != null) {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("applicationLead" + (i + 1), value);
-                        Log.e("applicationLead" + (i + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("applicationLead" + (i + 1)));
-                    }
-                    else {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("applicationLead" + (i + 1), "");
-                    }
-
-                    value = applications.get(i).getApplicationDescription();
-                    if(value != null) {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("applicationDescription" + (i + 1), value);
-                        Log.e("applicationDescription" + (i + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("applicationDescription" + (i + 1)));
-                    }
-                    else {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("applicationDescription" + (i + 1), "");
-                    }
-
-                    value = applications.get(i).getApplicationVersion();
-                    if(value != null) {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("applicationVersion" + (i + 1), value);
-                        Log.e("applicationVersion" + (i + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("applicationVersion" + (i + 1)));
-                    }
-                    else {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("applicationVersion" + (i + 1), "");
-                    }
-
-                    int value_2 = applications.get(i).getApplicationEnabledLoginFlag();
-                    if(value != null) {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("applicationEnabledLoginFlag" + (i + 1), value_2);
-                        Log.e("applicationEnabledLoginFlag" + (i + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("applicationEnabledLoginFlag" + (i + 1)));
-                    }
-                    else {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("applicationEnabledLoginFlag" + (i + 1), "");
-                    }
-
-                    value = applications.get(i).getLoginUrl();
-                    if(value != null) {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("loginUrl" + (i + 1), value);
-                        Log.e("loginUrl" + (i + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("loginUrl" + (i + 1)));
-                    }
-                    else {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("loginUrl" + (i + 1), "");
-                    }
-
-                    value = applications.get(i).getMainUrl();
-                    if(value != null) {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("mainUrl" + (i + 1), value);
-                        Log.e("mainUrl" + (i + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("mainUrl" + (i + 1)));
-                    }
-                    else {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("mainUrl" + (i + 1), "");
-                    }
-
-                    value = applications.get(i).getSettingsUrl();
-                    if(value != null) {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("settingsUrl" + (i + 1), value);
-                        Log.e("settingsUrl" + (i + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("settingsUrl" + (i + 1)));
-                    }
-                    else {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("settingsUrl" + (i + 1), "");
-                    }
-
-                    value = applications.get(i).getHelpUrl();
-                    if(value != null) {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("helpUrl" + (i + 1), value);
-                        Log.e("helpUrl" + (i + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("helpUrl" + (i + 1)));
-                    }
-                    else {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("helpUrl" + (i + 1), "");
-                    }
-
-                    value_2 = applications.get(i).getDefaultThemeId();
-                    if(value != null) {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("defaultThemeId" + (i + 1), value_2);
-                        Log.e("defaultThemeId" + (i + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("defaultThemeId" + (i + 1)));
-                    }
-                    else {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("defaultThemeId" + (i + 1), "");
-                    }
-
-                    value = applications.get(i).getLogoUrl();
-                    if(value != null) {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("logoUrl" + (i + 1), value);
-                        Log.e("logoUrl" + (i + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("logoUrl" + (i + 1)));
-                    }
-                    else {
-                        mainPreferenceFileService.saveValueToSettingsPrefFile("logoUrl" + (i + 1), "");
-                    }
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "comments" + (i + 1), applications.get(i).getId().toString());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationName" + (i + 1), applications.get(i).getApplicationName());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationTitle" + (i + 1), applications.get(i).getApplicationTitle());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationLead" + (i + 1), applications.get(i).getApplicationLead());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationDescription" + (i + 1), applications.get(i).getApplicationDescription());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationVersion" + (i + 1), applications.get(i).getApplicationVersion());
+                    AppDataManagerHelper.saveIntValueToPrefFile(mainPreferenceFileService, "applicationEnabledLoginFlag" + (i + 1), applications.get(i).getApplicationEnabledLoginFlag());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "loginUrl" + (i + 1), applications.get(i).getLoginUrl());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "mainUrl" + (i + 1), applications.get(i).getMainUrl());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "settingsUrl" + (i + 1), applications.get(i).getSettingsUrl());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "helpUrl" + (i + 1), applications.get(i).getHelpUrl());
+                    AppDataManagerHelper.saveIntValueToPrefFile(mainPreferenceFileService, "defaultThemeId" + (i + 1), applications.get(i).getDefaultThemeId());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "logoUrl" + (i + 1), applications.get(i).getLogoUrl());
 
                     List<ApplicationTheme> applicationThemes = applications.get(i).getApplicationThemeList();
                     if(applicationThemes != null){
+
+                        AppDataManagerHelper.saveIntValueToPrefFile(mainPreferenceFileService, "applicationThemesNumber", applications.get(i).getApplicationThemeList().size());
+
                         for (int l = 0; l < applicationThemes.size(); l++) {
 
-                            value_2 = applicationThemes.get(l).getId();
-                            if(value != null) {
-                                mainPreferenceFileService.saveValueToSettingsPrefFile("id" + (l + 1), value_2);
-                                Log.e("id" + (l + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("id" + (l + 1)));
-                            }
-                            else {
-                                mainPreferenceFileService.saveValueToSettingsPrefFile("logoUrl" + (i + 1), "");
-                            }
-
-                            value = applicationThemes.get(l).getApplicationId().toString();
-                            if(value != null) {
-                                mainPreferenceFileService.saveValueToSettingsPrefFile("applicationId" + (l + 1), value);
-                                Log.e("applicationId" + (l + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("applicationId" + (l + 1)));
-                            }
-                            else {
-                                mainPreferenceFileService.saveValueToSettingsPrefFile("applicationId" + (l + 1), "");
-                            }
-
-                            value = applications.get(l).getLogoUrl();
-                            if(value != null) {
-                                mainPreferenceFileService.saveValueToSettingsPrefFile("logoUrl" + (l + 1), value);
-                                Log.e("logoUrl" + (l + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("logoUrl" + (l + 1)));
-                            }
-                            else {
-                                mainPreferenceFileService.saveValueToSettingsPrefFile("logoUrl" + (l + 1), "");
-                            }
-
-                            value = applicationThemes.get(l).getName();
-                            if(value != null) {
-                                mainPreferenceFileService.saveValueToSettingsPrefFile("name" + (l + 1), value);
-                                Log.e("name" + (l + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("name" + (l + 1)));
-                            }
-                            else {
-                                mainPreferenceFileService.saveValueToSettingsPrefFile("name" + (l + 1), "");
-                            }
-
-                            saveColorToSettingsPrefFile("backgroundColor" + (l + 1), applicationThemes.get(l).getBackgroundColor());
-                            saveColorToSettingsPrefFile("backgroundGradientColor" + (l + 1), applicationThemes.get(l).getBackgroundGradientColor());
-                            saveColorToSettingsPrefFile("foregroundColor" + (l + 1), applicationThemes.get(l).getForegroundColor());
-                            saveColorToSettingsPrefFile("buttonBackgroundColor" + (l + 1), applicationThemes.get(l).getButtonBackgroundColor());
-                            saveColorToSettingsPrefFile("buttonBackgroundGradientColor" + (l + 1), applicationThemes.get(l).getButtonBackgroundGradientColor());
-                            saveColorToSettingsPrefFile("buttonForegroundColor" + (l + 1), applicationThemes.get(l).getButtonForegroundColor());
-                            saveColorToSettingsPrefFile("controlColor" + (l + 1), applicationThemes.get(l).getControlColor());
-
-                            Log.e("backgroundColor" + (l + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("backgroundColor" + (l + 1)));
-                            Log.e("backgroundGradientColor" + (l + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("backgroundGradientColor" + (l + 1)));
-                            Log.e("foregroundColor" + (l + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("foregroundColor" + (l + 1)));
-                            Log.e("buttonBackgroundColor" + (l + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("buttonBackgroundColor" + (l + 1)));
-                            Log.e("buttonBackgroundGradientColor" + (l + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("buttonBackgroundGradientColor" + (l + 1)));
-                            Log.e("buttonForegroundColor" + (l + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("buttonForegroundColor" + (l + 1)));
-                            Log.e("controlColor" + (l + 1), mainPreferenceFileService.getStringValueFromSettingsPrefFile("controlColor" + (l + 1)));
-
+                            AppDataManagerHelper.saveIntValueToPrefFile(mainPreferenceFileService, "id" + (l + 1), applicationThemes.get(l).getId());
+                            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationId" + (l + 1), applicationThemes.get(l).getApplicationId().toString());
+                            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "logoUrl" + (l + 1), applications.get(l).getLogoUrl());
+                            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "name" + (l + 1), applicationThemes.get(l).getName());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "backgroundColor" + (l + 1), applicationThemes.get(l).getBackgroundColor());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "backgroundGradientColor" + (l + 1), applicationThemes.get(l).getBackgroundGradientColor());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "foregroundColor" + (l + 1), applicationThemes.get(l).getForegroundColor());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "buttonBackgroundColor" + (l + 1), applicationThemes.get(l).getButtonBackgroundColor());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "buttonBackgroundGradientColor" + (l + 1), applicationThemes.get(l).getButtonBackgroundGradientColor());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "buttonForegroundColor" + (l + 1), applicationThemes.get(l).getButtonForegroundColor());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "controlColor" + (l + 1), applicationThemes.get(l).getControlColor());
                         }
                     }
                 }
             }
         }
 
+        String message = getMessageFromLanguagesFiles( "WC_DATA_RETIREVAL_END", "$");
+        if(message != null ) iMainActivityPresenter.sendWebAPIResultToPresenter(message);
+
         // TODO a resultCode-kat át kell majd beszélni Imivel
     }
 
-    private void saveColorToSettingsPrefFile(String number , String value){
-        if(value == null) return;
-        if(value.contains("#")){
-            mainPreferenceFileService.saveValueToSettingsPrefFile(number, value);
+    @Override
+    public void onFailure() {
+        if(iMainActivityPresenter == null) return;
+
+        String message = getMessageFromLanguagesFiles( "WC_BASE_WEBAPI_NOT_AVAILABLE", "$");
+        if(message != null ) iMainActivityPresenter.sendWebAPIResultToPresenter(message);
+
+    }
+
+    public String getMessageFromLanguagesFiles(String languageKey, String separator){
+        if(languageKey == null) return null;
+
+        String currentLanguage = getStringValueFromSettingsFile("CurrentSelectedLanguage");
+        String result = null;
+        switch (currentLanguage){
+            case "HU":{
+                result = getMessageText(RepositoryType.HUNGARY_PREFERENCES_FILE, "HU" + separator + languageKey);
+                break;
+            }
+            case "EN":{
+                result = getMessageText(RepositoryType.ENGLISH_PREFERENCES_FILE, "EN" + separator + languageKey);
+                break;
+            }
+            case "DE":{
+                result = getMessageText(RepositoryType.GERMAN_PREFERENCES_FILE, "DE" + separator + languageKey);
+                break;
+            }
         }
-        else {
-            mainPreferenceFileService.saveValueToSettingsPrefFile(number, "#" + value);
-        }
+
+        if(result == null) return null;
+        return result;
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
     /* PresenterThreadCallback interfész függvénye */
     @Override
-    public void sendResultToPresenter(Message message) {
+    public void sendMessageToHandler(Message message) {
         if(appDataManagerHandler == null) return;
         appDataManagerHandler.sendMessage(message);
+    }
+
+    @Override
+    public void sendMessageToLoginView(String message) {
+        if(message == null) return;
+        if(iLoginActivityPresenter != null) iLoginActivityPresenter.getMessageFromAppDataManager(message);
+    }
+
+    @Override
+    public void sendCreatedButtonsToLoginView(List<ImageButton> createdButtons) {
+        if(createdButtons == null) return;
+        if(iLoginActivityPresenter == null) return;
+        iLoginActivityPresenter.getCreatedButtonsFromAppDataManager(createdButtons);
     }
 
     private static class AppDataManagerHandler extends Handler {
@@ -457,9 +375,16 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
             super.handleMessage(msg);
 
             switch (msg.what) {
-                case MessageIdentifiers.HARDWARE_ID_FAILED:
-                case MessageIdentifiers.THREAD_INTERRUPTED: {
-                    iAppDataManagerHandler.get().sendResultFromWebAPICallingTask(getWeakReferenceNotification(msg));
+                case MessageIdentifiers.EXCEPTION:{
+                    iAppDataManagerHandler.get().sendMessageToLoginView(getWeakReferenceNotification(msg));
+                    break;
+                }
+                case MessageIdentifiers.BUTTONS_IS_CREATED:{
+                    Log.e("handleMessage", "beléptem ide");
+                    if(msg.obj instanceof List){
+                        List<ImageButton> createdButtons = (List<ImageButton>) msg.obj;
+                        iAppDataManagerHandler.get().sendCreatedButtonsToLoginView(createdButtons);
+                    }
                     break;
                 }
             }

@@ -4,4 +4,5 @@ import hu.logcontrol.mobilflexandroid.models.ResultObject;
 
 public interface IMainWebAPIService {
     void onSucces(ResultObject resultObject);
+    void onFailure();
 }

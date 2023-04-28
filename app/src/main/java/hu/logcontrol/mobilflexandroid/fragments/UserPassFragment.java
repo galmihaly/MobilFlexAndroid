@@ -70,8 +70,7 @@ public class UserPassFragment extends Fragment implements ILoginFragments {
         }
 
         initPresenter();
-        initSettingsPreferenceFile();
-        initLanguagesPreferenceFiles();
+        initAppDataManager();
         setControlsValuesBySettings();
         setControlsTextsBySettings();
         initButtonListeners();
@@ -81,17 +80,11 @@ public class UserPassFragment extends Fragment implements ILoginFragments {
 
     private void initPresenter() {
         loginFragmentsPresenter = new LoginFragmentsPresenter(this, getContext());
-        loginFragmentsPresenter.initTaskManager();
     }
 
-    private void initSettingsPreferenceFile() {
+    private void initAppDataManager(){
         if(loginFragmentsPresenter == null) return;
-        loginFragmentsPresenter.initSettingsPreferenceFile();
-    }
-
-    private void initLanguagesPreferenceFiles(){
-        if(loginFragmentsPresenter == null) return;
-        loginFragmentsPresenter.initLanguageSharedPreferenceFiles();
+        loginFragmentsPresenter.initAppDataManager();
     }
 
     private void setControlsValuesBySettings() {
