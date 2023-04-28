@@ -2,36 +2,14 @@ package hu.logcontrol.mobilflexandroid.fragments.presenters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 
-import androidx.security.crypto.EncryptedSharedPreferences;
-import androidx.security.crypto.MasterKeys;
-
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-
-import hu.logcontrol.mobilflexandroid.LoginActivity;
 import hu.logcontrol.mobilflexandroid.WebViewActivity;
 import hu.logcontrol.mobilflexandroid.datamanager.AppDataManager;
 import hu.logcontrol.mobilflexandroid.enums.FragmentTypes;
-import hu.logcontrol.mobilflexandroid.enums.MessageIdentifiers;
 import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
 import hu.logcontrol.mobilflexandroid.fragments.interfaces.ILoginFragmentsPresenter;
 import hu.logcontrol.mobilflexandroid.fragments.interfaces.ILoginFragments;
-import hu.logcontrol.mobilflexandroid.logger.ApplicationLogger;
-import hu.logcontrol.mobilflexandroid.logger.LogLevel;
-import hu.logcontrol.mobilflexandroid.models.LanguagesSharedPreferences;
-import hu.logcontrol.mobilflexandroid.models.LocalEncryptedPreferences;
-import hu.logcontrol.mobilflexandroid.models.SettingsObject;
-import hu.logcontrol.mobilflexandroid.taskmanager.CustomThreadPoolManager;
-import hu.logcontrol.mobilflexandroid.taskmanager.PresenterThreadCallback;
 
 public class LoginFragmentsPresenter implements ILoginFragmentsPresenter {
 

@@ -1,21 +1,13 @@
 package hu.logcontrol.mobilflexandroid.datamanager;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-
 import hu.logcontrol.mobilflexandroid.R;
-import hu.logcontrol.mobilflexandroid.enums.RepositoryType;
 import hu.logcontrol.mobilflexandroid.models.LanguagesSharedPreferences;
 import hu.logcontrol.mobilflexandroid.models.LocalEncryptedPreferences;
-import hu.logcontrol.mobilflexandroid.models.SettingsObject;
 
 public class MainPreferenceFileService {
 
