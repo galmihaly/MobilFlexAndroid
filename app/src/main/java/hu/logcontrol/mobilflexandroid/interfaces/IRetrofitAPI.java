@@ -11,10 +11,6 @@ import retrofit2.http.Headers;
 import retrofit2.http.POST;
 
 public interface IRetrofitAPI {
-
-    @GET
-    Call<Device> getDevices();
-
     @Headers("Content-Type: application/json")
     @POST("device")
     Call<ResultObject> postDeviceRequestObject(@Body JsonObject jsonObject);
