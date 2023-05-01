@@ -19,12 +19,9 @@ public class MessageIdentifiers {
     // Size of Buttons List
     public static final int BUTTONS_LIST_SIZE = 100;
 
-    // CreateOrderItemsResponseEnums
-    public static final int ADAPTER_CREATED_SUCCES = 20;
-    public static final int ADAPTER_CREATED_FAILED = 21;
+    // LOGO_DOWNLOAD identifiers
+    public static final int LOGO_DOWNLOAD_SUCCES = 14;
 
     //ERROR identifiers
     public static final int EXCEPTION = -2;
-    public static final int HARDWARE_ID_FAILED = -3;
-    public static final int THREAD_INTERRUPTED = -4;
 }

@@ -31,12 +31,16 @@ public class PinCodeFragment extends Fragment implements ILoginFragments {
 
     private Button loginButton;
     private WindowSizeTypes[] wsc = new WindowSizeTypes[2];
+    private String defaultThemeId;
+    private String applicationId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         wsc[0]  = (WindowSizeTypes) getArguments().getSerializable("windowHeightEnum");
         wsc[1] =  (WindowSizeTypes) getArguments().getSerializable("windowWidthEnum");
+        defaultThemeId = getArguments().getString("defaultThemeId");
+        applicationId = getArguments().getString("applicationId");
 
         if(wsc[0] != null && wsc[1] != null){
             if((wsc[0] == WindowSizeTypes.COMPACT && wsc[1] == WindowSizeTypes.MEDIUM) ||
@@ -80,7 +84,9 @@ public class PinCodeFragment extends Fragment implements ILoginFragments {
 
     private void setControlsValuesBySettings() {
         if(loginFragmentsPresenter == null) return;
-        loginFragmentsPresenter.setControlsValuesBySettings();
+        if(applicationId == null) return;
+        if(defaultThemeId == null) return;
+        loginFragmentsPresenter.setControlsValuesBySettings(applicationId, defaultThemeId);
     }
 
     private void setControlsTextsBySettings() {

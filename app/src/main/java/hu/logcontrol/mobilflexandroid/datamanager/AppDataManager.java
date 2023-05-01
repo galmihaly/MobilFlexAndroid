@@ -15,22 +15,24 @@ import hu.logcontrol.mobilflexandroid.R;
 import hu.logcontrol.mobilflexandroid.enums.MessageIdentifiers;
 import hu.logcontrol.mobilflexandroid.enums.RepositoryType;
 import hu.logcontrol.mobilflexandroid.enums.WindowSizeTypes;
-import hu.logcontrol.mobilflexandroid.fragments.interfaces.ILoginFragments;
 import hu.logcontrol.mobilflexandroid.fragments.interfaces.ILoginFragmentsPresenter;
 import hu.logcontrol.mobilflexandroid.helpers.AppDataManagerHelper;
 import hu.logcontrol.mobilflexandroid.interfaces.IAppDataManagerHandler;
 import hu.logcontrol.mobilflexandroid.interfaces.ILoginActivityPresenter;
 import hu.logcontrol.mobilflexandroid.interfaces.IMainActivityPresenter;
 import hu.logcontrol.mobilflexandroid.interfaces.IMainWebAPIService;
+import hu.logcontrol.mobilflexandroid.interfaces.IProgramsPresenter;
 import hu.logcontrol.mobilflexandroid.logger.ApplicationLogger;
 import hu.logcontrol.mobilflexandroid.logger.LogLevel;
 import hu.logcontrol.mobilflexandroid.models.Application;
 import hu.logcontrol.mobilflexandroid.models.ApplicationTheme;
 import hu.logcontrol.mobilflexandroid.models.Device;
+import hu.logcontrol.mobilflexandroid.models.ProgramsResultObject;
 import hu.logcontrol.mobilflexandroid.models.ResultObject;
 import hu.logcontrol.mobilflexandroid.taskmanager.CustomThreadPoolManager;
 import hu.logcontrol.mobilflexandroid.taskmanager.PresenterThreadCallback;
 import hu.logcontrol.mobilflexandroid.tasks.CreateLoginButtons;
+import hu.logcontrol.mobilflexandroid.tasks.DownloadSVGLogo;
 
 public class AppDataManager implements PresenterThreadCallback, IAppDataManagerHandler, IMainWebAPIService {
 
@@ -38,6 +40,7 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
     private IMainActivityPresenter iMainActivityPresenter;
     private ILoginActivityPresenter iLoginActivityPresenter;
     private ILoginFragmentsPresenter iLoginFragmentsPresenter;
+    private IProgramsPresenter iProgramsPresenter;
 
     private CustomThreadPoolManager mCustomThreadPoolManager;
     private AppDataManagerHandler appDataManagerHandler;
@@ -61,6 +64,11 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
         this.iLoginFragmentsPresenter = iLoginFragmentsPresenter;
     }
 
+    public AppDataManager(Context context, IProgramsPresenter iProgramsPresenter) {
+        this.context = context.getApplicationContext();
+        this.iProgramsPresenter = iProgramsPresenter;
+    }
+
     public void createPreferenceFileService(){
         mainPreferenceFileService = new MainPreferenceFileService(context);
     }
@@ -73,7 +81,7 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
     public void initLanguagesPrefFile(){
         if(mainPreferenceFileService == null) return;
 
-        mainPreferenceFileService.initPublicSharedPreferenceFiles(
+        mainPreferenceFileService.initPublicSharedPreferenceFile(
                 "HungaryWCPrefFile",
                 "EnglishWCPrefFile",
                 "GermanWCPrefFile"
@@ -127,7 +135,6 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
         if(key == null) return;
         if(value == null) return;
         if(mainPreferenceFileService == null) return;
-
         mainPreferenceFileService.saveValueToSettingsPrefFile(key, value);
     }
 
@@ -212,10 +219,21 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
 
     public void callSettingsWebAPI(){
         if(mainWebAPIService == null) return;
-        mainWebAPIService.sendDeviceDetails("7a0e0865-08b2-488a-8a20-c327ce28e59d", "TESZT", "1");
+
+        String serialNumber = AppDataManagerHelper.getDeviceSerialNumber();
+        String deviceName = AppDataManagerHelper.getDeviceName(context);
+
+        if(serialNumber != null && deviceName != null){
+            // ide kell majd második paraméternek a serialNumber változó értéke
+            mainWebAPIService.sendDeviceDetails("7a0e0865-08b2-488a-8a20-c327ce28e59d", "TESZT", deviceName);
+        }
     }
 
     public void initLoginButtons(int loginModesNumber, WindowSizeTypes[] wsc, int[] colors){
+        if(wsc == null) return;
+        if(colors == null) return;
+        if(mCustomThreadPoolManager == null) return;
+
         try {
             CreateLoginButtons callable = new CreateLoginButtons(context.getApplicationContext(), loginModesNumber, wsc, colors);
             callable.setCustomThreadPoolManager(mCustomThreadPoolManager);
@@ -226,14 +244,51 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
         }
     }
 
+    public void getDataFromAppDataManager(int applicationsSize) {
+        if(mCustomThreadPoolManager == null) return;
+        if(mainPreferenceFileService == null) return;
+
+        try {
+            DownloadSVGLogo callable = new DownloadSVGLogo(context.getApplicationContext(), mainPreferenceFileService, applicationsSize);
+            callable.setCustomThreadPoolManager(mCustomThreadPoolManager);
+            mCustomThreadPoolManager.addCallableMethod(callable);
+        }
+        catch (Exception e){
+            ApplicationLogger.logging(LogLevel.FATAL, e.getMessage());
+        }
+    }
+
+    public String getMessageFromLanguagesFiles(String languageKey, String separator){
+        if(languageKey == null) return null;
+
+        String currentLanguage = getStringValueFromSettingsFile("CurrentSelectedLanguage");
+        String result = null;
+        switch (currentLanguage){
+            case "HU":{
+                result = getMessageText(RepositoryType.HUNGARY_PREFERENCES_FILE, "HU" + separator + languageKey);
+                break;
+            }
+            case "EN":{
+                result = getMessageText(RepositoryType.ENGLISH_PREFERENCES_FILE, "EN" + separator + languageKey);
+                break;
+            }
+            case "DE":{
+                result = getMessageText(RepositoryType.GERMAN_PREFERENCES_FILE, "DE" + separator + languageKey);
+                break;
+            }
+        }
+
+        if(result == null) return null;
+        return result;
+    }
+
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
     /* IAppDataManager interfész függvénye */
     @Override
-    public void sendResultFromWebAPICallingTask(String resultMessage) {
-        if(resultMessage == null) return;
-        if(iMainActivityPresenter == null) return;
-
-        iMainActivityPresenter.sendWebAPIResultToPresenter(resultMessage);
+    public void sendDowloadedLogoToPresenter(List<ProgramsResultObject> programsResultObject) {
+        if(programsResultObject == null) return;
+        if(iProgramsPresenter == null) return;
+        iProgramsPresenter.sendDatasLogoToPresenter(programsResultObject);
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -263,19 +318,19 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
 
                 for (int i = 0; i < applications.size(); i++) {
 
-                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "comments" + (i + 1), applications.get(i).getId().toString());
-                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationName" + (i + 1), applications.get(i).getApplicationName());
-                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationTitle" + (i + 1), applications.get(i).getApplicationTitle());
-                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationLead" + (i + 1), applications.get(i).getApplicationLead());
-                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationDescription" + (i + 1), applications.get(i).getApplicationDescription());
-                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationVersion" + (i + 1), applications.get(i).getApplicationVersion());
-                    AppDataManagerHelper.saveIntValueToPrefFile(mainPreferenceFileService, "applicationEnabledLoginFlag" + (i + 1), applications.get(i).getApplicationEnabledLoginFlag());
-                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "loginUrl" + (i + 1), applications.get(i).getLoginUrl());
-                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "mainUrl" + (i + 1), applications.get(i).getMainUrl());
-                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "settingsUrl" + (i + 1), applications.get(i).getSettingsUrl());
-                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "helpUrl" + (i + 1), applications.get(i).getHelpUrl());
-                    AppDataManagerHelper.saveIntValueToPrefFile(mainPreferenceFileService, "defaultThemeId" + (i + 1), applications.get(i).getDefaultThemeId());
-                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "logoUrl" + (i + 1), applications.get(i).getLogoUrl());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationId" + '_' + (i + 1), applications.get(i).getId().toString());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationName" + '_' + (i + 1), applications.get(i).getApplicationName());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationTitle" + '_' + (i + 1), applications.get(i).getApplicationTitle());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationLead" + '_' + (i + 1), applications.get(i).getApplicationLead());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationDescription" + '_' + (i + 1), applications.get(i).getApplicationDescription());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationVersion" + '_' + (i + 1), applications.get(i).getApplicationVersion());
+                    AppDataManagerHelper.saveIntValueToPrefFile(mainPreferenceFileService, "applicationEnabledLoginFlag" + '_' + (i + 1), applications.get(i).getApplicationEnabledLoginFlag());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "loginUrl" + '_' + (i + 1), applications.get(i).getLoginUrl());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "mainUrl" + '_' + (i + 1), applications.get(i).getMainUrl());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "settingsUrl" + '_' + (i + 1), applications.get(i).getSettingsUrl());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "helpUrl" + '_' + (i + 1), applications.get(i).getHelpUrl());
+                    AppDataManagerHelper.saveIntValueToPrefFile(mainPreferenceFileService, "defaultThemeId" + '_' + (i + 1), applications.get(i).getDefaultThemeId());
+                    AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "logoUrl" + '_' + (i + 1), applications.get(i).getLogoUrl());
 
                     List<ApplicationTheme> applicationThemes = applications.get(i).getApplicationThemeList();
                     if(applicationThemes != null){
@@ -284,17 +339,17 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
 
                         for (int l = 0; l < applicationThemes.size(); l++) {
 
-                            AppDataManagerHelper.saveIntValueToPrefFile(mainPreferenceFileService, "id" + (l + 1), applicationThemes.get(l).getId());
-                            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationId" + (l + 1), applicationThemes.get(l).getApplicationId().toString());
-                            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "logoUrl" + (l + 1), applications.get(l).getLogoUrl());
-                            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "name" + (l + 1), applicationThemes.get(l).getName());
-                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "backgroundColor" + (l + 1), applicationThemes.get(l).getBackgroundColor());
-                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "backgroundGradientColor" + (l + 1), applicationThemes.get(l).getBackgroundGradientColor());
-                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "foregroundColor" + (l + 1), applicationThemes.get(l).getForegroundColor());
-                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "buttonBackgroundColor" + (l + 1), applicationThemes.get(l).getButtonBackgroundColor());
-                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "buttonBackgroundGradientColor" + (l + 1), applicationThemes.get(l).getButtonBackgroundGradientColor());
-                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "buttonForegroundColor" + (l + 1), applicationThemes.get(l).getButtonForegroundColor());
-                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "controlColor" + (l + 1), applicationThemes.get(l).getControlColor());
+                            AppDataManagerHelper.saveIntValueToPrefFile(mainPreferenceFileService, "id" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getId());
+                            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationId" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getApplicationId().toString());
+                            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "logoUrl" + '_' + (i + 1) + '_' + (l + 1), applications.get(l).getLogoUrl());
+                            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "name" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getName());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "backgroundColor" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getBackgroundColor());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "backgroundGradientColor" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getBackgroundGradientColor());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "foregroundColor" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getForegroundColor());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "buttonBackgroundColor" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getButtonBackgroundColor());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "buttonBackgroundGradientColor" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getButtonBackgroundGradientColor());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "buttonForegroundColor" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getButtonForegroundColor());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "controlColor" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getControlColor());
                         }
                     }
                 }
@@ -302,7 +357,7 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
         }
 
         String message = getMessageFromLanguagesFiles( "WC_DATA_RETIREVAL_END", "$");
-        if(message != null ) iMainActivityPresenter.sendWebAPIResultToPresenter(message);
+        if(message != null ) iMainActivityPresenter.sendBitmapLogoToPresenter(message);
 
         // TODO a resultCode-kat át kell majd beszélni Imivel
     }
@@ -312,32 +367,8 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
         if(iMainActivityPresenter == null) return;
 
         String message = getMessageFromLanguagesFiles( "WC_BASE_WEBAPI_NOT_AVAILABLE", "$");
-        if(message != null ) iMainActivityPresenter.sendWebAPIResultToPresenter(message);
+        if(message != null ) iMainActivityPresenter.sendBitmapLogoToPresenter(message);
 
-    }
-
-    public String getMessageFromLanguagesFiles(String languageKey, String separator){
-        if(languageKey == null) return null;
-
-        String currentLanguage = getStringValueFromSettingsFile("CurrentSelectedLanguage");
-        String result = null;
-        switch (currentLanguage){
-            case "HU":{
-                result = getMessageText(RepositoryType.HUNGARY_PREFERENCES_FILE, "HU" + separator + languageKey);
-                break;
-            }
-            case "EN":{
-                result = getMessageText(RepositoryType.ENGLISH_PREFERENCES_FILE, "EN" + separator + languageKey);
-                break;
-            }
-            case "DE":{
-                result = getMessageText(RepositoryType.GERMAN_PREFERENCES_FILE, "DE" + separator + languageKey);
-                break;
-            }
-        }
-
-        if(result == null) return null;
-        return result;
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -349,13 +380,13 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
     }
 
     @Override
-    public void sendMessageToLoginView(String message) {
+    public void sendMessageToPresenter(String message) {
         if(message == null) return;
         if(iLoginActivityPresenter != null) iLoginActivityPresenter.getMessageFromAppDataManager(message);
     }
 
     @Override
-    public void sendCreatedButtonsToLoginView(List<ImageButton> createdButtons) {
+    public void sendCreatedButtonsToPresenter(List<ImageButton> createdButtons) {
         if(createdButtons == null) return;
         if(iLoginActivityPresenter == null) return;
         iLoginActivityPresenter.getCreatedButtonsFromAppDataManager(createdButtons);
@@ -376,14 +407,20 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
 
             switch (msg.what) {
                 case MessageIdentifiers.EXCEPTION:{
-                    iAppDataManagerHandler.get().sendMessageToLoginView(getWeakReferenceNotification(msg));
+                    iAppDataManagerHandler.get().sendMessageToPresenter(getWeakReferenceNotification(msg));
                     break;
                 }
                 case MessageIdentifiers.BUTTONS_IS_CREATED:{
-                    Log.e("handleMessage", "beléptem ide");
                     if(msg.obj instanceof List){
                         List<ImageButton> createdButtons = (List<ImageButton>) msg.obj;
-                        iAppDataManagerHandler.get().sendCreatedButtonsToLoginView(createdButtons);
+                        iAppDataManagerHandler.get().sendCreatedButtonsToPresenter(createdButtons);
+                    }
+                    break;
+                }
+                case MessageIdentifiers.LOGO_DOWNLOAD_SUCCES:{
+                    if(msg.obj instanceof List){
+                        List<ProgramsResultObject> logo = (List<ProgramsResultObject>) msg.obj;
+                        iAppDataManagerHandler.get().sendDowloadedLogoToPresenter(logo);
                     }
                     break;
                 }

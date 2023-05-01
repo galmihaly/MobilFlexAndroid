@@ -128,22 +128,22 @@ public class LoginFragmentsPresenter implements ILoginFragmentsPresenter {
     }
 
     @Override
-    public void setControlsValuesBySettings() {
+    public void setControlsValuesBySettings(String defaultThemeId, String applicationId) {
         if(iLoginFragments == null) return;
         if(appDataManager == null) return;
 
-        String controlColor = appDataManager.getStringValueFromSettingsFile("controlColor1");
-        String textColor = appDataManager.getStringValueFromSettingsFile("foregroundColor1");
+        String controlColor = appDataManager.getStringValueFromSettingsFile("controlColor" + '_' + applicationId + '_' + defaultThemeId);
+        String textColor = appDataManager.getStringValueFromSettingsFile("foregroundColor" + '_' + applicationId + '_' + defaultThemeId);
 
-        String buttonBackgroundColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundColor1");
+        String buttonBackgroundColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundColor" + '_' + applicationId + '_' + defaultThemeId);
         Log.e("buttonBackgroundColor", buttonBackgroundColor);
 
-        String buttonBackgroundGradientColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundGradientColor1");
+        String buttonBackgroundGradientColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
         Log.e("buttonBackgroundGradientColor", buttonBackgroundGradientColor);
 
-        String buttonForeGroundColor = appDataManager.getStringValueFromSettingsFile("buttonForegroundColor1");
+        String buttonForeGroundColor = appDataManager.getStringValueFromSettingsFile("buttonForegroundColor" + '_' + applicationId + '_' + defaultThemeId);
 
-        String currentLanguage = appDataManager.getStringValueFromSettingsFile("CurrentSelectedLanguage1");
+        String currentLanguage = appDataManager.getStringValueFromSettingsFile("CurrentSelectedLanguage");
         String buttonLabel = null;
 
 //        switch (currentLanguage){

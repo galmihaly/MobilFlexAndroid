@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import hu.logcontrol.mobilflexandroid.LoginActivity;
+import hu.logcontrol.mobilflexandroid.ProgramsActivity;
 import hu.logcontrol.mobilflexandroid.adapters.LanguagesSpinnerAdapter;
 import hu.logcontrol.mobilflexandroid.datamanager.AppDataManager;
 import hu.logcontrol.mobilflexandroid.enums.RepositoryType;
@@ -29,7 +30,7 @@ public class MainActivityPresenter implements IMainActivityPresenter {
     /* ILoginActivityPresenter interfész függvényei */
 
     @Override
-    public void openActivityByEnum(ViewEnums viewEnum) {
+    public void openActivityByEnum(ViewEnums viewEnum, int applicationNumber) {
         if(viewEnum == null) return;
         if(iMainActivity == null) return;
         if(appDataManager == null) return;
@@ -39,9 +40,19 @@ public class MainActivityPresenter implements IMainActivityPresenter {
         switch (viewEnum){
             case LOGIN_ACTIVITY:{
                 intent = new Intent(context, LoginActivity.class);
-
+                intent.putExtra("applicationsSize", applicationNumber);
                 break;
             }
+            case APPLICATIONS_ACTIVITY:{
+                intent = new Intent(context, ProgramsActivity.class);
+                intent.putExtra("applicationsSize", applicationNumber);
+                break;
+            }
+//            case SETTINSG_ACTIVITY:{
+//                intent = new Intent(context, ProgramsActivity.class);
+//                intent.putExtra("applicationsSize", applicationNumber);
+//                break;
+//            }
         }
 
         if(intent == null) return;
@@ -152,7 +163,7 @@ public class MainActivityPresenter implements IMainActivityPresenter {
     }
 
     @Override
-    public void sendWebAPIResultToPresenter(String resultMessage) {
+    public void sendBitmapLogoToPresenter(String resultMessage) {
         if(resultMessage == null) return;
         if(iMainActivity == null) return;
 
@@ -160,16 +171,17 @@ public class MainActivityPresenter implements IMainActivityPresenter {
 
         int resultCode = appDataManager.getIntValueFromSettingsFile("resultCode");
         if(resultCode == -99) {
-            openActivityByEnum(ViewEnums.SETTINSG_ACTIVITY);
+            openActivityByEnum(ViewEnums.SETTINSG_ACTIVITY, -1);
         }
         else {
 
             int applicationNumber = appDataManager.getIntValueFromSettingsFile("applicationsNumber");
             if(applicationNumber == 1){
-                openActivityByEnum(ViewEnums.LOGIN_ACTIVITY);
+//                openActivityByEnum(ViewEnums.LOGIN_ACTIVITY, 1);
+                openActivityByEnum(ViewEnums.APPLICATIONS_ACTIVITY, applicationNumber);
             }
             else {
-                openActivityByEnum(ViewEnums.APPLICATIONS_ACTIVITY);
+                openActivityByEnum(ViewEnums.APPLICATIONS_ACTIVITY, applicationNumber);
             }
         }
     }

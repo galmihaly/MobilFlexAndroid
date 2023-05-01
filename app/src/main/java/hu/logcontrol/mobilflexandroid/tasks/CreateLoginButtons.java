@@ -1,14 +1,10 @@
 package hu.logcontrol.mobilflexandroid.tasks;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Message;
-import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-
-import androidx.core.content.ContextCompat;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -295,7 +291,7 @@ public class CreateLoginButtons implements Callable {
             case -1:{ ApplicationLogger.logging(LogLevel.WARNING, "Nem lehet ilyen módon bejelentkezni!"); break; }
             case -2:{
                 ApplicationLogger.logging(LogLevel.FATAL, exceptionMessage);
-                sendMessageToPresenterHandler(CreateFileEnums.EXCEPTION);
+                sendMessageToAdapterHandler(CreateLoginButtonsEnums.EXCEPTION);
                 break;
             }
 
@@ -310,7 +306,7 @@ public class CreateLoginButtons implements Callable {
         }
     }
 
-    private void sendMessageToPresenterHandler(CreateFileEnums createFileEnum){
+    private void sendMessageToAdapterHandler(CreateLoginButtonsEnums createFileEnum){
 
         switch (createFileEnum){
             case EXCEPTION:{
@@ -324,7 +320,7 @@ public class CreateLoginButtons implements Callable {
         }
     }
 
-    private enum  CreateFileEnums{
+    private enum CreateLoginButtonsEnums {
         EXCEPTION,
     }
 }

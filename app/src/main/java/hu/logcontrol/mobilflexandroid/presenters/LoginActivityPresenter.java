@@ -1,6 +1,7 @@
 package hu.logcontrol.mobilflexandroid.presenters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.util.Log;
 import android.widget.ImageButton;
@@ -56,21 +57,25 @@ public class LoginActivityPresenter implements ILoginActivityPresenter {
     }
 
     @Override
-    public void initButtonsByLoginModesNumber(WindowSizeTypes[] wsc) {
+    public void initButtonsByLoginModesNumber(WindowSizeTypes[] wsc, Intent intent) {
         if(wsc == null) return;
+        if(intent == null) return;
         if(appDataManager == null) return;
 
-        String color1 = appDataManager.getStringValueFromSettingsFile("backgroundColor1");
-        String color2 = appDataManager.getStringValueFromSettingsFile("backgroundGradientColor1");
+        String defaultThemeId = String.valueOf(intent.getIntExtra("defaultThemeId", -1));
+        String applicationId = String.valueOf(intent.getIntExtra("applicationId", -1));
+
+        String color1 = appDataManager.getStringValueFromSettingsFile("backgroundColor" + '_' + applicationId + '_' + defaultThemeId);
+        String color2 = appDataManager.getStringValueFromSettingsFile("backgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
 
         try {
             if(color1 != null && color2 != null){
                 int[] colors = new int[] {
-                        Color.parseColor(appDataManager.getStringValueFromSettingsFile("backgroundColor1")),
-                        Color.parseColor(appDataManager.getStringValueFromSettingsFile("backgroundGradientColor1"))
+                        Color.parseColor(appDataManager.getStringValueFromSettingsFile("backgroundColor" + '_' + applicationId + '_' + defaultThemeId)),
+                        Color.parseColor(appDataManager.getStringValueFromSettingsFile("backgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId))
                 };
 
-                int loginModesNumber = appDataManager.getIntValueFromSettingsFile("applicationEnabledLoginFlag1");
+                int loginModesNumber = appDataManager.getIntValueFromSettingsFile("applicationEnabledLoginFlag" + '_' + applicationId);
                 appDataManager.initLoginButtons(loginModesNumber, wsc, colors);
             }
         }
@@ -80,16 +85,21 @@ public class LoginActivityPresenter implements ILoginActivityPresenter {
     }
 
     @Override
-    public void setControlsValuesBySettings() {
+    public void setControlsValuesBySettings(Intent intent) {
         if(iLoginActivity == null) return;
         if(appDataManager == null) return;
+        if(intent == null) return;
+
+        String defaultThemeId = String.valueOf(intent.getIntExtra("defaultThemeId", -1));
+        String applicationId = String.valueOf(intent.getIntExtra("applicationId", -1));
 
         String message = "Bejelentkezés";
-        String applicationLead = appDataManager.getStringValueFromSettingsFile("applicationLead1");
-        String backgroundColor = appDataManager.getStringValueFromSettingsFile("backgroundColor1");
-        String backgroundGradientColor = appDataManager.getStringValueFromSettingsFile("backgroundGradientColor1");
-        String foreGroundColor = appDataManager.getStringValueFromSettingsFile("foregroundColor1");
-        String applicationName = appDataManager.getStringValueFromSettingsFile("applicationTitle1");
+        String applicationLead = appDataManager.getStringValueFromSettingsFile("applicationLead" + '_' + applicationId);
+        String applicationName = appDataManager.getStringValueFromSettingsFile("applicationTitle" + '_' + applicationId);
+
+        String backgroundColor = appDataManager.getStringValueFromSettingsFile("backgroundColor" + '_' + applicationId + '_' + defaultThemeId);
+        String backgroundGradientColor = appDataManager.getStringValueFromSettingsFile("backgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
+        String foreGroundColor = appDataManager.getStringValueFromSettingsFile("foregroundColor" + '_' + applicationId + '_' + defaultThemeId);
 
         // TODO ezt majd le kell tölteni egy URL-ről
         iLoginActivity.changeStateLoginLogo(R.drawable.ic_baseline_album);

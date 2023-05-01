@@ -17,7 +17,6 @@ import androidx.fragment.app.Fragment;
 
 import java.util.List;
 
-import hu.logcontrol.mobilflexandroid.enums.FragmentTypes;
 import hu.logcontrol.mobilflexandroid.enums.MessageIdentifiers;
 import hu.logcontrol.mobilflexandroid.enums.WindowSizeTypes;
 
@@ -76,11 +75,17 @@ public class Helper {
         }
     }
 
-    public static void sendDisplaySizesToFragments(Fragment fragment, WindowSizeTypes[] windowSizeClasses) {
+    public static void sendDisplaySizesToFragments(Fragment fragment, WindowSizeTypes[] windowSizeClasses, String defaultThemeId, String applicationId) {
+        if(fragment == null) return;
+        if(windowSizeClasses == null) return;
+        if(defaultThemeId == null) return;
+        if(applicationId == null) return;
+
         Bundle bundle = new Bundle();
         bundle.putSerializable("windowHeightEnum", windowSizeClasses[0]);
         bundle.putSerializable("windowWidthEnum", windowSizeClasses[1]);
-//        bundle.putSerializable("fragmentType", fragmentTypes);
+        bundle.putString("defaultThemeId", defaultThemeId);
+        bundle.putSerializable("applicationId", applicationId);
 
         fragment.setArguments(bundle);
     }

@@ -16,18 +16,12 @@ public class MainPreferenceFileService {
     private LanguagesSharedPreferences englishWCPrefFile;
     private LocalEncryptedPreferences preferences;
 
-    private static final int[] languagesFlags = new int[] {
-            R.drawable.ic_hu2,
-            R.drawable.ic_brit,
-            R.drawable.ic_german
-    };
-
     private Context context;
     public MainPreferenceFileService(Context context) {
         this.context = context.getApplicationContext();
     }
 
-    public void initPublicSharedPreferenceFiles(String hungaryFileName, String englsihFileName, String germanFileName) {
+    public void initPublicSharedPreferenceFile(String hungaryFileName, String englsihFileName, String germanFileName) {
         this.hungaryWCPrefFile = new LanguagesSharedPreferences(context, hungaryFileName);
         this.englishWCPrefFile = new LanguagesSharedPreferences(context, englsihFileName);
         this.germanWCPrefFile = new LanguagesSharedPreferences(context, germanFileName);
@@ -125,11 +119,11 @@ public class MainPreferenceFileService {
         preferences.replaceInt(key, value);
     }
 
-    public void saveValueToSettingsPrefFile(String key, boolean value){
-        if(key == null) return;
-        if(preferences == null) return;
-        preferences.replaceBoolean(key, value);
+    public int[] getLanguagesFlags(){
+        return new int[] {
+                R.drawable.ic_hu2,
+                R.drawable.ic_brit,
+                R.drawable.ic_german
+        };
     }
-
-    public int[] getLanguagesFlags(){ return languagesFlags; }
 }

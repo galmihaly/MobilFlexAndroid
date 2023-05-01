@@ -8,8 +8,8 @@ import java.util.List;
 import hu.logcontrol.mobilflexandroid.enums.WindowSizeTypes;
 
 public interface ILoginActivityPresenter {
-    void initButtonsByLoginModesNumber(WindowSizeTypes[] wsc);
-    void setControlsValuesBySettings();
+    void initButtonsByLoginModesNumber(WindowSizeTypes[] wsc, Intent intent);
+    void setControlsValuesBySettings(Intent intent);
     void initAppDataManager();
     void getMessageFromAppDataManager(String message);
     void getCreatedButtonsFromAppDataManager(List<ImageButton> createdButtons);

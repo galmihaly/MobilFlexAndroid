@@ -13,7 +13,6 @@ import retrofit2.Callback;
 
 import retrofit2.Response;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class MainWebAPIService implements Callback<ResultObject>{
 
@@ -25,7 +24,6 @@ public class MainWebAPIService implements Callback<ResultObject>{
 
         this.iRetrofitAPI = new retrofit2.Retrofit.Builder()
                 .baseUrl(baseUrl)
-                .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(IRetrofitAPI.class);
@@ -62,6 +60,7 @@ public class MainWebAPIService implements Callback<ResultObject>{
     public void onResponse(Call<ResultObject> call, Response<ResultObject> response) {
         if(response.isSuccessful() && response.body() != null && response.body().getDevice() != null){
             ResultObject resultObject = response.body();
+            Log.e("resultCode", String.valueOf(resultObject.getResultCode()));
             iMainWebAPIService.onSucces(resultObject);
         }
     }

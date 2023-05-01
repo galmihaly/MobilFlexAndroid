@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <rotate android:pivotX="50%"
+            android:pivotY="50%">
+            <shape>
+                <solid android:color="#506A6C73"/>
+                <corners
+                    android:bottomRightRadius="0dp"
+                    android:bottomLeftRadius="0dp"
+                    android:topLeftRadius="40dp"
+                    android:topRightRadius="40dp"/>
+            </shape>
+        </rotate>
+    </item>
+</selector>
