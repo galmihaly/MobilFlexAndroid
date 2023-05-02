@@ -15,4 +15,5 @@ public interface ILoginActivity {
     void changeStateApplicationTitleTextbox(String applicationName, String textColor);
     void sendCreatedButtonsToView(List<ImageButton> createdButtons);
     void changeMobileBarsColors(String statusBarColor, String navigationBarColor);
+    void openWebViewActivity(String applicationId, String defaultThemeId);
 }

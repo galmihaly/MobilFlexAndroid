@@ -1,7 +1,9 @@
 package hu.logcontrol.mobilflexandroid.adapters;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,10 +29,12 @@ public class ProgramsRecycleAdapter extends RecyclerView.Adapter<ProgramsRecycle
 
     private ProgramsPresenter programsPresenter;
     private List<ProgramsResultObject> programsResultObjectList;
+    private Intent backActivityIntent;
 
-    public ProgramsRecycleAdapter(List<ProgramsResultObject> programsResultObjectList, ProgramsPresenter programsPresenter) {
+    public ProgramsRecycleAdapter(List<ProgramsResultObject> programsResultObjectList, ProgramsPresenter programsPresenter, Intent backActivityIntent) {
         this.programsResultObjectList = programsResultObjectList;
         this.programsPresenter = programsPresenter;
+        this.backActivityIntent = backActivityIntent;
     }
 
     @NonNull
@@ -43,32 +47,34 @@ public class ProgramsRecycleAdapter extends RecyclerView.Adapter<ProgramsRecycle
     @Override
     public void onBindViewHolder(@NonNull ProgramItemViewHolder holder, int position) {
         if(programsResultObjectList != null){
-            if(programsResultObjectList.size() != 0){
-                if(holder.getAdapterPosition() != RecyclerView.NO_POSITION){
 
-                    Log.e("beléptem ide", "ok");
+            Bitmap logo = programsResultObjectList.get(position).getLogo();
+            if(logo != null) holder.getLogoItemIV().setImageBitmap(logo);
 
-                    Bitmap logo = programsResultObjectList.get(position).getLogos();
-                    if(logo != null) holder.getLogoItemIV().setImageBitmap(programsResultObjectList.get(position).getLogos());
+            holder.getApplicationTitleTV().setText(programsResultObjectList.get(position).getTitle());
 
-                    holder.getApplicationTitleTV().setText(programsResultObjectList.get(position).getTitles());
+            int[] colors = {
+                    Color.parseColor(programsResultObjectList.get(position).getBackgroundColor()),
+                    Color.parseColor(programsResultObjectList.get(position).getBackgroundGradientColor())
+            };
 
-                    int[] colors = {
-                            Color.parseColor(programsResultObjectList.get(position).getBackgroundColors()),
-                            Color.parseColor(programsResultObjectList.get(position).getBackgroundGradientColors())
-                    };
+            GradientDrawable g = new GradientDrawable(GradientDrawable.Orientation.RIGHT_LEFT, colors);
+            holder.getProgramsItemCL().setBackground(g);
 
-                    GradientDrawable g = new GradientDrawable(GradientDrawable.Orientation.RIGHT_LEFT, colors);
-                    holder.getProgramsItemCL().setBackground(g);
+            Log.e("ProgramsActivity_defaultThemeId", String.valueOf(backActivityIntent.getIntExtra("defaultThemeId", -1)));
+            Log.e("ProgramsActivity_applicationId", String.valueOf(backActivityIntent.getIntExtra("applicationId", -1)));
 
-                    holder.getProgramsItemCL().setOnClickListener(v -> programsPresenter.openActivityByEnum(
-                            ViewEnums.LOGIN_ACTIVITY,
-                            programsResultObjectList.get(position).getDefaultThemeId(),
-                            position + 1
-                    ));
-                }
-            }
+            holder.getProgramsItemCL().setOnClickListener(v -> programsPresenter.openActivityByEnum(
+                    ViewEnums.LOGIN_ACTIVITY,
+                    programsResultObjectList.get(position).getDefaultThemeId(),
+                    programsResultObjectList.get(position).getApplicationId()
+            ));
         }
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     @Override

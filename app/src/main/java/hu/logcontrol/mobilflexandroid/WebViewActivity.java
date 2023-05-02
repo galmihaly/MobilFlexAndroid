@@ -37,14 +37,21 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewActivi
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private Intent backActivityIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_view);
 
+        backActivityIntent = getIntent();
+
+        String applicationId = String.valueOf(backActivityIntent.getIntExtra("applicationId", -1));
+        Log.e("WebViewActivity_backActivityIntent", applicationId);
+
         initView();
         initPresenter();
-        initSharedPreferenceFile();
+        initAppDataManager();
         initAppBarLayout();
         loadWebViewFromSettings();
         initSwipeRefreshLayout();
@@ -54,32 +61,37 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewActivi
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
     /* WebViewActivity fügvényei */
 
+    private void initAppDataManager(){
+        if(webViewActivityPresenter == null) return;
+        webViewActivityPresenter.initAppDataManager();
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     private void loadWebViewFromSettings() {
         if(webViewActivityPresenter == null) return;
-        webViewActivityPresenter.getURLfromSettings();
+        if(backActivityIntent == null) return;
+
+        Log.e("loadWebViewFromSettings", "beléptem ide is");
+
+        webViewActivityPresenter.getURLfromSettings(backActivityIntent);
     }
 
     private void initFunctions() {
         if(logoutBut == null) return;
+        if(backActivityIntent == null) return;
         logoutBut.setOnClickListener(v -> {
-            webViewActivityPresenter.openActivityByEnum(ViewEnums.LOGIN_ACTIVITY);
+            webViewActivityPresenter.openActivityByEnum(ViewEnums.LOGIN_ACTIVITY, backActivityIntent);
         });
-    }
-
-    private void initSharedPreferenceFile() {
-        if(webViewActivityPresenter == null) return;
-        webViewActivityPresenter.initSharedPreferenceFile();
     }
 
     private void initPresenter() {
         webViewActivityPresenter = new WebViewActivityPresenter(this, getApplicationContext());
-        webViewActivityPresenter.initTaskManager();
     }
 
     private void initAppBarLayout() {
         if(webViewActivityPresenter == null) return;
-        webViewActivityPresenter.getValuesFromSettingsPrefFile();
+        if(backActivityIntent == null) return;
+        webViewActivityPresenter.getValuesFromSettingsPrefFile(backActivityIntent);
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -103,7 +115,7 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewActivi
         if(swipeRefreshLayout == null) return;
         if(webViewActivityPresenter == null) return;
 
-        swipeRefreshLayout.setOnRefreshListener(() -> { webViewActivityPresenter.getURLfromSettings(); });
+        swipeRefreshLayout.setOnRefreshListener(() -> { webViewActivityPresenter.getURLfromSettings(backActivityIntent); });
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */

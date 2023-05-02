@@ -131,16 +131,17 @@ public class LoginFragmentsPresenter implements ILoginFragmentsPresenter {
     public void setControlsValuesBySettings(String defaultThemeId, String applicationId) {
         if(iLoginFragments == null) return;
         if(appDataManager == null) return;
+        if(defaultThemeId == null) return;
+        if(applicationId == null) return;
+
+        Log.e("setControlsValuesBySettings_defaultThemeId", defaultThemeId);
+        Log.e("setControlsValuesBySettings_applicationId", applicationId);
 
         String controlColor = appDataManager.getStringValueFromSettingsFile("controlColor" + '_' + applicationId + '_' + defaultThemeId);
         String textColor = appDataManager.getStringValueFromSettingsFile("foregroundColor" + '_' + applicationId + '_' + defaultThemeId);
 
         String buttonBackgroundColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundColor" + '_' + applicationId + '_' + defaultThemeId);
-        Log.e("buttonBackgroundColor", buttonBackgroundColor);
-
         String buttonBackgroundGradientColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
-        Log.e("buttonBackgroundGradientColor", buttonBackgroundGradientColor);
-
         String buttonForeGroundColor = appDataManager.getStringValueFromSettingsFile("buttonForegroundColor" + '_' + applicationId + '_' + defaultThemeId);
 
         String currentLanguage = appDataManager.getStringValueFromSettingsFile("CurrentSelectedLanguage");

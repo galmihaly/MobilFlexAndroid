@@ -13,6 +13,7 @@ import androidx.security.crypto.MasterKeys;
 import java.lang.ref.WeakReference;
 
 import hu.logcontrol.mobilflexandroid.LoginActivity;
+import hu.logcontrol.mobilflexandroid.datamanager.AppDataManager;
 import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
 import hu.logcontrol.mobilflexandroid.interfaces.IWebViewActivity;
 import hu.logcontrol.mobilflexandroid.interfaces.IWebViewActivityPresenter;
@@ -22,14 +23,12 @@ import hu.logcontrol.mobilflexandroid.models.LocalEncryptedPreferences;
 import hu.logcontrol.mobilflexandroid.taskmanager.CustomThreadPoolManager;
 import hu.logcontrol.mobilflexandroid.taskmanager.PresenterThreadCallback;
 
-public class WebViewActivityPresenter implements IWebViewActivityPresenter, PresenterThreadCallback {
+public class WebViewActivityPresenter implements IWebViewActivityPresenter {
 
     private IWebViewActivity webViewActivity;
     private Context context;
-    private CustomThreadPoolManager mCustomThreadPoolManager;
-    private WebViewActivityHandler mWebViewActivityHandler;
 
-    private LocalEncryptedPreferences preferences;
+    private AppDataManager appDataManager;
 
     public WebViewActivityPresenter(IWebViewActivity webViewActivity, Context context) {
         this.webViewActivity = webViewActivity;
@@ -39,32 +38,23 @@ public class WebViewActivityPresenter implements IWebViewActivityPresenter, Pres
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
     /* IWebViewActivityPresenter interfész függvényei */
 
-    @Override
-    public void initTaskManager() {
-        try {
-            ApplicationLogger.logging(LogLevel.INFORMATION, "A feladatkezelő létrehozása megkezdődött.");
-
-            mWebViewActivityHandler = new WebViewActivityHandler(Looper.myLooper(), this);
-            mCustomThreadPoolManager = CustomThreadPoolManager.getsInstance();
-            mCustomThreadPoolManager.setPresenterCallback(this);
-
-            ApplicationLogger.logging(LogLevel.INFORMATION, "A feladatkezelő létrehozása befejeződött.");
-        }
-        catch (Exception e){
-            ApplicationLogger.logging(LogLevel.FATAL, e.getMessage());
-        }
-    }
 
     @Override
-    public void openActivityByEnum(ViewEnums viewEnum) {
+    public void openActivityByEnum(ViewEnums viewEnum, Intent backActivityIntent) {
         if(viewEnum == null) return;
+        if(backActivityIntent == null) return;
         if(webViewActivity == null) return;
+
+        String defaultThemeId = String.valueOf(backActivityIntent.getIntExtra("defaultThemeId", -1));
+        String applicationId = String.valueOf(backActivityIntent.getIntExtra("applicationId", -1));
 
         Intent intent = null;
 
         switch (viewEnum){
             case LOGIN_ACTIVITY:{
                 intent = new Intent(context, LoginActivity.class);
+                intent.putExtra("defaultThemeId", defaultThemeId);
+                intent.putExtra("applicationId", applicationId);
                 break;
             }
         }
@@ -74,29 +64,33 @@ public class WebViewActivityPresenter implements IWebViewActivityPresenter, Pres
     }
 
     @Override
-    public void initSharedPreferenceFile() {
-        preferences = LocalEncryptedPreferences.getInstance(
-                "values",
-                MasterKeys.AES256_GCM_SPEC,
-                context,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        );
+    public void initAppDataManager() {
+        appDataManager = new AppDataManager(context, this);
+        appDataManager.createPreferenceFileService();
+        appDataManager.createMainWebAPIService();
+        appDataManager.initLanguagesPrefFile();
+        appDataManager.initSettingsPrefFile();
+        appDataManager.initBaseMessagesPrefFile();
+        appDataManager.initTaskManager();
     }
 
     @Override
-    public void getValuesFromSettingsPrefFile() {
-        if(preferences == null) return;
+    public void getValuesFromSettingsPrefFile(Intent intent) {
+        if(appDataManager == null) return;
         if(webViewActivity == null) return;
+        if(intent == null) return;
 
-        String appBarBackgroundColor = preferences.getStringValueByKey("backgroundColor");
-        String appBarBackgroundGradientColor = preferences.getStringValueByKey("backgroundGradientColor");
+        String defaultThemeId = String.valueOf(intent.getIntExtra("defaultThemeId", -1));
+        String applicationId = String.valueOf(intent.getIntExtra("applicationId", -1));
+
+        String appBarBackgroundColor = appDataManager.getStringValueFromSettingsFile("backgroundColor" + '_' + applicationId + '_' + defaultThemeId);
+        String appBarBackgroundGradientColor = appDataManager.getStringValueFromSettingsFile("backgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
 
         if(appBarBackgroundColor != null && appBarBackgroundGradientColor != null) webViewActivity.changeStateAppbarLayout(appBarBackgroundColor, appBarBackgroundGradientColor);
         if(appBarBackgroundColor != null && appBarBackgroundGradientColor != null) webViewActivity.changeMobileBarsColors(appBarBackgroundColor, appBarBackgroundGradientColor);
 
-        String buttonBackgroundColor = preferences.getStringValueByKey("buttonBackgroundColor");
-        String buttonBackgroundGradientColor = preferences.getStringValueByKey("buttonBackgroundGradientColor");
+        String buttonBackgroundColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundColor" + '_' + applicationId + '_' + defaultThemeId);
+        String buttonBackgroundGradientColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
 
         if(buttonBackgroundColor != null && buttonBackgroundGradientColor != null) {
             webViewActivity.changeStateLoginButton( buttonBackgroundColor, buttonBackgroundGradientColor);
@@ -104,43 +98,17 @@ public class WebViewActivityPresenter implements IWebViewActivityPresenter, Pres
     }
 
     @Override
-    public void getURLfromSettings() {
-        if(preferences == null) return;
+    public void getURLfromSettings(Intent intent) {
+        if(appDataManager == null) return;
+        if(intent == null) return;
 
-        String loginWebApiUrl = preferences.getStringValueByKey("loginWebApiUrl");
+        String applicationId = String.valueOf(intent.getIntExtra("applicationId", -1));
+        Log.e("applicationId_applicationId", applicationId);
+
+        String loginWebApiUrl = appDataManager.getStringValueFromSettingsFile("mainUrl" + '_' + applicationId);
         Log.e("loginWebApiUrl", loginWebApiUrl);
         if(loginWebApiUrl != null) webViewActivity.loadLoginWebAPIUrl(loginWebApiUrl);
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
-
-    /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
-    /* PresenterThreadCallback interfész függvénye */
-
-    @Override
-    public void sendMessageToHandler(Message message) {
-        if(mWebViewActivityHandler == null) return;
-        mWebViewActivityHandler.sendMessage(message);
-    }
-    /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
-
-    private static class WebViewActivityHandler extends Handler {
-
-
-        private WeakReference<IWebViewActivityPresenter> iWebViewActivityPresenterWeakReference;
-
-        public WebViewActivityHandler(Looper looper, IWebViewActivityPresenter iWebViewActivityPresenter) {
-            super(looper);
-            this.iWebViewActivityPresenterWeakReference = new WeakReference<>(iWebViewActivityPresenter);
-        }
-
-        // Ui-ra szánt üzenetet kezelejük itt
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-
-            switch (msg.what) {
-            }
-        }
-    }
 }

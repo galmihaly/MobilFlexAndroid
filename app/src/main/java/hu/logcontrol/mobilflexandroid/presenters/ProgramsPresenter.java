@@ -35,6 +35,9 @@ public class ProgramsPresenter implements IProgramsPresenter {
 
         Intent intent = null;
 
+        Log.e("ProgramsPresenter_defaultThemeId", String.valueOf(defaultThemeId));
+        Log.e("ProgramsPresenter_applicationId", String.valueOf(applicationId));
+
         switch (viewEnum){
             case LOGIN_ACTIVITY:{
                 intent = new Intent(context, LoginActivity.class);
@@ -63,7 +66,6 @@ public class ProgramsPresenter implements IProgramsPresenter {
         if(appDataManager == null) return;
 
         int applicationsSize = intent.getIntExtra("applicationsSize", -1);
-        Log.e("applicationsSize", String.valueOf(applicationsSize));
         if(applicationsSize != -1) appDataManager.getDataFromAppDataManager(applicationsSize);
     }
 

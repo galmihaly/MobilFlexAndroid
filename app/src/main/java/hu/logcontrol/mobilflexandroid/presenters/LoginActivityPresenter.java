@@ -9,7 +9,9 @@ import android.widget.ImageButton;
 import java.util.List;
 
 import hu.logcontrol.mobilflexandroid.R;
+import hu.logcontrol.mobilflexandroid.WebViewActivity;
 import hu.logcontrol.mobilflexandroid.datamanager.AppDataManager;
+import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
 import hu.logcontrol.mobilflexandroid.enums.WindowSizeTypes;
 import hu.logcontrol.mobilflexandroid.interfaces.ILoginActivity;
 import hu.logcontrol.mobilflexandroid.interfaces.ILoginActivityPresenter;
@@ -30,6 +32,29 @@ public class LoginActivityPresenter implements ILoginActivityPresenter {
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
     /* ILoginActivityPresenter interfész függvényei */
+
+    @Override
+    public void openActivityByEnum(ViewEnums viewEnum, String applicationId, String defaultTheme) {
+        if(viewEnum == null) return;
+        if(iLoginActivity == null) return;
+        if(applicationId == null) return;
+        if(defaultTheme == null) return;
+
+        Intent intent = null;
+
+        switch (viewEnum){
+            case WEBVIEW_ACTIVITY:{
+                intent = new Intent(context, WebViewActivity.class);
+                intent.putExtra("applicationId", applicationId);
+                intent.putExtra("defaultTheme", defaultTheme);
+                break;
+            }
+        }
+
+        if(intent == null) return;
+        if(iLoginActivity != null) iLoginActivity.openViewByIntent(intent);
+
+    }
 
     @Override
     public void initAppDataManager() {
@@ -76,7 +101,12 @@ public class LoginActivityPresenter implements ILoginActivityPresenter {
                 };
 
                 int loginModesNumber = appDataManager.getIntValueFromSettingsFile("applicationEnabledLoginFlag" + '_' + applicationId);
-                appDataManager.initLoginButtons(loginModesNumber, wsc, colors);
+                if(loginModesNumber != 0){
+                    appDataManager.initLoginButtons(loginModesNumber, wsc, colors);
+                }
+                else {
+                    openActivityByEnum(ViewEnums.WEBVIEW_ACTIVITY, applicationId, defaultThemeId);
+                }
             }
         }
         catch (Exception e){

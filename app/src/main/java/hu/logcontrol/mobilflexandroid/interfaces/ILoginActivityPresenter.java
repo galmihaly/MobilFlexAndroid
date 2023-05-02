@@ -5,6 +5,7 @@ import android.widget.ImageButton;
 
 import java.util.List;
 
+import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
 import hu.logcontrol.mobilflexandroid.enums.WindowSizeTypes;
 
 public interface ILoginActivityPresenter {
@@ -13,4 +14,5 @@ public interface ILoginActivityPresenter {
     void initAppDataManager();
     void getMessageFromAppDataManager(String message);
     void getCreatedButtonsFromAppDataManager(List<ImageButton> createdButtons);
+    void openActivityByEnum(ViewEnums viewEnum, String applicationId, String defaultThemeId);
 }

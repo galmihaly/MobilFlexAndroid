@@ -22,6 +22,7 @@ import hu.logcontrol.mobilflexandroid.interfaces.ILoginActivityPresenter;
 import hu.logcontrol.mobilflexandroid.interfaces.IMainActivityPresenter;
 import hu.logcontrol.mobilflexandroid.interfaces.IMainWebAPIService;
 import hu.logcontrol.mobilflexandroid.interfaces.IProgramsPresenter;
+import hu.logcontrol.mobilflexandroid.interfaces.IWebViewActivityPresenter;
 import hu.logcontrol.mobilflexandroid.logger.ApplicationLogger;
 import hu.logcontrol.mobilflexandroid.logger.LogLevel;
 import hu.logcontrol.mobilflexandroid.models.Application;
@@ -40,6 +41,7 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
     private IMainActivityPresenter iMainActivityPresenter;
     private ILoginActivityPresenter iLoginActivityPresenter;
     private ILoginFragmentsPresenter iLoginFragmentsPresenter;
+    private IWebViewActivityPresenter iWebViewActivityPresenter;
     private IProgramsPresenter iProgramsPresenter;
 
     private CustomThreadPoolManager mCustomThreadPoolManager;
@@ -67,6 +69,11 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
     public AppDataManager(Context context, IProgramsPresenter iProgramsPresenter) {
         this.context = context.getApplicationContext();
         this.iProgramsPresenter = iProgramsPresenter;
+    }
+
+    public AppDataManager(Context context, IWebViewActivityPresenter iWebViewActivityPresenter) {
+        this.context = context.getApplicationContext();
+        this.iWebViewActivityPresenter = iWebViewActivityPresenter;
     }
 
     public void createPreferenceFileService(){
@@ -318,6 +325,8 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
 
                 for (int i = 0; i < applications.size(); i++) {
 
+                    int defaultThemeId = device.getApplicationList().get(i).getDefaultThemeId();
+
                     AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationId" + '_' + (i + 1), applications.get(i).getId().toString());
                     AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationName" + '_' + (i + 1), applications.get(i).getApplicationName());
                     AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationTitle" + '_' + (i + 1), applications.get(i).getApplicationTitle());
@@ -339,17 +348,17 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
 
                         for (int l = 0; l < applicationThemes.size(); l++) {
 
-                            AppDataManagerHelper.saveIntValueToPrefFile(mainPreferenceFileService, "id" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getId());
-                            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationId" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getApplicationId().toString());
-                            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "logoUrl" + '_' + (i + 1) + '_' + (l + 1), applications.get(l).getLogoUrl());
-                            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "name" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getName());
-                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "backgroundColor" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getBackgroundColor());
-                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "backgroundGradientColor" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getBackgroundGradientColor());
-                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "foregroundColor" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getForegroundColor());
-                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "buttonBackgroundColor" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getButtonBackgroundColor());
-                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "buttonBackgroundGradientColor" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getButtonBackgroundGradientColor());
-                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "buttonForegroundColor" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getButtonForegroundColor());
-                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "controlColor" + '_' + (i + 1) + '_' + (l + 1), applicationThemes.get(l).getControlColor());
+                            AppDataManagerHelper.saveIntValueToPrefFile(mainPreferenceFileService, "id" + '_' + (i + 1) + '_' + defaultThemeId, applicationThemes.get(l).getId());
+                            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationId" + '_' + (i + 1) + '_' + defaultThemeId, applicationThemes.get(l).getApplicationId().toString());
+                            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "logoUrl" + '_' + (i + 1) + '_' + defaultThemeId, applications.get(l).getLogoUrl());
+                            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "name" + '_' + (i + 1) + '_' + defaultThemeId, applicationThemes.get(l).getName());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "backgroundColor" + '_' + (i + 1) + '_' + defaultThemeId, applicationThemes.get(l).getBackgroundColor());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "backgroundGradientColor" + '_' + (i + 1) + '_' + defaultThemeId, applicationThemes.get(l).getBackgroundGradientColor());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "foregroundColor" + '_' + (i + 1) + '_' + defaultThemeId, applicationThemes.get(l).getForegroundColor());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "buttonBackgroundColor" + '_' + (i + 1) + '_' + defaultThemeId, applicationThemes.get(l).getButtonBackgroundColor());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "buttonBackgroundGradientColor" + '_' + (i + 1) + '_' + defaultThemeId, applicationThemes.get(l).getButtonBackgroundGradientColor());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "buttonForegroundColor" + '_' + (i + 1) + '_' + defaultThemeId, applicationThemes.get(l).getButtonForegroundColor());
+                            AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "controlColor" + '_' + (i + 1) + '_' + defaultThemeId, applicationThemes.get(l).getControlColor());
                         }
                     }
                 }

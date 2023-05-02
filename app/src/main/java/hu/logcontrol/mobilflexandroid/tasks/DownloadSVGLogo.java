@@ -3,8 +3,12 @@ package hu.logcontrol.mobilflexandroid.tasks;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Message;
 import android.util.Log;
+
+import com.larvalabs.svgandroid.SVG;
+import com.larvalabs.svgandroid.SVGParser;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -42,7 +46,7 @@ public class DownloadSVGLogo implements Callable {
     private ProgramsResultObject p;
 
     private Message message;
-    private Bitmap bitmap;
+    private Bitmap drawable;
 
     public DownloadSVGLogo(Context context, MainPreferenceFileService mainPreferenceFileService, int applicationsSize) {
         this.context = context.getApplicationContext();
@@ -68,6 +72,12 @@ public class DownloadSVGLogo implements Callable {
                     backgroundGradientColor = mainPreferenceFileService.getStringValueFromSettingsPrefFile("backgroundGradientColor" + '_' + (i + 1) + '_' + defaultThemeId);
                     logoUrl = mainPreferenceFileService.getStringValueFromSettingsPrefFile("logoUrl" + '_' + (i + 1));
 
+                    Log.e("defaultThemeId" + '_' + (i + 1),  " " + String.valueOf(defaultThemeId));
+                    Log.e("applicationTitle" + '_' + (i + 1), applicationTitle);
+                    Log.e("backgroundColor" + '_' + (i + 1) + '_' + defaultThemeId, backgroundColor);
+                    Log.e("backgroundGradientColor" + '_' + (i + 1) + '_' + defaultThemeId, backgroundGradientColor);
+                    Log.e("logoUrl" + '_' + (i + 1) + '_' + defaultThemeId, logoUrl);
+
                     logoUrl = "https://html.com/wp-content/uploads/flamingo.jpg";
 
                     URL url = new URL(logoUrl);
@@ -80,21 +90,30 @@ public class DownloadSVGLogo implements Callable {
 
                         if(connection.getResponseCode() == 200){
 
+//                            InputStream inputStream = connection.getInputStream();
+//                            Log.e("inputstream", String.valueOf(inputStream.available()));
+//                            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+//
+//                            SVG svg = SVGParser. getSVGFromInputStream(bufferedInputStream);
+//                            drawable = svg.createPictureDrawable();
+
+//                            bitmap = BitmapFactory.decodeStream(bufferedInputStream);
+//                            Log.e("a", String.valueOf(bitmap.getHeight()));
+
                             InputStream inputStream = connection.getInputStream();
                             Log.e("inputstream", String.valueOf(inputStream.available()));
                             BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
-                            bitmap = BitmapFactory.decodeStream(bufferedInputStream);
-                            Log.e("a", String.valueOf(bitmap.getHeight()));
+                            drawable = BitmapFactory.decodeStream(bufferedInputStream);
 
                             inputStream.close();
+
+                            p = new ProgramsResultObject(applicationTitle, backgroundColor, backgroundGradientColor, drawable, defaultThemeId, i + 1);
+                            pList.add(p);
                         }
                     }catch(IOException e){
                         e.printStackTrace();
                     }
                 }
-
-                p = new ProgramsResultObject(applicationTitle, backgroundColor, backgroundGradientColor, bitmap, defaultThemeId);
-                pList.add(p);
             }
 
             message = Helper.createMessage(MessageIdentifiers.LOGO_DOWNLOAD_SUCCES, "A logó sikersen letöltődött!");

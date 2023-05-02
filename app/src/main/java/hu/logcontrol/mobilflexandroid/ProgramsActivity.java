@@ -13,6 +13,7 @@ import android.util.Log;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import hu.logcontrol.mobilflexandroid.adapters.ProgramsRecycleAdapter;
@@ -25,10 +26,15 @@ public class ProgramsActivity extends AppCompatActivity implements IProgramsActi
     private RecyclerView programsRV;
     private ProgramsPresenter programsPresenter;
 
+    private Intent backActivityIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_programs);
+
+        backActivityIntent = getIntent();
+
         initView();
         initPresenter();
         initAppDataManager();
@@ -50,7 +56,8 @@ public class ProgramsActivity extends AppCompatActivity implements IProgramsActi
 
     private void initRelativeLayoutElementsData() {
         if(programsPresenter == null) return;
-        programsPresenter.getDataFromAppDataManager(getIntent());
+        if(backActivityIntent == null) return;
+        programsPresenter.getDataFromAppDataManager(backActivityIntent);
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -71,8 +78,9 @@ public class ProgramsActivity extends AppCompatActivity implements IProgramsActi
         if(programsResultObjects == null) return;
         if(programsRV == null) return;
         if(programsPresenter == null) return;
+        if(backActivityIntent == null) return;
 
-        ProgramsRecycleAdapter adapter = new ProgramsRecycleAdapter(programsResultObjects, programsPresenter);
+        ProgramsRecycleAdapter adapter = new ProgramsRecycleAdapter(programsResultObjects, programsPresenter, backActivityIntent);
         programsRV.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         programsRV.setAdapter(adapter);
     }

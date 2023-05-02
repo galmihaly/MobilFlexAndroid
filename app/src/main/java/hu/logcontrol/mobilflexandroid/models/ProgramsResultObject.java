@@ -1,42 +1,49 @@
 package hu.logcontrol.mobilflexandroid.models;
 
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 
 import java.util.List;
 
 public class ProgramsResultObject {
 
-    private String titles;
-    private String backgroundColors;
-    private String backgroundGradientColors;
-    private Bitmap logos;
+    private String title;
+    private String backgroundColor;
+    private String backgroundGradientColor;
+    private Bitmap logo;
     private int defaultThemeId;
+    private int applicationId;
 
-    public ProgramsResultObject(String titles, String backgroundColors, String backgroundGradientColors, Bitmap logos, int defaultThemeId) {
-        this.titles = titles;
-        this.backgroundColors = backgroundColors;
-        this.backgroundGradientColors = backgroundGradientColors;
-        this.logos = logos;
+    public ProgramsResultObject(String title, String backgroundColor, String backgroundGradientColor, Bitmap logo, int defaultThemeId, int applicationId) {
+        this.title = title;
+        this.backgroundColor = backgroundColor;
+        this.backgroundGradientColor = backgroundGradientColor;
+        this.logo = logo;
         this.defaultThemeId = defaultThemeId;
+        this.applicationId = applicationId;
     }
 
-    public String getTitles() {
-        return titles;
+    public String getTitle() {
+        return title;
     }
 
-    public String getBackgroundColors() {
-        return backgroundColors;
+    public String getBackgroundColor() {
+        return backgroundColor;
     }
 
-    public String getBackgroundGradientColors() {
-        return backgroundGradientColors;
+    public String getBackgroundGradientColor() {
+        return backgroundGradientColor;
     }
 
-    public Bitmap getLogos() {
-        return logos;
+    public Bitmap getLogo() {
+        return logo;
     }
 
     public int getDefaultThemeId() {
         return defaultThemeId;
+    }
+
+    public int getApplicationId() {
+        return applicationId;
     }
 }

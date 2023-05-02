@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,6 +96,10 @@ public class UserPassFragment extends Fragment implements ILoginFragments {
         if(loginFragmentsPresenter == null) return;
         if(defaultThemeId == null) return;
         if(applicationId == null) return;
+
+        Log.e("fr_setControlsValuesBySettings_defaultThemeId", defaultThemeId);
+        Log.e("fr_setControlsValuesBySettings_applicationId", applicationId);
+
         loginFragmentsPresenter.setControlsValuesBySettings(defaultThemeId, applicationId);
     }
 

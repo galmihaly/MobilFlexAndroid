@@ -12,6 +12,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
@@ -239,6 +240,13 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.setStatusBarColor(Color.parseColor(statusBarColor));
         window.setNavigationBarColor(Color.parseColor(navigationBarColor));
+    }
+
+    @Override
+    public void openWebViewActivity(String applicationId, String defaultThemeId) {
+        if(applicationId == null) return;
+        if(defaultThemeId == null) return;
+
     }
 
     @Override
