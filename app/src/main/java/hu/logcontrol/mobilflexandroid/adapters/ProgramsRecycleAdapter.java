@@ -29,12 +29,10 @@ public class ProgramsRecycleAdapter extends RecyclerView.Adapter<ProgramsRecycle
 
     private ProgramsPresenter programsPresenter;
     private List<ProgramsResultObject> programsResultObjectList;
-    private Intent backActivityIntent;
 
-    public ProgramsRecycleAdapter(List<ProgramsResultObject> programsResultObjectList, ProgramsPresenter programsPresenter, Intent backActivityIntent) {
+    public ProgramsRecycleAdapter(List<ProgramsResultObject> programsResultObjectList, ProgramsPresenter programsPresenter) {
         this.programsResultObjectList = programsResultObjectList;
         this.programsPresenter = programsPresenter;
-        this.backActivityIntent = backActivityIntent;
     }
 
     @NonNull
@@ -60,9 +58,6 @@ public class ProgramsRecycleAdapter extends RecyclerView.Adapter<ProgramsRecycle
 
             GradientDrawable g = new GradientDrawable(GradientDrawable.Orientation.RIGHT_LEFT, colors);
             holder.getProgramsItemCL().setBackground(g);
-
-            Log.e("ProgramsActivity_defaultThemeId", String.valueOf(backActivityIntent.getIntExtra("defaultThemeId", -1)));
-            Log.e("ProgramsActivity_applicationId", String.valueOf(backActivityIntent.getIntExtra("applicationId", -1)));
 
             holder.getProgramsItemCL().setOnClickListener(v -> programsPresenter.openActivityByEnum(
                     ViewEnums.LOGIN_ACTIVITY,

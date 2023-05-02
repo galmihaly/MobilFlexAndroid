@@ -75,17 +75,15 @@ public class Helper {
         }
     }
 
-    public static void sendDisplaySizesToFragments(Fragment fragment, WindowSizeTypes[] windowSizeClasses, String defaultThemeId, String applicationId) {
+    public static void sendDisplaySizesToFragments(Fragment fragment, WindowSizeTypes[] windowSizeClasses, int defaultThemeId, int applicationId) {
         if(fragment == null) return;
         if(windowSizeClasses == null) return;
-        if(defaultThemeId == null) return;
-        if(applicationId == null) return;
 
         Bundle bundle = new Bundle();
         bundle.putSerializable("windowHeightEnum", windowSizeClasses[0]);
         bundle.putSerializable("windowWidthEnum", windowSizeClasses[1]);
-        bundle.putString("defaultThemeId", defaultThemeId);
-        bundle.putSerializable("applicationId", applicationId);
+        bundle.putInt("defaultThemeId", defaultThemeId);
+        bundle.putInt("applicationId", applicationId);
 
         fragment.setArguments(bundle);
     }

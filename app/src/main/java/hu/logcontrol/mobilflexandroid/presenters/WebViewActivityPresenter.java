@@ -2,6 +2,7 @@ package hu.logcontrol.mobilflexandroid.presenters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.http.SslError;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -40,13 +41,9 @@ public class WebViewActivityPresenter implements IWebViewActivityPresenter {
 
 
     @Override
-    public void openActivityByEnum(ViewEnums viewEnum, Intent backActivityIntent) {
+    public void openActivityByEnum(ViewEnums viewEnum, int applicationId, int defaultThemeId) {
         if(viewEnum == null) return;
-        if(backActivityIntent == null) return;
         if(webViewActivity == null) return;
-
-        String defaultThemeId = String.valueOf(backActivityIntent.getIntExtra("defaultThemeId", -1));
-        String applicationId = String.valueOf(backActivityIntent.getIntExtra("applicationId", -1));
 
         Intent intent = null;
 
@@ -75,39 +72,48 @@ public class WebViewActivityPresenter implements IWebViewActivityPresenter {
     }
 
     @Override
-    public void getValuesFromSettingsPrefFile(Intent intent) {
+    public void getValuesFromSettingsPrefFile(int applicationId, int defaultThemeId) {
         if(appDataManager == null) return;
         if(webViewActivity == null) return;
-        if(intent == null) return;
 
-        String defaultThemeId = String.valueOf(intent.getIntExtra("defaultThemeId", -1));
-        String applicationId = String.valueOf(intent.getIntExtra("applicationId", -1));
+        Log.e("webViewActivity_applicationId", String.valueOf(applicationId));
+        Log.e("webViewActivity_defaultThemeId", String.valueOf(defaultThemeId));
 
-        String appBarBackgroundColor = appDataManager.getStringValueFromSettingsFile("backgroundColor" + '_' + applicationId + '_' + defaultThemeId);
-        String appBarBackgroundGradientColor = appDataManager.getStringValueFromSettingsFile("backgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
+        if(applicationId != -1 && defaultThemeId != -1){
+            String appBarBackgroundColor = appDataManager.getStringValueFromSettingsFile("backgroundColor" + '_' + applicationId + '_' + defaultThemeId);
+            String appBarBackgroundGradientColor = appDataManager.getStringValueFromSettingsFile("backgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
 
-        if(appBarBackgroundColor != null && appBarBackgroundGradientColor != null) webViewActivity.changeStateAppbarLayout(appBarBackgroundColor, appBarBackgroundGradientColor);
-        if(appBarBackgroundColor != null && appBarBackgroundGradientColor != null) webViewActivity.changeMobileBarsColors(appBarBackgroundColor, appBarBackgroundGradientColor);
+            Log.e("appBarBackgroundColor", appBarBackgroundColor);
+            Log.e("appBarBackgroundGradientColor", appBarBackgroundGradientColor);
 
-        String buttonBackgroundColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundColor" + '_' + applicationId + '_' + defaultThemeId);
-        String buttonBackgroundGradientColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
+            if(appBarBackgroundColor != null && appBarBackgroundGradientColor != null) webViewActivity.changeStateAppbarLayout(appBarBackgroundColor, appBarBackgroundGradientColor);
+            if(appBarBackgroundColor != null && appBarBackgroundGradientColor != null) webViewActivity.changeMobileBarsColors(appBarBackgroundColor, appBarBackgroundGradientColor);
 
-        if(buttonBackgroundColor != null && buttonBackgroundGradientColor != null) {
-            webViewActivity.changeStateLoginButton( buttonBackgroundColor, buttonBackgroundGradientColor);
+            String buttonBackgroundColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundColor" + '_' + applicationId + '_' + defaultThemeId);
+            String buttonBackgroundGradientColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
+
+            if(buttonBackgroundColor != null && buttonBackgroundGradientColor != null) {
+                webViewActivity.changeStateLoginButton( buttonBackgroundColor, buttonBackgroundGradientColor);
+            }
         }
     }
 
     @Override
-    public void getURLfromSettings(Intent intent) {
+    public void getURLfromSettings(int applicationId) {
         if(appDataManager == null) return;
-        if(intent == null) return;
 
-        String applicationId = String.valueOf(intent.getIntExtra("applicationId", -1));
-        Log.e("applicationId_applicationId", applicationId);
-
-        String loginWebApiUrl = appDataManager.getStringValueFromSettingsFile("mainUrl" + '_' + applicationId);
-        Log.e("loginWebApiUrl", loginWebApiUrl);
-        if(loginWebApiUrl != null) webViewActivity.loadLoginWebAPIUrl(loginWebApiUrl);
+        if(applicationId != -1){
+            String loginWebApiUrl = appDataManager.getStringValueFromSettingsFile("mainUrl" + '_' + applicationId);
+            Log.e("loginWebApiUrl", loginWebApiUrl);
+            if(loginWebApiUrl != null) {
+                if(loginWebApiUrl.contains("https://")) {
+                    webViewActivity.loadLoginWebAPIUrl(loginWebApiUrl);
+                }
+                else {
+                    webViewActivity.loadLoginWebAPIUrl("https://" + loginWebApiUrl);
+                }
+            }
+        }
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */

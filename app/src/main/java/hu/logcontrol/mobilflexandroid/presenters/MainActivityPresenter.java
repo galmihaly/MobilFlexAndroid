@@ -40,12 +40,12 @@ public class MainActivityPresenter implements IMainActivityPresenter {
         switch (viewEnum){
             case LOGIN_ACTIVITY:{
                 intent = new Intent(context, LoginActivity.class);
-                intent.putExtra("applicationsSize", applicationNumber);
+                intent.putExtra("applicationNumber", applicationNumber);
                 break;
             }
-            case APPLICATIONS_ACTIVITY:{
+            case PROGRAMS_ACTIVITY:{
                 intent = new Intent(context, ProgramsActivity.class);
-                intent.putExtra("applicationsSize", applicationNumber);
+                intent.putExtra("applicationNumber", applicationNumber);
                 break;
             }
 //            case SETTINSG_ACTIVITY:{
@@ -178,10 +178,10 @@ public class MainActivityPresenter implements IMainActivityPresenter {
             int applicationNumber = appDataManager.getIntValueFromSettingsFile("applicationsNumber");
             if(applicationNumber == 1){
 //                openActivityByEnum(ViewEnums.LOGIN_ACTIVITY, 1);
-                openActivityByEnum(ViewEnums.APPLICATIONS_ACTIVITY, applicationNumber);
+                openActivityByEnum(ViewEnums.PROGRAMS_ACTIVITY, applicationNumber);
             }
             else {
-                openActivityByEnum(ViewEnums.APPLICATIONS_ACTIVITY, applicationNumber);
+                openActivityByEnum(ViewEnums.PROGRAMS_ACTIVITY, applicationNumber);
             }
         }
     }

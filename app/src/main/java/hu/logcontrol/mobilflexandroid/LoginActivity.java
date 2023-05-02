@@ -67,16 +67,15 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
 
     private LoginModesPagerAdapter loginModesPagerAdapter;
 
-    private Intent backActivityIntent;
+    private int defaultThemeId;
+    private int applicationId;
 
     @SuppressLint("HardwareIds")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        backActivityIntent = getIntent();
-
         initView();
+        getDatasFromIntent();
         initPresenter();
         initAppDataManager();
         setControlsValuesBySettings();
@@ -94,15 +93,23 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
 
     private void setControlsValuesBySettings() {
         if(loginActivityPresenter == null) return;
-        if(backActivityIntent == null) return;
-        loginActivityPresenter.setControlsValuesBySettings(backActivityIntent);
+        loginActivityPresenter.setControlsValuesBySettings(applicationId, defaultThemeId);
     }
 
     private void initLoginButtons() {
         if(loginActivityPresenter == null) return;
-        if(backActivityIntent == null) return;
         if(wst == null) return;
-        loginActivityPresenter.initButtonsByLoginModesNumber(wst, backActivityIntent);
+        loginActivityPresenter.initButtonsByLoginModesNumber(wst, applicationId, defaultThemeId);
+    }
+
+    private void getDatasFromIntent(){
+
+        Intent i = getIntent();
+
+        if(i != null){
+            defaultThemeId = i.getIntExtra("defaultThemeId", -1);
+            applicationId = i.getIntExtra("applicationId", -1);
+        }
     }
 
     void initView(){
@@ -253,7 +260,6 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
     public void sendCreatedButtonsToView(List<ImageButton> createdButtons) {
         if(llay == null) return;
         if(createdButtons == null) return;
-        if(backActivityIntent == null) return;
         llay.invalidate();
 
         loginModesPagerAdapter = new LoginModesPagerAdapter(getSupportFragmentManager(), getLifecycle());
@@ -263,12 +269,9 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
                 case MessageIdentifiers.BUTTON_USER_PASS:{
                     loginAccAndPassButton = createdButtons.get(i);
 
-                    String defaultThemeId = String.valueOf(backActivityIntent.getIntExtra("defaultThemeId", -1));
-                    String applicationId = String.valueOf(backActivityIntent.getIntExtra("applicationId", -1));
-
                     Fragment fragment = new UserPassFragment();
 
-                    if(wst != null && defaultThemeId != null && applicationId != null) {
+                    if(wst != null && defaultThemeId != -1 && applicationId != -1) {
                         Helper.sendDisplaySizesToFragments(fragment, wst, defaultThemeId, applicationId);
                     }
 
@@ -282,12 +285,9 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
                 case MessageIdentifiers.BUTTON_PINCODE:{
                     loginPinButton = createdButtons.get(i);
 
-                    String defaultThemeId = String.valueOf(backActivityIntent.getIntExtra("defaultThemeId", -1));
-                    String applicationId = String.valueOf(backActivityIntent.getIntExtra("applicationId", -1));
-
                     Fragment fragment = new PinCodeFragment();
 
-                    if(wst != null && defaultThemeId != null && applicationId != null) {
+                    if(wst != null && defaultThemeId != -1 && applicationId != -1) {
                         Helper.sendDisplaySizesToFragments(fragment, wst, defaultThemeId, applicationId);
                     }
 
@@ -301,12 +301,9 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
                 case MessageIdentifiers.BUTTON_RFID:{
                     loginRFIDButton = createdButtons.get(i);
 
-                    String defaultThemeId = String.valueOf(backActivityIntent.getIntExtra("defaultThemeId", -1));
-                    String applicationId = String.valueOf(backActivityIntent.getIntExtra("applicationId", -1));
-
                     Fragment fragment = new RFIDFragment();
 
-                    if(wst != null && defaultThemeId != null && applicationId != null) {
+                    if(wst != null && defaultThemeId != -1 && applicationId != -1) {
                         Helper.sendDisplaySizesToFragments(fragment, wst, defaultThemeId, applicationId);
                     }
 
@@ -319,12 +316,10 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
                 }
                 case MessageIdentifiers.BUTTON_BARCODE:{
                     loginBarcodeButton = createdButtons.get(i);
-                    String defaultThemeId = String.valueOf(backActivityIntent.getIntExtra("defaultThemeId", -1));
-                    String applicationId = String.valueOf(backActivityIntent.getIntExtra("applicationId", -1));
 
                     Fragment fragment = new BarcodeFragment();
 
-                    if(wst != null && defaultThemeId != null && applicationId != null) {
+                    if(wst != null && defaultThemeId != -1 && applicationId != -1) {
                         Helper.sendDisplaySizesToFragments(fragment, wst, defaultThemeId, applicationId);
                     }
 
