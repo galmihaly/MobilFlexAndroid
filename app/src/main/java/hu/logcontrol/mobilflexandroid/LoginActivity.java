@@ -132,8 +132,6 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
 
             applicationLeadTV = findViewById(R.id.applicationLead_mobile_portrait);
             applicationTitleTV = findViewById(R.id.applicationTitle_mobile_portrait);
-
-            changeStateLoginLogo(R.drawable.ic_baseline_album);
         }
         else if(wst[0] == WindowSizeTypes.MEDIUM && wst[1] == WindowSizeTypes.COMPACT){
 
@@ -146,8 +144,6 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
 
             applicationLeadTV = findViewById(R.id.applicationLead_mobile_landscape);
             applicationTitleTV = findViewById(R.id.applicationTitle_mobile_landscape);
-
-            changeStateLoginLogo(R.drawable.ic_baseline_album);
         }
         else if(wst[0] == WindowSizeTypes.MEDIUM && wst[1] == WindowSizeTypes.EXPANDED){
 
@@ -160,8 +156,6 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
 
             applicationLeadTV = findViewById(R.id.applicationLead_tablet_portrait);
             applicationTitleTV = findViewById(R.id.applicationTitle_tablet_portrait);
-
-            changeStateLoginLogo(R.drawable.ic_baseline_album);
         }
         else if(wst[0] == WindowSizeTypes.EXPANDED && wst[1] == WindowSizeTypes.MEDIUM){
 
@@ -174,8 +168,6 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
 
             applicationLeadTV = findViewById(R.id.applicationLead_tablet_landscape);
             applicationTitleTV = findViewById(R.id.applicationTitle_tablet_landscape);
-
-            changeStateLoginLogo(R.drawable.ic_baseline_album);
         }
     }
 

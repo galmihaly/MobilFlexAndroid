@@ -3,12 +3,23 @@ package hu.logcontrol.mobilflexandroid.tasks;
 import android.annotation.SuppressLint;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.graphics.Picture;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.PictureDrawable;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.Message;
 import android.util.Log;
 
+import com.larvalabs.svgandroid.SVG;
+import com.larvalabs.svgandroid.SVGParser;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -74,6 +85,30 @@ public class ProcessSVGLogo implements Callable {
                     backgroundGradientColor = mainPreferenceFileService.getStringValueFromSettingsPrefFile("backgroundGradientColor" + '_' + (i + 1) + '_' + defaultThemeId);
                     logoUrl = mainPreferenceFileService.getStringValueFromSettingsPrefFile("logoUrl" + '_' + (i + 1) + '_' + defaultThemeId);
 
+                    String filname = getFileNameFromUrl();
+
+                    try {
+                        File f = new File(Environment.getExternalStorageDirectory() + File.separator + "WasteProgram", filname);
+
+//                        if(!f.exists()) f.createNewFile();
+
+                        Log.e("getExternalStorageDirectory", Environment.getExternalStorageDirectory() + File.separator + "WasteProgram");
+                        Log.e("filePath", context.getFilesDir() + File.separator + filname);
+                        Log.e("fileExisting", String.valueOf(f.exists()));
+                        Log.e("fileIsFile", String.valueOf(f.isFile()));
+                        Log.e("fileIsDirectory", String.valueOf(f.isDirectory()));
+
+                        if(f.exists()){
+                            FileInputStream fIn = new FileInputStream(f);
+//                            SVG svg = SVGParser.getSVGFromInputStream(fIn,0,0);
+//                            PictureDrawable d = svg.createPictureDrawable();
+//                            Log.e("pic", String.valueOf(svg.getPicture().getHeight()));
+//                            drawable = d.getCurrent();
+                        }
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
                     p = new ProgramsResultObject(applicationTitle, backgroundColor, backgroundGradientColor, drawable, defaultThemeId, i + 1);
                     pList.add(p);
 
@@ -93,6 +128,13 @@ public class ProcessSVGLogo implements Callable {
         }
 
         return null;
+    }
+
+    private String getFileNameFromUrl() {
+        if(logoUrl == null) return null;
+
+        String[] s = logoUrl.split("/");
+        return s[s.length - 1];
     }
 
     private void savingGlobalMessageHandling(int messageID, String exceptionMessage) {

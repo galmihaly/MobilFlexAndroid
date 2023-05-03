@@ -24,7 +24,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_baseline_album" />
+            app:srcCompat="@drawable/ic_mobileflex" />
 
         <TextView
             android:id="@+id/applicationTitleTV"

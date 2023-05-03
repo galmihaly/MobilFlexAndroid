@@ -126,7 +126,7 @@ public class LoginActivityPresenter implements ILoginActivityPresenter {
             String foreGroundColor = appDataManager.getStringValueFromSettingsFile("foregroundColor" + '_' + applicationId + '_' + defaultThemeId);
 
             // TODO ezt majd le kell tölteni egy URL-ről
-            iLoginActivity.changeStateLoginLogo(R.drawable.ic_baseline_album);
+//            iLoginActivity.changeStateLoginLogo(R.drawable.ic_mobileflex);
 
             if(message != null && foreGroundColor != null) iLoginActivity.changeStateLoginTV(message, foreGroundColor);
             if(backgroundColor != null && backgroundGradientColor != null) iLoginActivity.changeStateMainActivityCL(backgroundColor, backgroundGradientColor);

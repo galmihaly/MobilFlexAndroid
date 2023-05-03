@@ -3,27 +3,20 @@ package hu.logcontrol.mobilflexandroid.tasks;
 import android.annotation.SuppressLint;
 import android.app.DownloadManager;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Message;
 import android.util.Log;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
 import java.net.HttpURLConnection;
 
-import hu.logcontrol.mobilflexandroid.R;
 import hu.logcontrol.mobilflexandroid.datamanager.MainPreferenceFileService;
 import hu.logcontrol.mobilflexandroid.enums.MessageIdentifiers;
 import hu.logcontrol.mobilflexandroid.helpers.Helper;
@@ -31,12 +24,6 @@ import hu.logcontrol.mobilflexandroid.logger.ApplicationLogger;
 import hu.logcontrol.mobilflexandroid.logger.LogLevel;
 import hu.logcontrol.mobilflexandroid.models.ProgramsResultObject;
 import hu.logcontrol.mobilflexandroid.taskmanager.CustomThreadPoolManager;
-import okhttp3.Cache;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class DownloadSVGLogo implements Callable {
 
@@ -48,7 +35,7 @@ public class DownloadSVGLogo implements Callable {
     private int defaultThemeId;
     private String logoUrl;
 
-    private final List<String> fileNameList = new ArrayList<>();
+    private final List<String> fileList = new ArrayList<>();
     private ProgramsResultObject p;
     private Message message;
 
@@ -84,74 +71,33 @@ public class DownloadSVGLogo implements Callable {
 
                         boolean isConnected = isConnectedToServer(logoUrl);
                         if(isConnected){
-                            File file = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + filname);
+                            File dir = new File(Environment.getExternalStorageState() + File.separator + "WasteProgram", filname);
 
-                            File[] listFiles = file.listFiles();
-
-                            if(listFiles.length != 0){
-                                for (int j = 0; j < listFiles.length; j++) {
-                                    if(listFiles[j].getName().equals(filname)){
-                                        Log.e("s", "megegyezik");
-                                    }
-                                    else {
-                                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(logoUrl));
-
-                                        Log.e("path", file.getAbsolutePath());
-                                        Log.e("filename", file.getAbsoluteFile().getName());
-                                        Log.e("getPath", file.getAbsoluteFile().getPath());
-                                        Log.e("getAbsolutePath", file.getAbsoluteFile().getAbsolutePath());
-
-                                        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-                                        request.setDestinationInExternalPublicDir(Environment.getDownloadCacheDirectory().getPath(), filname);
-
-                                        DownloadManager manager = (DownloadManager)context.getSystemService(Context.DOWNLOAD_SERVICE);
-                                        manager.enqueue(request);
-                                    }
-                                }
-                            }
-                            else {
+                            if(!dir.exists()){
                                 DownloadManager.Request request = new DownloadManager.Request(Uri.parse(logoUrl));
 
-                                Log.e("path", file.getAbsolutePath());
-                                Log.e("filename", file.getAbsoluteFile().getName());
-                                Log.e("getPath", file.getAbsoluteFile().getPath());
-                                Log.e("getAbsolutePath", file.getAbsoluteFile().getAbsolutePath());
+                                Log.e("path", dir.getAbsolutePath());
+                                Log.e("filename", dir.getName());
+                                Log.e("getPath", dir.getPath());
+                                Log.e("getAbsolutePath", dir.getAbsoluteFile().getAbsolutePath());
 
                                 request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-                                request.setDestinationInExternalPublicDir(Environment.getDownloadCacheDirectory().getPath(), filname);
+                                request.setDestinationInExternalPublicDir(File.separator + "WasteProgram", filname);
 
                                 DownloadManager manager = (DownloadManager)context.getSystemService(Context.DOWNLOAD_SERVICE);
                                 manager.enqueue(request);
                             }
-
-//                            if(!file.exists()){
-//                                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(logoUrl));
-//
-//                                Log.e("path", file.getAbsolutePath());
-//                                Log.e("filename", file.getAbsoluteFile().getName());
-//                                Log.e("getPath", file.getAbsoluteFile().getPath());
-//                                Log.e("getAbsolutePath", file.getAbsoluteFile().getAbsolutePath());
-//
-//                                request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-//                                request.setDestinationInExternalPublicDir(Environment.getDownloadCacheDirectory().getPath(), filname);
-//
-//                                DownloadManager manager = (DownloadManager)context.getSystemService(Context.DOWNLOAD_SERVICE);
-//                                manager.enqueue(request);
-//                            }
-//                            else {
-//                                Log.e("a", "asd");
-//                            }
                         }
 
-                        fileNameList.add(filname);
+                        fileList.add(filname);
                     }
                 }
             }
 
             message = Helper.createMessage(MessageIdentifiers.LOGO_DOWNLOAD_SUCCES, "A logó sikersen letöltődött!");
 
-            if(ctpmw != null && ctpmw.get() != null && message != null && fileNameList != null) {
-                message.obj = fileNameList;
+            if(ctpmw != null && ctpmw.get() != null && message != null && fileList != null) {
+                message.obj = fileList;
                 ctpmw.get().sendResultToPresenter(message);
             }
 
