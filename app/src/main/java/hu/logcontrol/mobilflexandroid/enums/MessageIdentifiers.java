@@ -21,6 +21,7 @@ public class MessageIdentifiers {
 
     // LOGO_DOWNLOAD identifiers
     public static final int LOGO_DOWNLOAD_SUCCES = 14;
+    public static final int SUCCES = 15;
 
     //ERROR identifiers
     public static final int EXCEPTION = -2;

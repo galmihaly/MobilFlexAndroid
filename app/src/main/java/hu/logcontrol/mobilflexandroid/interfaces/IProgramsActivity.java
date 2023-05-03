@@ -10,5 +10,6 @@ import hu.logcontrol.mobilflexandroid.models.ProgramsResultObject;
 public interface IProgramsActivity {
     void openViewByIntent(Intent intent);
     void getMessageFromPresenter(String message);
-    void getProgramsCardElements(List<ProgramsResultObject> programsResultObjects);
+    void getFileNameList(List<String> filenNames);
+    void getDatasFromPresenter(List<ProgramsResultObject> programsResultObjectList);
 }

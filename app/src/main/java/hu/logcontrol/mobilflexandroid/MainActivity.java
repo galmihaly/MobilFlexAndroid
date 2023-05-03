@@ -1,9 +1,14 @@
 package hu.logcontrol.mobilflexandroid;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -35,11 +40,35 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initView();
+        startWrite();
         initPresenter();
         initAppDataManager();
-
         initLanguagesSpinner();
         initFunctions();
+    }
+
+    public void startWrite() {
+        if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            Log.e("", "Jelenleg rendelkezik írási joggal!");
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 786);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, int[] grantResults) {
+        for (int r : grantResults) {
+            if (r == PackageManager.PERMISSION_DENIED) {
+                Toast.makeText(this, "Engedély elutasítva!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+        if (requestCode == 786) {
+            Toast.makeText(this, "Engedély elfogadva!", Toast.LENGTH_SHORT).show();
+        }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */

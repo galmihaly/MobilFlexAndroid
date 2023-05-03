@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 import android.widget.ImageButton;
 
 import java.lang.ref.WeakReference;
@@ -34,6 +33,7 @@ import hu.logcontrol.mobilflexandroid.taskmanager.CustomThreadPoolManager;
 import hu.logcontrol.mobilflexandroid.taskmanager.PresenterThreadCallback;
 import hu.logcontrol.mobilflexandroid.tasks.CreateLoginButtons;
 import hu.logcontrol.mobilflexandroid.tasks.DownloadSVGLogo;
+import hu.logcontrol.mobilflexandroid.tasks.ProcessSVGLogo;
 
 public class AppDataManager implements PresenterThreadCallback, IAppDataManagerHandler, IMainWebAPIService {
 
@@ -251,7 +251,7 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
         }
     }
 
-    public void getDataFromAppDataManager(int applicationsSize) {
+    public void downloadLogoFromUrl(int applicationsSize) {
         if(mCustomThreadPoolManager == null) return;
         if(mainPreferenceFileService == null) return;
 
@@ -264,6 +264,21 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
             ApplicationLogger.logging(LogLevel.FATAL, e.getMessage());
         }
     }
+
+    public void processSVGLogoFiles(List<String> fileNames, int applicationsSize) {
+        if(mCustomThreadPoolManager == null) return;
+        if(mainPreferenceFileService == null) return;
+
+        try {
+            ProcessSVGLogo callable = new ProcessSVGLogo(context.getApplicationContext(), mainPreferenceFileService, fileNames, applicationsSize);
+            callable.setCustomThreadPoolManager(mCustomThreadPoolManager);
+            mCustomThreadPoolManager.addCallableMethod(callable);
+        }
+        catch (Exception e){
+            ApplicationLogger.logging(LogLevel.FATAL, e.getMessage());
+        }
+    }
+
 
     public String getMessageFromLanguagesFiles(String languageKey, String separator){
         if(languageKey == null) return null;
@@ -292,10 +307,17 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
     /* IAppDataManager interfész függvénye */
     @Override
-    public void sendDowloadedLogoToPresenter(List<ProgramsResultObject> programsResultObject) {
-        if(programsResultObject == null) return;
+    public void sendFileNamesToPresenter(List<String> fileNames) {
+        if(fileNames == null) return;
         if(iProgramsPresenter == null) return;
-        iProgramsPresenter.sendDatasLogoToPresenter(programsResultObject);
+        iProgramsPresenter.sendFileNamesToView(fileNames);
+    }
+
+    @Override
+    public void sendDatasToPresenter(List<ProgramsResultObject> programsResultObjectList) {
+        if(programsResultObjectList == null) return;
+        if(iProgramsPresenter == null) return;
+        iProgramsPresenter.getDatasFromPresenter(programsResultObjectList);
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -350,7 +372,7 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
 
                             AppDataManagerHelper.saveIntValueToPrefFile(mainPreferenceFileService, "id" + '_' + (i + 1) + '_' + defaultThemeId, applicationThemes.get(l).getId());
                             AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "applicationId" + '_' + (i + 1) + '_' + defaultThemeId, applicationThemes.get(l).getApplicationId().toString());
-                            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "logoUrl" + '_' + (i + 1) + '_' + defaultThemeId, applications.get(l).getLogoUrl());
+                            AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "logoUrl" + '_' + (i + 1) + '_' + defaultThemeId, applicationThemes.get(l).getLogoUrl());
                             AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "name" + '_' + (i + 1) + '_' + defaultThemeId, applicationThemes.get(l).getName());
                             AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "backgroundColor" + '_' + (i + 1) + '_' + defaultThemeId, applicationThemes.get(l).getBackgroundColor());
                             AppDataManagerHelper.saveColorToSettingsPrefFile(mainPreferenceFileService, "backgroundGradientColor" + '_' + (i + 1) + '_' + defaultThemeId, applicationThemes.get(l).getBackgroundGradientColor());
@@ -428,8 +450,15 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
                 }
                 case MessageIdentifiers.LOGO_DOWNLOAD_SUCCES:{
                     if(msg.obj instanceof List){
-                        List<ProgramsResultObject> logo = (List<ProgramsResultObject>) msg.obj;
-                        iAppDataManagerHandler.get().sendDowloadedLogoToPresenter(logo);
+                        List<String> fileNames = (List<String>) msg.obj;
+                        iAppDataManagerHandler.get().sendFileNamesToPresenter(fileNames);
+                    }
+                    break;
+                }
+                case MessageIdentifiers.SUCCES:{
+                    if(msg.obj instanceof List){
+                        List<ProgramsResultObject> programsResultObjectList = (List<ProgramsResultObject>) msg.obj;
+                        iAppDataManagerHandler.get().sendDatasToPresenter(programsResultObjectList);
                     }
                     break;
                 }

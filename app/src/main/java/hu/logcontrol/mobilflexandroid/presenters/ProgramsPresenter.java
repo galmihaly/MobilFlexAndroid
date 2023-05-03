@@ -62,16 +62,28 @@ public class ProgramsPresenter implements IProgramsPresenter {
     }
 
     @Override
-    public void getDataFromAppDataManager(int applicationNumber) {
+    public void getDownloadedLogoFromWeb(int applicationNumber) {
         if(appDataManager == null) return;
-
-        if(applicationNumber != -1) appDataManager.getDataFromAppDataManager(applicationNumber);
+        if(applicationNumber != -1) appDataManager.downloadLogoFromUrl(applicationNumber);
     }
 
     @Override
-    public void sendDatasLogoToPresenter(List<ProgramsResultObject> programsResultObjects) {
+    public void getDrawablesFromSVGFiles(List<String> fileNames, int applicationNumber) {
+        if(appDataManager == null) return;
+        if(applicationNumber != -1) appDataManager.processSVGLogoFiles(fileNames, applicationNumber);
+    }
+
+    @Override
+    public void getDatasFromPresenter(List<ProgramsResultObject> programsResultObjectList) {
+        if(programsResultObjectList == null) return;
         if(iProgramsActivity == null) return;
-        if(programsResultObjects == null) return;
-        iProgramsActivity.getProgramsCardElements(programsResultObjects);
+        iProgramsActivity.getDatasFromPresenter(programsResultObjectList);
+    }
+
+    @Override
+    public void sendFileNamesToView(List<String> fileNames) {
+        if(iProgramsActivity == null) return;
+        if(fileNames == null) return;
+        iProgramsActivity.getFileNameList(fileNames);
     }
 }

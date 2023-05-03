@@ -1,25 +1,29 @@
 package hu.logcontrol.mobilflexandroid.tasks;
 
+import android.annotation.SuppressLint;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Environment;
 import android.os.Message;
 import android.util.Log;
 
-//import com.larvalabs.svgandroid.SVG;
-//import com.larvalabs.svgandroid.SVGParser;
-
-import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
-import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import java.net.HttpURLConnection;
+
+import hu.logcontrol.mobilflexandroid.R;
 import hu.logcontrol.mobilflexandroid.datamanager.MainPreferenceFileService;
 import hu.logcontrol.mobilflexandroid.enums.MessageIdentifiers;
 import hu.logcontrol.mobilflexandroid.helpers.Helper;
@@ -27,6 +31,12 @@ import hu.logcontrol.mobilflexandroid.logger.ApplicationLogger;
 import hu.logcontrol.mobilflexandroid.logger.LogLevel;
 import hu.logcontrol.mobilflexandroid.models.ProgramsResultObject;
 import hu.logcontrol.mobilflexandroid.taskmanager.CustomThreadPoolManager;
+import okhttp3.Cache;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class DownloadSVGLogo implements Callable {
 
@@ -36,17 +46,12 @@ public class DownloadSVGLogo implements Callable {
     private int applicationsSize;
 
     private int defaultThemeId;
-    private String applicationTitle;
-    private String backgroundColor;
-    private String backgroundGradientColor;
     private String logoUrl;
 
-    private final List<ProgramsResultObject> pList = new ArrayList<>();
-
+    private final List<String> fileNameList = new ArrayList<>();
     private ProgramsResultObject p;
-
     private Message message;
-    private Bitmap drawable;
+
 
     public DownloadSVGLogo(Context context, MainPreferenceFileService mainPreferenceFileService, int applicationsSize) {
         this.context = context.getApplicationContext();
@@ -58,6 +63,10 @@ public class DownloadSVGLogo implements Callable {
         this.ctpmw = new WeakReference<>(customThreadPoolManager);
     }
 
+    // TODO ez itt még nem teljesen működik, majd meg kell csinálni
+    // sokszor jön létre a fájl a Environment.getExternalStorageDirectory().getPath() útvonalon
+
+    @SuppressLint("CheckResult")
     @Override
     public Object call() throws Exception {
         try {
@@ -67,59 +76,82 @@ public class DownloadSVGLogo implements Callable {
                 for (int i = 0; i < applicationsSize; i++) {
 
                     defaultThemeId = mainPreferenceFileService.getIntValueFromSettingsPrefFile("defaultThemeId" + '_' + (i + 1));
-                    applicationTitle = mainPreferenceFileService.getStringValueFromSettingsPrefFile("applicationTitle" + '_' + (i + 1));
-                    backgroundColor = mainPreferenceFileService.getStringValueFromSettingsPrefFile("backgroundColor" + '_' + (i + 1) + '_' + defaultThemeId);
-                    backgroundGradientColor = mainPreferenceFileService.getStringValueFromSettingsPrefFile("backgroundGradientColor" + '_' + (i + 1) + '_' + defaultThemeId);
-                    logoUrl = mainPreferenceFileService.getStringValueFromSettingsPrefFile("logoUrl" + '_' + (i + 1));
+                    logoUrl = mainPreferenceFileService.getStringValueFromSettingsPrefFile("logoUrl" + '_' + (i + 1) + '_' + defaultThemeId);
 
-                    Log.e("defaultThemeId" + '_' + (i + 1),  " " + String.valueOf(defaultThemeId));
-                    Log.e("applicationTitle" + '_' + (i + 1), applicationTitle);
-                    Log.e("backgroundColor" + '_' + (i + 1) + '_' + defaultThemeId, backgroundColor);
-                    Log.e("backgroundGradientColor" + '_' + (i + 1) + '_' + defaultThemeId, backgroundGradientColor);
-                    Log.e("logoUrl" + '_' + (i + 1) + '_' + defaultThemeId, logoUrl);
+                    String filname = getFileNameFromUrl();
 
-                    logoUrl = "https://html.com/wp-content/uploads/flamingo.jpg";
+                    if(filname != null){
 
-                    URL url = new URL(logoUrl);
+                        boolean isConnected = isConnectedToServer(logoUrl);
+                        if(isConnected){
+                            File file = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + filname);
 
-                    HttpURLConnection connection = null;
-                    try{
-                        connection = (HttpURLConnection) url.openConnection();
-                        connection.setDoInput(true);
-                        connection.connect();
+                            File[] listFiles = file.listFiles();
 
-                        if(connection.getResponseCode() == 200){
+                            if(listFiles.length != 0){
+                                for (int j = 0; j < listFiles.length; j++) {
+                                    if(listFiles[j].getName().equals(filname)){
+                                        Log.e("s", "megegyezik");
+                                    }
+                                    else {
+                                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(logoUrl));
 
-//                            InputStream inputStream = connection.getInputStream();
-//                            Log.e("inputstream", String.valueOf(inputStream.available()));
-//                            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+                                        Log.e("path", file.getAbsolutePath());
+                                        Log.e("filename", file.getAbsoluteFile().getName());
+                                        Log.e("getPath", file.getAbsoluteFile().getPath());
+                                        Log.e("getAbsolutePath", file.getAbsoluteFile().getAbsolutePath());
+
+                                        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+                                        request.setDestinationInExternalPublicDir(Environment.getDownloadCacheDirectory().getPath(), filname);
+
+                                        DownloadManager manager = (DownloadManager)context.getSystemService(Context.DOWNLOAD_SERVICE);
+                                        manager.enqueue(request);
+                                    }
+                                }
+                            }
+                            else {
+                                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(logoUrl));
+
+                                Log.e("path", file.getAbsolutePath());
+                                Log.e("filename", file.getAbsoluteFile().getName());
+                                Log.e("getPath", file.getAbsoluteFile().getPath());
+                                Log.e("getAbsolutePath", file.getAbsoluteFile().getAbsolutePath());
+
+                                request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+                                request.setDestinationInExternalPublicDir(Environment.getDownloadCacheDirectory().getPath(), filname);
+
+                                DownloadManager manager = (DownloadManager)context.getSystemService(Context.DOWNLOAD_SERVICE);
+                                manager.enqueue(request);
+                            }
+
+//                            if(!file.exists()){
+//                                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(logoUrl));
 //
-//                            SVG svg = SVGParser. getSVGFromInputStream(bufferedInputStream);
-//                            drawable = svg.createPictureDrawable();
-
-//                            bitmap = BitmapFactory.decodeStream(bufferedInputStream);
-//                            Log.e("a", String.valueOf(bitmap.getHeight()));
-
-                            InputStream inputStream = connection.getInputStream();
-                            Log.e("inputstream", String.valueOf(inputStream.available()));
-                            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
-                            drawable = BitmapFactory.decodeStream(bufferedInputStream);
-
-                            inputStream.close();
-
-                            p = new ProgramsResultObject(applicationTitle, backgroundColor, backgroundGradientColor, drawable, defaultThemeId, i + 1);
-                            pList.add(p);
+//                                Log.e("path", file.getAbsolutePath());
+//                                Log.e("filename", file.getAbsoluteFile().getName());
+//                                Log.e("getPath", file.getAbsoluteFile().getPath());
+//                                Log.e("getAbsolutePath", file.getAbsoluteFile().getAbsolutePath());
+//
+//                                request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+//                                request.setDestinationInExternalPublicDir(Environment.getDownloadCacheDirectory().getPath(), filname);
+//
+//                                DownloadManager manager = (DownloadManager)context.getSystemService(Context.DOWNLOAD_SERVICE);
+//                                manager.enqueue(request);
+//                            }
+//                            else {
+//                                Log.e("a", "asd");
+//                            }
                         }
-                    }catch(IOException e){
-                        e.printStackTrace();
+
+                        fileNameList.add(filname);
                     }
                 }
             }
 
             message = Helper.createMessage(MessageIdentifiers.LOGO_DOWNLOAD_SUCCES, "A logó sikersen letöltődött!");
 
-            if(ctpmw != null && ctpmw.get() != null && message != null && p != null) {
-                message.obj = pList;
+            if(ctpmw != null && ctpmw.get() != null && message != null && fileNameList != null) {
+                message.obj = fileNameList;
                 ctpmw.get().sendResultToPresenter(message);
             }
 
@@ -129,6 +161,39 @@ public class DownloadSVGLogo implements Callable {
         }
 
         return null;
+    }
+
+    private String getFileNameFromUrl() {
+        if(logoUrl == null) return null;
+
+        String[] s = logoUrl.split("/");
+        return s[s.length - 1];
+    }
+
+    public boolean isConnectedToServer(String stringUrl) {
+        if(logoUrl == null) return false;
+        if(stringUrl == null) return false;
+
+        boolean isConnected = false;
+
+        try{
+            URL url = new URL(stringUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.connect();
+
+            if(connection.getResponseCode() == 200){
+                isConnected = true;
+            }
+            else if(connection.getResponseCode() == 404){
+                isConnected = false;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            isConnected = false;
+        }
+
+        return isConnected;
     }
 
     private void savingGlobalMessageHandling(int messageID, String exceptionMessage) {

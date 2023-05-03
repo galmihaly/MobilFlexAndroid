@@ -9,7 +9,9 @@ import hu.logcontrol.mobilflexandroid.models.ProgramsResultObject;
 
 public interface IProgramsPresenter {
     void initAppDataManager();
-    void getDataFromAppDataManager(int applicationNumber);
-    void sendDatasLogoToPresenter(List<ProgramsResultObject> resultLogo);
+    void getDownloadedLogoFromWeb(int applicationNumber);
+    void sendFileNamesToView(List<String> fileNames);
     void openActivityByEnum(ViewEnums viewEnum, int defaultThemeId, int applicationId);
+    void getDrawablesFromSVGFiles(List<String> fileNames, int applicationNumber);
+    void getDatasFromPresenter(List<ProgramsResultObject> programsResultObjectList);
 }

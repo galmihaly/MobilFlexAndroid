@@ -1,5 +1,6 @@
 package hu.logcontrol.mobilflexandroid.adapters;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -16,7 +17,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.List;
 
 import hu.logcontrol.mobilflexandroid.ProgramsActivity;
@@ -27,12 +27,14 @@ import hu.logcontrol.mobilflexandroid.presenters.ProgramsPresenter;
 
 public class ProgramsRecycleAdapter extends RecyclerView.Adapter<ProgramsRecycleAdapter.ProgramItemViewHolder> {
 
+    private Context context;
     private ProgramsPresenter programsPresenter;
     private List<ProgramsResultObject> programsResultObjectList;
 
-    public ProgramsRecycleAdapter(List<ProgramsResultObject> programsResultObjectList, ProgramsPresenter programsPresenter) {
-        this.programsResultObjectList = programsResultObjectList;
+    public ProgramsRecycleAdapter(Context context, ProgramsPresenter programsPresenter, List<ProgramsResultObject> programsResultObjectList) {
+        this.context = context;
         this.programsPresenter = programsPresenter;
+        this.programsResultObjectList = programsResultObjectList;
     }
 
     @NonNull
@@ -46,8 +48,9 @@ public class ProgramsRecycleAdapter extends RecyclerView.Adapter<ProgramsRecycle
     public void onBindViewHolder(@NonNull ProgramItemViewHolder holder, int position) {
         if(programsResultObjectList != null){
 
-            Bitmap logo = programsResultObjectList.get(position).getLogo();
-            if(logo != null) holder.getLogoItemIV().setImageBitmap(logo);
+//            Bitmap logo = programsResultObjectList.get(position).getLogo();
+            Drawable logo = programsResultObjectList.get(position).getLogo();
+            if(logo != null) holder.getLogoItemIV().setImageDrawable(logo);
 
             holder.getApplicationTitleTV().setText(programsResultObjectList.get(position).getTitle());
 
