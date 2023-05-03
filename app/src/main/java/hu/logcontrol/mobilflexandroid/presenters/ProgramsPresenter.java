@@ -38,7 +38,6 @@ public class ProgramsPresenter implements IProgramsPresenter {
         Log.e("ProgramsPresenter_defaultThemeId", String.valueOf(defaultThemeId));
         Log.e("ProgramsPresenter_applicationId", String.valueOf(applicationId));
 
-
         switch (viewEnum){
             case LOGIN_ACTIVITY:{
                 intent = new Intent(context, LoginActivity.class);
