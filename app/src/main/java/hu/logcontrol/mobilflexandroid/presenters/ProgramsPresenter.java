@@ -35,6 +35,7 @@ public class ProgramsPresenter implements IProgramsPresenter {
 
         Intent intent = null;
 
+
         Log.e("ProgramsPresenter_defaultThemeId", String.valueOf(defaultThemeId));
         Log.e("ProgramsPresenter_applicationId", String.valueOf(applicationId));
 
