@@ -10,11 +10,12 @@ public class ProgramsResultObject {
     private String title;
     private String backgroundColor;
     private String backgroundGradientColor;
-    private Bitmap logo;
+//    private Bitmap logo;
+    private Drawable logo;
     private int defaultThemeId;
     private int applicationId;
 
-    public ProgramsResultObject(String title, String backgroundColor, String backgroundGradientColor, Bitmap logo, int defaultThemeId, int applicationId) {
+    public ProgramsResultObject(String title, String backgroundColor, String backgroundGradientColor, Drawable logo, int defaultThemeId, int applicationId) {
         this.title = title;
         this.backgroundColor = backgroundColor;
         this.backgroundGradientColor = backgroundGradientColor;
@@ -35,7 +36,7 @@ public class ProgramsResultObject {
         return backgroundGradientColor;
     }
 
-    public Bitmap getLogo() {
+    public Drawable getLogo() {
         return logo;
     }
 

@@ -5,15 +5,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import hu.logcontrol.mobilflexandroid.adapters.ProgramsRecycleAdapter;
@@ -27,6 +23,8 @@ public class ProgramsActivity extends AppCompatActivity implements IProgramsActi
     private ProgramsPresenter programsPresenter;
     private int applicationNumber;
 
+    private List<String> fileNameList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +35,7 @@ public class ProgramsActivity extends AppCompatActivity implements IProgramsActi
         initView();
         initPresenter();
         initAppDataManager();
-        initRelativeLayoutElementsData();
+        downloadSVGLogoFromWeb();
     }
 
     void initView(){
@@ -53,9 +51,9 @@ public class ProgramsActivity extends AppCompatActivity implements IProgramsActi
         programsPresenter.initAppDataManager();
     }
 
-    private void initRelativeLayoutElementsData() {
+    private void downloadSVGLogoFromWeb() {
         if(programsPresenter == null) return;
-        programsPresenter.getDataFromAppDataManager(applicationNumber);
+        programsPresenter.getDownloadedLogoFromWeb(applicationNumber);
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -72,13 +70,23 @@ public class ProgramsActivity extends AppCompatActivity implements IProgramsActi
     }
 
     @Override
-    public void getProgramsCardElements(List<ProgramsResultObject> programsResultObjects){
-        if(programsResultObjects == null) return;
+    public void getFileNameList(List<String> fileNames){
+        if(fileNames == null) return;
         if(programsRV == null) return;
         if(programsPresenter == null) return;
 
-        ProgramsRecycleAdapter adapter = new ProgramsRecycleAdapter(programsResultObjects, programsPresenter);
+        fileNameList = fileNames;
+        programsPresenter.getDrawablesFromSVGFiles(fileNameList, applicationNumber);
+    }
+
+    @Override
+    public void getDatasFromPresenter(List<ProgramsResultObject> programsResultObjectList) {
+        if(programsResultObjectList == null) return;
+        if(programsRV == null) return;
+
+        ProgramsRecycleAdapter adapter = new ProgramsRecycleAdapter(getApplicationContext(), programsPresenter, programsResultObjectList);
         programsRV.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         programsRV.setAdapter(adapter);
+
     }
 }
