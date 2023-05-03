@@ -9,7 +9,7 @@ import hu.logcontrol.mobilflexandroid.models.ProgramsResultObject;
 
 public interface IProgramsPresenter {
     void initAppDataManager();
-    void getDataFromAppDataManager(Intent intent);
+    void getDataFromAppDataManager(int applicationNumber);
     void sendDatasLogoToPresenter(List<ProgramsResultObject> resultLogo);
     void openActivityByEnum(ViewEnums viewEnum, int defaultThemeId, int applicationId);
 }

@@ -31,16 +31,16 @@ public class BarcodeFragment extends Fragment implements ILoginFragments {
 
     private Button loginButton;
     private WindowSizeTypes[] wsc = new WindowSizeTypes[2];
-    private String defaultThemeId;
-    private String applicationId;
+    private int defaultThemeId;
+    private int applicationId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         wsc[0]  = (WindowSizeTypes) getArguments().getSerializable("windowHeightEnum");
         wsc[1] =  (WindowSizeTypes) getArguments().getSerializable("windowWidthEnum");
-        defaultThemeId = getArguments().getString("defaultThemeId");
-        applicationId = getArguments().getString("applicationId");
+        defaultThemeId = getArguments().getInt("defaultThemeId");
+        applicationId = getArguments().getInt("applicationId");
 
         if(wsc[0] != null && wsc[1] != null){
             if((wsc[0] == WindowSizeTypes.COMPACT && wsc[1] == WindowSizeTypes.MEDIUM) ||
@@ -83,9 +83,7 @@ public class BarcodeFragment extends Fragment implements ILoginFragments {
 
     private void setControlsValuesBySettings() {
         if(loginFragmentsPresenter == null) return;
-        if(applicationId == null) return;
-        if(defaultThemeId == null) return;
-        loginFragmentsPresenter.setControlsValuesBySettings(applicationId, defaultThemeId);
+        loginFragmentsPresenter.setControlsValuesBySettings(defaultThemeId, applicationId);
     }
 
     private void setControlsTextsBySettings() {
@@ -96,7 +94,9 @@ public class BarcodeFragment extends Fragment implements ILoginFragments {
     private void initButtonListeners(){
         if(loginButton == null) return;
         if(loginFragmentsPresenter == null) return;
-        loginButton.setOnClickListener(v -> { loginFragmentsPresenter.openActivityByEnum(ViewEnums.WEBVIEW_ACTIVITY); });
+        loginButton.setOnClickListener(v -> {
+            loginFragmentsPresenter.openActivityByEnum(ViewEnums.WEBVIEW_ACTIVITY, applicationId, defaultThemeId);
+        });
     }
 
     @Override

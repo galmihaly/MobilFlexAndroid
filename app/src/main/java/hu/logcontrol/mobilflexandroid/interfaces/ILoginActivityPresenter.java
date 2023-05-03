@@ -9,10 +9,10 @@ import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
 import hu.logcontrol.mobilflexandroid.enums.WindowSizeTypes;
 
 public interface ILoginActivityPresenter {
-    void initButtonsByLoginModesNumber(WindowSizeTypes[] wsc, Intent intent);
-    void setControlsValuesBySettings(Intent intent);
+    void initButtonsByLoginModesNumber(WindowSizeTypes[] wsc, int applicationId, int defaultThemeId);
+    void setControlsValuesBySettings(int applicationId, int defaultThemeId);
     void initAppDataManager();
     void getMessageFromAppDataManager(String message);
     void getCreatedButtonsFromAppDataManager(List<ImageButton> createdButtons);
-    void openActivityByEnum(ViewEnums viewEnum, String applicationId, String defaultThemeId);
+    void openActivityByEnum(ViewEnums viewEnum, int applicationId, int defaultTheme);
 }

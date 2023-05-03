@@ -25,15 +25,14 @@ public class ProgramsActivity extends AppCompatActivity implements IProgramsActi
 
     private RecyclerView programsRV;
     private ProgramsPresenter programsPresenter;
-
-    private Intent backActivityIntent;
+    private int applicationNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_programs);
 
-        backActivityIntent = getIntent();
+        applicationNumber = getIntent().getIntExtra("applicationNumber", applicationNumber);
 
         initView();
         initPresenter();
@@ -56,8 +55,7 @@ public class ProgramsActivity extends AppCompatActivity implements IProgramsActi
 
     private void initRelativeLayoutElementsData() {
         if(programsPresenter == null) return;
-        if(backActivityIntent == null) return;
-        programsPresenter.getDataFromAppDataManager(backActivityIntent);
+        programsPresenter.getDataFromAppDataManager(applicationNumber);
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -78,9 +76,8 @@ public class ProgramsActivity extends AppCompatActivity implements IProgramsActi
         if(programsResultObjects == null) return;
         if(programsRV == null) return;
         if(programsPresenter == null) return;
-        if(backActivityIntent == null) return;
 
-        ProgramsRecycleAdapter adapter = new ProgramsRecycleAdapter(programsResultObjects, programsPresenter, backActivityIntent);
+        ProgramsRecycleAdapter adapter = new ProgramsRecycleAdapter(programsResultObjects, programsPresenter);
         programsRV.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         programsRV.setAdapter(adapter);
     }

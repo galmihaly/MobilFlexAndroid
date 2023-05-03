@@ -63,11 +63,10 @@ public class ProgramsPresenter implements IProgramsPresenter {
     }
 
     @Override
-    public void getDataFromAppDataManager(Intent intent) {
+    public void getDataFromAppDataManager(int applicationNumber) {
         if(appDataManager == null) return;
 
-        int applicationsSize = intent.getIntExtra("applicationsSize", -1);
-        if(applicationsSize != -1) appDataManager.getDataFromAppDataManager(applicationsSize);
+        if(applicationNumber != -1) appDataManager.getDataFromAppDataManager(applicationNumber);
     }
 
     @Override

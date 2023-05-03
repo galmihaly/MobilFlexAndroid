@@ -109,7 +109,7 @@ public class LoginFragmentsPresenter implements ILoginFragmentsPresenter {
     }
 
     @Override
-    public void openActivityByEnum(ViewEnums viewEnum) {
+    public void openActivityByEnum(ViewEnums viewEnum, int applicationId, int defaultThemeId) {
         if(viewEnum == null) return;
         if(iLoginFragments == null) return;
 
@@ -118,6 +118,8 @@ public class LoginFragmentsPresenter implements ILoginFragmentsPresenter {
         switch (viewEnum){
             case WEBVIEW_ACTIVITY:{
                 intent = new Intent(context, WebViewActivity.class);
+                intent.putExtra("applicationId", applicationId);
+                intent.putExtra("defaultThemeId", defaultThemeId);
                 break;
             }
         }
@@ -128,24 +130,21 @@ public class LoginFragmentsPresenter implements ILoginFragmentsPresenter {
     }
 
     @Override
-    public void setControlsValuesBySettings(String defaultThemeId, String applicationId) {
+    public void setControlsValuesBySettings(int defaultThemeId, int applicationId) {
         if(iLoginFragments == null) return;
         if(appDataManager == null) return;
-        if(defaultThemeId == null) return;
-        if(applicationId == null) return;
 
-        Log.e("setControlsValuesBySettings_defaultThemeId", defaultThemeId);
-        Log.e("setControlsValuesBySettings_applicationId", applicationId);
+        if(defaultThemeId != -1 && applicationId != -1){
 
-        String controlColor = appDataManager.getStringValueFromSettingsFile("controlColor" + '_' + applicationId + '_' + defaultThemeId);
-        String textColor = appDataManager.getStringValueFromSettingsFile("foregroundColor" + '_' + applicationId + '_' + defaultThemeId);
+            String controlColor = appDataManager.getStringValueFromSettingsFile("controlColor" + '_' + applicationId + '_' + defaultThemeId);
+            String textColor = appDataManager.getStringValueFromSettingsFile("foregroundColor" + '_' + applicationId + '_' + defaultThemeId);
 
-        String buttonBackgroundColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundColor" + '_' + applicationId + '_' + defaultThemeId);
-        String buttonBackgroundGradientColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
-        String buttonForeGroundColor = appDataManager.getStringValueFromSettingsFile("buttonForegroundColor" + '_' + applicationId + '_' + defaultThemeId);
+            String buttonBackgroundColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundColor" + '_' + applicationId + '_' + defaultThemeId);
+            String buttonBackgroundGradientColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
+            String buttonForeGroundColor = appDataManager.getStringValueFromSettingsFile("buttonForegroundColor" + '_' + applicationId + '_' + defaultThemeId);
 
-        String currentLanguage = appDataManager.getStringValueFromSettingsFile("CurrentSelectedLanguage");
-        String buttonLabel = null;
+            String currentLanguage = appDataManager.getStringValueFromSettingsFile("CurrentSelectedLanguage");
+            String buttonLabel = null;
 
 //        switch (currentLanguage){
 //            case "HU":{ buttonLabel = hungaryWCPrefFile.getStringValueByKey("HU$WC_ApplicationLoginButtonTitle"); break; }
@@ -153,19 +152,20 @@ public class LoginFragmentsPresenter implements ILoginFragmentsPresenter {
 //            case "DE":{ buttonLabel = germanWCPrefFile.getStringValueByKey("DE$WC_ApplicationLoginButtonTitle"); break; }
 //        }
 
-        buttonLabel = "Bejelentkezés";
+            buttonLabel = "Bejelentkezés";
 
-        if(controlColor != null && textColor != null) {
-            iLoginFragments.changeStateUserPassElements(controlColor, textColor);
-        }
+            if(controlColor != null && textColor != null) {
+                iLoginFragments.changeStateUserPassElements(controlColor, textColor);
+            }
 
-        if(buttonBackgroundColor != null && buttonBackgroundGradientColor != null && buttonForeGroundColor != null && buttonLabel != null) {
-            iLoginFragments.changeStateLoginButton(
-                    buttonBackgroundColor,
-                    buttonBackgroundGradientColor,
-                    buttonForeGroundColor,
-                    buttonLabel
-            );
+            if(buttonBackgroundColor != null && buttonBackgroundGradientColor != null && buttonForeGroundColor != null && buttonLabel != null) {
+                iLoginFragments.changeStateLoginButton(
+                        buttonBackgroundColor,
+                        buttonBackgroundGradientColor,
+                        buttonForeGroundColor,
+                        buttonLabel
+                );
+            }
         }
     }
 }

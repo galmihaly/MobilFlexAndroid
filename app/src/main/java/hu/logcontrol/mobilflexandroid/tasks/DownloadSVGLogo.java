@@ -7,8 +7,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Message;
 import android.util.Log;
 
-import com.larvalabs.svgandroid.SVG;
-import com.larvalabs.svgandroid.SVGParser;
+//import com.larvalabs.svgandroid.SVG;
+//import com.larvalabs.svgandroid.SVGParser;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

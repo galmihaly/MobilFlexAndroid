@@ -34,11 +34,9 @@ public class LoginActivityPresenter implements ILoginActivityPresenter {
     /* ILoginActivityPresenter interfész függvényei */
 
     @Override
-    public void openActivityByEnum(ViewEnums viewEnum, String applicationId, String defaultTheme) {
+    public void openActivityByEnum(ViewEnums viewEnum, int applicationId, int defaultTheme) {
         if(viewEnum == null) return;
         if(iLoginActivity == null) return;
-        if(applicationId == null) return;
-        if(defaultTheme == null) return;
 
         Intent intent = null;
 
@@ -82,62 +80,59 @@ public class LoginActivityPresenter implements ILoginActivityPresenter {
     }
 
     @Override
-    public void initButtonsByLoginModesNumber(WindowSizeTypes[] wsc, Intent intent) {
+    public void initButtonsByLoginModesNumber(WindowSizeTypes[] wsc, int applicationId, int defaultThemeId) {
         if(wsc == null) return;
-        if(intent == null) return;
         if(appDataManager == null) return;
 
-        String defaultThemeId = String.valueOf(intent.getIntExtra("defaultThemeId", -1));
-        String applicationId = String.valueOf(intent.getIntExtra("applicationId", -1));
+        if(applicationId != -1 && defaultThemeId != -1){
+            String color1 = appDataManager.getStringValueFromSettingsFile("backgroundColor" + '_' + applicationId + '_' + defaultThemeId);
+            String color2 = appDataManager.getStringValueFromSettingsFile("backgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
 
-        String color1 = appDataManager.getStringValueFromSettingsFile("backgroundColor" + '_' + applicationId + '_' + defaultThemeId);
-        String color2 = appDataManager.getStringValueFromSettingsFile("backgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
+            try {
+                if(color1 != null && color2 != null){
+                    int[] colors = new int[] {
+                            Color.parseColor(appDataManager.getStringValueFromSettingsFile("backgroundColor" + '_' + applicationId + '_' + defaultThemeId)),
+                            Color.parseColor(appDataManager.getStringValueFromSettingsFile("backgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId))
+                    };
 
-        try {
-            if(color1 != null && color2 != null){
-                int[] colors = new int[] {
-                        Color.parseColor(appDataManager.getStringValueFromSettingsFile("backgroundColor" + '_' + applicationId + '_' + defaultThemeId)),
-                        Color.parseColor(appDataManager.getStringValueFromSettingsFile("backgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId))
-                };
-
-                int loginModesNumber = appDataManager.getIntValueFromSettingsFile("applicationEnabledLoginFlag" + '_' + applicationId);
-                if(loginModesNumber != 0){
-                    appDataManager.initLoginButtons(loginModesNumber, wsc, colors);
-                }
-                else {
-                    openActivityByEnum(ViewEnums.WEBVIEW_ACTIVITY, applicationId, defaultThemeId);
+                    int loginModesNumber = appDataManager.getIntValueFromSettingsFile("applicationEnabledLoginFlag" + '_' + applicationId);
+                    if(loginModesNumber != 0){
+                        appDataManager.initLoginButtons(loginModesNumber, wsc, colors);
+                    }
+                    else {
+                        openActivityByEnum(ViewEnums.WEBVIEW_ACTIVITY, applicationId, defaultThemeId);
+                    }
                 }
             }
-        }
-        catch (Exception e){
-            ApplicationLogger.logging(LogLevel.FATAL, e.getMessage());
+            catch (Exception e){
+                ApplicationLogger.logging(LogLevel.FATAL, e.getMessage());
+            }
         }
     }
 
     @Override
-    public void setControlsValuesBySettings(Intent intent) {
+    public void setControlsValuesBySettings(int applicationId, int defaultThemeId) {
         if(iLoginActivity == null) return;
         if(appDataManager == null) return;
-        if(intent == null) return;
 
-        String defaultThemeId = String.valueOf(intent.getIntExtra("defaultThemeId", -1));
-        String applicationId = String.valueOf(intent.getIntExtra("applicationId", -1));
+        if(applicationId != -1 && defaultThemeId != -1){
 
-        String message = "Bejelentkezés";
-        String applicationLead = appDataManager.getStringValueFromSettingsFile("applicationLead" + '_' + applicationId);
-        String applicationName = appDataManager.getStringValueFromSettingsFile("applicationTitle" + '_' + applicationId);
+            String message = "Bejelentkezés";
+            String applicationLead = appDataManager.getStringValueFromSettingsFile("applicationLead" + '_' + applicationId);
+            String applicationName = appDataManager.getStringValueFromSettingsFile("applicationTitle" + '_' + applicationId);
 
-        String backgroundColor = appDataManager.getStringValueFromSettingsFile("backgroundColor" + '_' + applicationId + '_' + defaultThemeId);
-        String backgroundGradientColor = appDataManager.getStringValueFromSettingsFile("backgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
-        String foreGroundColor = appDataManager.getStringValueFromSettingsFile("foregroundColor" + '_' + applicationId + '_' + defaultThemeId);
+            String backgroundColor = appDataManager.getStringValueFromSettingsFile("backgroundColor" + '_' + applicationId + '_' + defaultThemeId);
+            String backgroundGradientColor = appDataManager.getStringValueFromSettingsFile("backgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
+            String foreGroundColor = appDataManager.getStringValueFromSettingsFile("foregroundColor" + '_' + applicationId + '_' + defaultThemeId);
 
-        // TODO ezt majd le kell tölteni egy URL-ről
-        iLoginActivity.changeStateLoginLogo(R.drawable.ic_baseline_album);
+            // TODO ezt majd le kell tölteni egy URL-ről
+            iLoginActivity.changeStateLoginLogo(R.drawable.ic_baseline_album);
 
-        if(message != null && foreGroundColor != null) iLoginActivity.changeStateLoginTV(message, foreGroundColor);
-        if(backgroundColor != null && backgroundGradientColor != null) iLoginActivity.changeStateMainActivityCL(backgroundColor, backgroundGradientColor);
-        if(applicationLead != null && foreGroundColor != null) iLoginActivity.changeStateApplicationLeadTextbox(applicationLead, foreGroundColor);
-        if(applicationName != null && foreGroundColor != null) iLoginActivity.changeStateApplicationTitleTextbox(applicationName, foreGroundColor);
-        if(backgroundColor != null) iLoginActivity.changeMobileBarsColors(backgroundColor, backgroundGradientColor);
+            if(message != null && foreGroundColor != null) iLoginActivity.changeStateLoginTV(message, foreGroundColor);
+            if(backgroundColor != null && backgroundGradientColor != null) iLoginActivity.changeStateMainActivityCL(backgroundColor, backgroundGradientColor);
+            if(applicationLead != null && foreGroundColor != null) iLoginActivity.changeStateApplicationLeadTextbox(applicationLead, foreGroundColor);
+            if(applicationName != null && foreGroundColor != null) iLoginActivity.changeStateApplicationTitleTextbox(applicationName, foreGroundColor);
+            if(backgroundColor != null) iLoginActivity.changeMobileBarsColors(backgroundColor, backgroundGradientColor);
+        }
     }
 }

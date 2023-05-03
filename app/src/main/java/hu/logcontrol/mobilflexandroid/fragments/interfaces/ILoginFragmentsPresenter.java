@@ -5,7 +5,7 @@ import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
 
 public interface ILoginFragmentsPresenter {
     void initAppDataManager();
-    void setControlsValuesBySettings(String defaultThemeId, String applicationId);
+    void setControlsValuesBySettings(int defaultThemeId, int applicationId);
     void setControlsTextBySettings(FragmentTypes fragmentType);
-    void openActivityByEnum(ViewEnums viewEnum);
+    void openActivityByEnum(ViewEnums viewEnum, int applicationId, int defaultTheme);
 }
