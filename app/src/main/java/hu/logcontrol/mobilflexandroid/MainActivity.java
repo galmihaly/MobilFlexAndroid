@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
 
         initLanguagesSpinner();
         initFunctions();
+
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
