@@ -15,5 +15,6 @@ public interface IMainActivityPresenter {
     int getCurrentLanguageFromSettingsFile();
     void initAppDataManager();
     void startProgram();
-    void sendBitmapLogoToPresenter(String resultMessage);
+    void sendMessageToPresenter(String resultMessage);
+    void initWebAPIServices();
 }

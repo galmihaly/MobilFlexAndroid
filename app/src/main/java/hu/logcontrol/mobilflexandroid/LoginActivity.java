@@ -7,6 +7,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
@@ -78,8 +79,15 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
         getDatasFromIntent();
         initPresenter();
         initAppDataManager();
+        initWebAPIServices();
         setControlsValuesBySettings();
+        getLogoFromExternalStorage();
         initLoginButtons();
+    }
+
+    private void getLogoFromExternalStorage() {
+        if(loginActivityPresenter == null) return;
+        loginActivityPresenter.getLogoImageFromExternalStorage(applicationId, defaultThemeId);
     }
 
     private void initPresenter(){
@@ -89,6 +97,11 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
     private void initAppDataManager(){
         if(loginActivityPresenter == null) return;
         loginActivityPresenter.initAppDataManager();
+    }
+
+    private void initWebAPIServices() {
+        if(loginActivityPresenter == null) return;
+        loginActivityPresenter.initWebAPIServices();
     }
 
     private void setControlsValuesBySettings() {
@@ -198,6 +211,13 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
     public void changeStateLoginLogo(int logoID) {
         if(loginLogo == null) return;
         loginLogo.setImageResource(logoID);
+    }
+
+    @Override
+    public void getLogoFromPresenter(Bitmap bitmap) {
+        if(loginLogo == null) return;
+        if(bitmap == null) return;
+        loginLogo.setImageBitmap(bitmap);
     }
 
     @Override

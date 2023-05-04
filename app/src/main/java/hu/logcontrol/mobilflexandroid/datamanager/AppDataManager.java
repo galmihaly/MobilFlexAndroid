@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.widget.ImageButton;
 
 import java.lang.ref.WeakReference;
@@ -21,6 +22,7 @@ import hu.logcontrol.mobilflexandroid.interfaces.ILoginActivityPresenter;
 import hu.logcontrol.mobilflexandroid.interfaces.IMainActivityPresenter;
 import hu.logcontrol.mobilflexandroid.interfaces.IMainWebAPIService;
 import hu.logcontrol.mobilflexandroid.interfaces.IProgramsPresenter;
+import hu.logcontrol.mobilflexandroid.interfaces.ISettingsWebAPIService;
 import hu.logcontrol.mobilflexandroid.interfaces.IWebViewActivityPresenter;
 import hu.logcontrol.mobilflexandroid.logger.ApplicationLogger;
 import hu.logcontrol.mobilflexandroid.logger.LogLevel;
@@ -28,14 +30,14 @@ import hu.logcontrol.mobilflexandroid.models.Application;
 import hu.logcontrol.mobilflexandroid.models.ApplicationTheme;
 import hu.logcontrol.mobilflexandroid.models.Device;
 import hu.logcontrol.mobilflexandroid.models.ProgramsResultObject;
-import hu.logcontrol.mobilflexandroid.models.ResultObject;
+import hu.logcontrol.mobilflexandroid.models.MainWebAPIResponseObject;
+import hu.logcontrol.mobilflexandroid.models.SettingsWebAPIResponseObject;
 import hu.logcontrol.mobilflexandroid.taskmanager.CustomThreadPoolManager;
 import hu.logcontrol.mobilflexandroid.taskmanager.PresenterThreadCallback;
 import hu.logcontrol.mobilflexandroid.tasks.CreateLoginButtons;
-import hu.logcontrol.mobilflexandroid.tasks.DownloadSVGLogo;
-import hu.logcontrol.mobilflexandroid.tasks.ProcessSVGLogo;
+import hu.logcontrol.mobilflexandroid.tasks.DownloadPNGLogo;
 
-public class AppDataManager implements PresenterThreadCallback, IAppDataManagerHandler, IMainWebAPIService {
+public class AppDataManager implements PresenterThreadCallback, IAppDataManagerHandler, IMainWebAPIService, ISettingsWebAPIService {
 
     private Context context;
     private IMainActivityPresenter iMainActivityPresenter;
@@ -48,6 +50,7 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
     private AppDataManagerHandler appDataManagerHandler;
     private static MainPreferenceFileService mainPreferenceFileService;
     private static MainWebAPIService mainWebAPIService;
+    private static SettingsWebAPIService settingsWebAPIService;
 
     private static int[] languagesImages;
 
@@ -117,10 +120,26 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
         mainPreferenceFileService.saveValueToHungaryPrefFile("HU$WC_BASE_WEBAPI_NOT_AVAILABLE", "Az alap WEB API nem elérhető!");
         mainPreferenceFileService.saveValueToEnglishPrefFile("EN$WC_BASE_WEBAPI_NOT_AVAILABLE", "The basic Web API is available!");
         mainPreferenceFileService.saveValueToGermanPrefFile("DE$WC_BASE_WEBAPI_NOT_AVAILABLE", "Die grundlegende Web-API ist verfügbar!");
+
+        mainPreferenceFileService.saveValueToHungaryPrefFile("HU$WC_BASE_WEBAPI_NOT_EXIST", "Az eszköz nem létezik az adatbázisban!");
+        mainPreferenceFileService.saveValueToEnglishPrefFile("EN$WC_BASE_WEBAPI_NOT_EXIST", "The device does not exist in the database!");
+        mainPreferenceFileService.saveValueToGermanPrefFile("DE$WC_BASE_WEBAPI_NOT_EXIST", "Das Gerät existiert nicht in der Datenbank!");
+
+        mainPreferenceFileService.saveValueToHungaryPrefFile("HU$WC_BASE_WEBAPI_INACTIVE_STATE", "Az eszköz jelenleg inaktív státuszban van!");
+        mainPreferenceFileService.saveValueToEnglishPrefFile("EN$WC_BASE_WEBAPI_INACTIVE_STATE", "The device is currently in inactive status!");
+        mainPreferenceFileService.saveValueToGermanPrefFile("DE$WC_BASE_WEBAPI_INACTIVE_STATE", "Das Werkzeug ist derzeit inaktiv!");
+
+        mainPreferenceFileService.saveValueToHungaryPrefFile("HU$WC_BASE_WEBAPI_NOT_ALLOWED", "Az eszköz számára nincs engedélyezve a belépés!");
+        mainPreferenceFileService.saveValueToEnglishPrefFile("EN$WC_BASE_WEBAPI_NOT_ALLOWED", "The device is not allowed access!");
+        mainPreferenceFileService.saveValueToGermanPrefFile("DE$WC_BASE_WEBAPI_NOT_ALLOWED", "Das Gerät ist nicht zugangsberechtigt!");
     }
 
-    public void createMainWebAPIService(){
-        mainWebAPIService = MainWebAPIService.getRetrofitInstance("https://api.mobileflex.hu/", this);
+    public void createMainWebAPIService(String baseUrl){
+        mainWebAPIService = MainWebAPIService.getRetrofitInstance(baseUrl, this);
+    }
+
+    public void createSettingsWebAPIService(String baseUrl){
+        settingsWebAPIService = SettingsWebAPIService.getRetrofitInstance(baseUrl, this);
     }
 
     public void initTaskManager() {
@@ -224,7 +243,7 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
         return result;
     }
 
-    public void callSettingsWebAPI(){
+    public void callMainWebAPI(){
         if(mainWebAPIService == null) return;
 
         String serialNumber = AppDataManagerHelper.getDeviceSerialNumber();
@@ -232,8 +251,17 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
 
         if(serialNumber != null && deviceName != null){
             // ide kell majd második paraméternek a serialNumber változó értéke
-            mainWebAPIService.sendDeviceDetails("7a0e0865-08b2-488a-8a20-c327ce28e59d", "TESZT", deviceName);
+            mainWebAPIService.sendDeviceDetails("7a0e0865-08b2-488a-8a20-c327ce28e59d", serialNumber, deviceName);
         }
+    }
+
+    public void callSettingsWebAPI(int loginModeEnum, String identifier, String authenticationToken, String data, boolean createSession){
+        if(settingsWebAPIService == null) return;
+        if(identifier == null) return;
+        if(authenticationToken == null) return;
+        if(data == null) return;
+
+        settingsWebAPIService.sendLoginDetails(loginModeEnum, identifier, authenticationToken, data, createSession);
     }
 
     public void initLoginButtons(int loginModesNumber, WindowSizeTypes[] wsc, int[] colors){
@@ -256,7 +284,7 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
         if(mainPreferenceFileService == null) return;
 
         try {
-            DownloadSVGLogo callable = new DownloadSVGLogo(context.getApplicationContext(), mainPreferenceFileService, applicationsSize);
+            DownloadPNGLogo callable = new DownloadPNGLogo(context.getApplicationContext(), mainPreferenceFileService, applicationsSize);
             callable.setCustomThreadPoolManager(mCustomThreadPoolManager);
             mCustomThreadPoolManager.addCallableMethod(callable);
         }
@@ -264,21 +292,6 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
             ApplicationLogger.logging(LogLevel.FATAL, e.getMessage());
         }
     }
-
-    public void processSVGLogoFiles(List<String> fileNames, int applicationsSize) {
-        if(mCustomThreadPoolManager == null) return;
-        if(mainPreferenceFileService == null) return;
-
-        try {
-            ProcessSVGLogo callable = new ProcessSVGLogo(context.getApplicationContext(), mainPreferenceFileService, fileNames, applicationsSize);
-            callable.setCustomThreadPoolManager(mCustomThreadPoolManager);
-            mCustomThreadPoolManager.addCallableMethod(callable);
-        }
-        catch (Exception e){
-            ApplicationLogger.logging(LogLevel.FATAL, e.getMessage());
-        }
-    }
-
 
     public String getMessageFromLanguagesFiles(String languageKey, String separator){
         if(languageKey == null) return null;
@@ -306,12 +319,6 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
     /* IAppDataManager interfész függvénye */
-    @Override
-    public void sendFileNamesToPresenter(List<String> fileNames) {
-        if(fileNames == null) return;
-        if(iProgramsPresenter == null) return;
-        iProgramsPresenter.sendFileNamesToView(fileNames);
-    }
 
     @Override
     public void sendDatasToPresenter(List<ProgramsResultObject> programsResultObjectList) {
@@ -323,14 +330,14 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
     /* IMainWebAPIService interfész függvénye */
     @Override
-    public void onSucces(ResultObject resultObject) {
-        if(resultObject == null) return;
+    public void onSuccesMainWebAPI(MainWebAPIResponseObject mainWebAPIResponseObject) {
+        if(mainWebAPIResponseObject == null) return;
         if(iMainActivityPresenter == null ) return;
         if(mainPreferenceFileService == null) return;
 
-        AppDataManagerHelper.saveIntValueToPrefFile(mainPreferenceFileService, "resultCode", resultObject.getResultCode());
+        AppDataManagerHelper.saveIntValueToPrefFile(mainPreferenceFileService, "resultCode", mainWebAPIResponseObject.getResultCode());
 
-        Device device = resultObject.getDevice();
+        Device device = mainWebAPIResponseObject.getDevice();
         if(device != null){
 
             AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "deviceId", device.getDeviceId());
@@ -388,18 +395,33 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
         }
 
         String message = getMessageFromLanguagesFiles( "WC_DATA_RETIREVAL_END", "$");
-        if(message != null ) iMainActivityPresenter.sendBitmapLogoToPresenter(message);
-
-        // TODO a resultCode-kat át kell majd beszélni Imivel
+        if(message != null ) iMainActivityPresenter.sendMessageToPresenter(message);
     }
 
     @Override
-    public void onFailure() {
+    public void onFailureMainWebAPI() {
         if(iMainActivityPresenter == null) return;
 
         String message = getMessageFromLanguagesFiles( "WC_BASE_WEBAPI_NOT_AVAILABLE", "$");
-        if(message != null ) iMainActivityPresenter.sendBitmapLogoToPresenter(message);
+        if(message != null ) iMainActivityPresenter.sendMessageToPresenter(message);
 
+    }
+
+    @Override
+    public void onSuccesSettingsWebAPI(SettingsWebAPIResponseObject s) {
+        if(iLoginFragmentsPresenter == null) return;
+        if(mainPreferenceFileService == null) return;
+        if(s == null) return;
+
+        Log.e("getLoginModeIdentifierCode", String.valueOf(s.getLoginModeResponseCode()));
+        Log.e("getUserId", String.valueOf(s.getUserId()));
+        Log.e("getSessionId", String.valueOf(s.getSessionId()));
+
+    }
+
+    @Override
+    public void onFailureSettingsWebAPI() {
+        if(iLoginActivityPresenter == null) return;
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -450,15 +472,8 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
                 }
                 case MessageIdentifiers.LOGO_DOWNLOAD_SUCCES:{
                     if(msg.obj instanceof List){
-                        List<String> fileNames = (List<String>) msg.obj;
-                        iAppDataManagerHandler.get().sendFileNamesToPresenter(fileNames);
-                    }
-                    break;
-                }
-                case MessageIdentifiers.SUCCES:{
-                    if(msg.obj instanceof List){
-                        List<ProgramsResultObject> programsResultObjectList = (List<ProgramsResultObject>) msg.obj;
-                        iAppDataManagerHandler.get().sendDatasToPresenter(programsResultObjectList);
+                        List<ProgramsResultObject> fileNames = (List<ProgramsResultObject>) msg.obj;
+                        iAppDataManagerHandler.get().sendDatasToPresenter(fileNames);
                     }
                     break;
                 }

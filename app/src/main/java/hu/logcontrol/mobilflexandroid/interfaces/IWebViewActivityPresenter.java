@@ -9,4 +9,5 @@ public interface IWebViewActivityPresenter {
     void getValuesFromSettingsPrefFile(int applicationId, int defaultThemeId);
     void getURLfromSettings(int applicationId);
     void initAppDataManager();
+    void initWebAPIServices();
 }

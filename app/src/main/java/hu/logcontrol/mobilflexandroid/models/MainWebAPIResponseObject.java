@@ -3,7 +3,7 @@ package hu.logcontrol.mobilflexandroid.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class ResultObject {
+public class MainWebAPIResponseObject {
 
     @SerializedName("resultCode")
     @Expose
@@ -13,7 +13,7 @@ public class ResultObject {
     @Expose
     private Device device;
 
-    public ResultObject(int resultCode, Device device) {
+    public MainWebAPIResponseObject(int resultCode, Device device) {
         this.resultCode = resultCode;
         this.device = device;
     }

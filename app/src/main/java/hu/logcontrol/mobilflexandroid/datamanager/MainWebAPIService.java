@@ -7,14 +7,14 @@ import com.google.gson.JsonObject;
 
 import hu.logcontrol.mobilflexandroid.interfaces.IMainWebAPIService;
 import hu.logcontrol.mobilflexandroid.interfaces.IRetrofitAPI;
-import hu.logcontrol.mobilflexandroid.models.ResultObject;
+import hu.logcontrol.mobilflexandroid.models.MainWebAPIResponseObject;
 import retrofit2.Call;
 import retrofit2.Callback;
 
 import retrofit2.Response;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainWebAPIService implements Callback<ResultObject>{
+public class MainWebAPIService implements Callback<MainWebAPIResponseObject>{
 
     private static MainWebAPIService mIsntance;
     private IMainWebAPIService iMainWebAPIService;
@@ -52,22 +52,20 @@ public class MainWebAPIService implements Callback<ResultObject>{
         jsonObject.addProperty("deviceId", deviceId);
         jsonObject.addProperty("deviceName", deviceName);
 
-        Call<ResultObject> userCall = iRetrofitAPI.postDeviceRequestObject(jsonObject);
+        Call<MainWebAPIResponseObject> userCall = iRetrofitAPI.postDeviceRequestObject(jsonObject);
         userCall.enqueue(this);
     }
 
     @Override
-    public void onResponse(Call<ResultObject> call, Response<ResultObject> response) {
+    public void onResponse(Call<MainWebAPIResponseObject> call, Response<MainWebAPIResponseObject> response) {
         if(response.isSuccessful() && response.body() != null && response.body().getDevice() != null){
-            ResultObject resultObject = response.body();
-            Log.e("resultCode", String.valueOf(resultObject.getResultCode()));
-            iMainWebAPIService.onSucces(resultObject);
+            MainWebAPIResponseObject mainWebAPIResponseObject = response.body();
+            iMainWebAPIService.onSuccesMainWebAPI(mainWebAPIResponseObject);
         }
     }
 
     @Override
-    public void onFailure(Call<ResultObject> call, Throwable t) {
-        Log.e("onFailure", t.getMessage());
-        iMainWebAPIService.onFailure();
+    public void onFailure(Call<MainWebAPIResponseObject> call, Throwable t) {
+        iMainWebAPIService.onFailureMainWebAPI();
     }
 }

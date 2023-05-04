@@ -117,10 +117,18 @@ public class MainActivityPresenter implements IMainActivityPresenter {
     public void initAppDataManager() {
         appDataManager = new AppDataManager(context, this);
         appDataManager.createPreferenceFileService();
-        appDataManager.createMainWebAPIService();
         appDataManager.initLanguagesPrefFile();
         appDataManager.initSettingsPrefFile();
         appDataManager.initBaseMessagesPrefFile();
+    }
+
+    @Override
+    public void initWebAPIServices() {
+        if(appDataManager == null) return;
+        String baseUrl = appDataManager.getStringValueFromSettingsFile("loginWebApiUrl");
+        if(baseUrl != null){
+            appDataManager.createMainWebAPIService(baseUrl);
+        }
     }
 
     @Override
@@ -131,14 +139,6 @@ public class MainActivityPresenter implements IMainActivityPresenter {
         String loginWebApiUrl = appDataManager.getStringValueFromSettingsFile("loginWebApiUrl");
         if(loginWebApiUrl != null){
             initCallingWebAPI();
-        }
-        else{
-            appDataManager.saveValueToSettinsPrefFile("loginWebApiUrl", "https://api.mobileflex.hu/");
-
-            loginWebApiUrl = appDataManager.getStringValueFromSettingsFile("loginWebApiUrl");
-            if(loginWebApiUrl != null){
-                initCallingWebAPI();
-            }
         }
     }
 
@@ -154,7 +154,7 @@ public class MainActivityPresenter implements IMainActivityPresenter {
 
             message = appDataManager.getMessageFromLanguagesFiles("WC_DATA_RETIREVAL_START", "$");
             if(message != null) iMainActivity.setTextToMessageTV(message);
-            appDataManager.callSettingsWebAPI();
+            appDataManager.callMainWebAPI();
         }
         else {
             message = appDataManager.getMessageFromLanguagesFiles("WC_NETWORK_NOT_AVAILABLE", "$");
@@ -163,17 +163,20 @@ public class MainActivityPresenter implements IMainActivityPresenter {
     }
 
     @Override
-    public void sendBitmapLogoToPresenter(String resultMessage) {
+    public void sendMessageToPresenter(String resultMessage) {
         if(resultMessage == null) return;
         if(iMainActivity == null) return;
 
-        iMainActivity.setTextToMessageTV(resultMessage);
+        String message = null;
 
         int resultCode = appDataManager.getIntValueFromSettingsFile("resultCode");
         if(resultCode == -99) {
             openActivityByEnum(ViewEnums.SETTINSG_ACTIVITY, -1);
         }
-        else {
+        // OK
+        else if(resultCode == 0) {
+
+            iMainActivity.setTextToMessageTV(resultMessage);
 
             int applicationNumber = appDataManager.getIntValueFromSettingsFile("applicationsNumber");
             if(applicationNumber == 1){
@@ -184,5 +187,26 @@ public class MainActivityPresenter implements IMainActivityPresenter {
                 openActivityByEnum(ViewEnums.PROGRAMS_ACTIVITY, applicationNumber);
             }
         }
+        // DeviceDoesNotExists
+        else if(resultCode == 100) {
+            message = appDataManager.getMessageFromLanguagesFiles("WC_BASE_WEBAPI_NOT_EXIST", "$");
+            if(message != null) iMainActivity.setTextToMessageTV(message);
+        }
+        // DeviceInactive
+        else if(resultCode == 101) {
+            message = appDataManager.getMessageFromLanguagesFiles("WC_BASE_WEBAPI_INACTIVE_STATE", "$");
+            if(message != null) iMainActivity.setTextToMessageTV(message);
+        }
+        // DeviceAccessDenied
+        else if(resultCode == 102) {
+            message = appDataManager.getMessageFromLanguagesFiles("WC_BASE_WEBAPI_NOT_ALLOWED", "$");
+            if(message != null) iMainActivity.setTextToMessageTV(message);
+        }
+    }
+
+    public void saveBaseUrl() {
+        if(iMainActivity == null) return;
+        if(appDataManager == null) return;
+        appDataManager.saveValueToSettinsPrefFile("loginWebApiUrl", "https://api.mobileflex.hu/");
     }
 }

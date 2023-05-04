@@ -30,11 +30,19 @@ public class LoginFragmentsPresenter implements ILoginFragmentsPresenter {
     public void initAppDataManager() {
         appDataManager = new AppDataManager(context, this);
         appDataManager.createPreferenceFileService();
-        appDataManager.createMainWebAPIService();
         appDataManager.initLanguagesPrefFile();
         appDataManager.initSettingsPrefFile();
         appDataManager.initBaseMessagesPrefFile();
         appDataManager.initTaskManager();
+    }
+
+    @Override
+    public void initWebAPIServices() {
+        if(appDataManager == null) return;
+        String baseUrl = appDataManager.getStringValueFromSettingsFile("loginWebApiUrl");
+        if(baseUrl != null){
+            appDataManager.createSettingsWebAPIService(baseUrl);
+        }
     }
 
     @Override
@@ -167,5 +175,16 @@ public class LoginFragmentsPresenter implements ILoginFragmentsPresenter {
                 );
             }
         }
+    }
+
+    @Override
+    public void startLogin(String identifier, String authenticationToken, int loginModeEnum) {
+        if(appDataManager == null) return;
+        if(identifier == null) return;
+
+        String data = "";
+        boolean createSession = true;
+
+        appDataManager.callSettingsWebAPI(loginModeEnum, identifier, authenticationToken, data, createSession);
     }
 }

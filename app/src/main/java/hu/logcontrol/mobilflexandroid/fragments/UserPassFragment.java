@@ -76,6 +76,7 @@ public class UserPassFragment extends Fragment implements ILoginFragments {
 
         initPresenter();
         initAppDataManager();
+        initWebAPIServices();
         setControlsValuesBySettings();
         setControlsTextsBySettings();
         initButtonListeners();
@@ -92,6 +93,11 @@ public class UserPassFragment extends Fragment implements ILoginFragments {
         loginFragmentsPresenter.initAppDataManager();
     }
 
+    private void initWebAPIServices() {
+        if(loginFragmentsPresenter == null) return;
+        loginFragmentsPresenter.initWebAPIServices();
+    }
+
     private void setControlsValuesBySettings() {
         if(loginFragmentsPresenter == null) return;
         loginFragmentsPresenter.setControlsValuesBySettings(defaultThemeId, applicationId);
@@ -104,9 +110,15 @@ public class UserPassFragment extends Fragment implements ILoginFragments {
 
     private void initButtonListeners(){
         if(loginButton == null) return;
+        if(loginUsername2 == null) return;
+        if(loginPassword2 == null) return;
         if(loginFragmentsPresenter == null) return;
+
+        int loginModeEnum = 1;
+
         loginButton.setOnClickListener(v -> {
-            loginFragmentsPresenter.openActivityByEnum(ViewEnums.WEBVIEW_ACTIVITY, applicationId, defaultThemeId);
+            loginFragmentsPresenter.startLogin(loginUsername2.getText().toString(), loginPassword2.getText().toString(), loginModeEnum);
+//            loginFragmentsPresenter.openActivityByEnum(ViewEnums.WEBVIEW_ACTIVITY, applicationId, defaultThemeId);
         });
     }
 

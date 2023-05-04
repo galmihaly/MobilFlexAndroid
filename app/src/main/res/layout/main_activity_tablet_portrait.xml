@@ -54,7 +54,6 @@
                     android:id="@+id/messageTV_tablet_portrait"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="TextView"
                     android:textColor="#FFFFFFFF"
                     android:textSize="24sp"
                     android:textStyle="bold"

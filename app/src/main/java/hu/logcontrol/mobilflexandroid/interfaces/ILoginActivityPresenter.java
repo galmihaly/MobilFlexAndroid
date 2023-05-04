@@ -15,4 +15,6 @@ public interface ILoginActivityPresenter {
     void getMessageFromAppDataManager(String message);
     void getCreatedButtonsFromAppDataManager(List<ImageButton> createdButtons);
     void openActivityByEnum(ViewEnums viewEnum, int applicationId, int defaultTheme);
+    void getLogoImageFromExternalStorage(int applicationId, int defaultThemeId);
+    void initWebAPIServices();
 }

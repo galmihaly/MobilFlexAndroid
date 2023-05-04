@@ -65,6 +65,7 @@ public class BarcodeFragment extends Fragment implements ILoginFragments {
 
         initPresenter();
         initAppDataManager();
+        initWebAPIServices();
         setControlsValuesBySettings();
         setControlsTextsBySettings();
         initButtonListeners();
@@ -81,6 +82,11 @@ public class BarcodeFragment extends Fragment implements ILoginFragments {
         loginFragmentsPresenter.initAppDataManager();
     }
 
+    private void initWebAPIServices() {
+        if(loginFragmentsPresenter == null) return;
+        loginFragmentsPresenter.initWebAPIServices();
+    }
+
     private void setControlsValuesBySettings() {
         if(loginFragmentsPresenter == null) return;
         loginFragmentsPresenter.setControlsValuesBySettings(defaultThemeId, applicationId);
@@ -93,8 +99,13 @@ public class BarcodeFragment extends Fragment implements ILoginFragments {
 
     private void initButtonListeners(){
         if(loginButton == null) return;
+        if(loginBarCode2 == null) return;
         if(loginFragmentsPresenter == null) return;
+
+        int loginModeEnum = 8;
+
         loginButton.setOnClickListener(v -> {
+            loginFragmentsPresenter.startLogin(loginBarCode2.getText().toString(), null, loginModeEnum);
             loginFragmentsPresenter.openActivityByEnum(ViewEnums.WEBVIEW_ACTIVITY, applicationId, defaultThemeId);
         });
     }

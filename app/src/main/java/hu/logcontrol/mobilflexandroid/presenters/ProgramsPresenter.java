@@ -69,22 +69,9 @@ public class ProgramsPresenter implements IProgramsPresenter {
     }
 
     @Override
-    public void getDrawablesFromSVGFiles(List<String> fileNames, int applicationNumber) {
-        if(appDataManager == null) return;
-        if(applicationNumber != -1) appDataManager.processSVGLogoFiles(fileNames, applicationNumber);
-    }
-
-    @Override
     public void getDatasFromPresenter(List<ProgramsResultObject> programsResultObjectList) {
         if(programsResultObjectList == null) return;
         if(iProgramsActivity == null) return;
-        iProgramsActivity.getDatasFromPresenter(programsResultObjectList);
-    }
-
-    @Override
-    public void sendFileNamesToView(List<String> fileNames) {
-        if(iProgramsActivity == null) return;
-        if(fileNames == null) return;
-        iProgramsActivity.getFileNameList(fileNames);
+        iProgramsActivity.getObjectList(programsResultObjectList);
     }
 }

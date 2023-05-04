@@ -43,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         startWrite();
         initPresenter();
         initAppDataManager();
+        initWebAPIServices();
+        saveBaseUrl();
         initLanguagesSpinner();
         initFunctions();
     }
@@ -77,6 +79,11 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     private void initAppDataManager() {
         if(mainActivityPresenter == null) return;
         mainActivityPresenter.initAppDataManager();
+    }
+
+    private void initWebAPIServices() {
+        if(mainActivityPresenter == null) return;
+        mainActivityPresenter.initWebAPIServices();
     }
 
     private void initLanguagesSpinner() {
@@ -118,6 +125,11 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
                 @Override  public void onNothingSelected(AdapterView<?> parent) {}
             });
         }
+    }
+
+    private void saveBaseUrl() {
+        if(mainActivityPresenter == null) return;
+        mainActivityPresenter.saveBaseUrl();
     }
 
     private void initFunctions() {
@@ -174,6 +186,8 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
 
             button = findViewById(R.id.button_tablet_landscape);
         }
+
+        if(messageTV != null) messageTV.setText(null);
     }
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
 

@@ -1,6 +1,7 @@
 package hu.logcontrol.mobilflexandroid.interfaces;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.widget.ImageButton;
 
 import java.util.List;
@@ -16,4 +17,5 @@ public interface ILoginActivity {
     void sendCreatedButtonsToView(List<ImageButton> createdButtons);
     void changeMobileBarsColors(String statusBarColor, String navigationBarColor);
     void openWebViewActivity(String applicationId, String defaultThemeId);
+    void getLogoFromPresenter(Bitmap bitmap);
 }

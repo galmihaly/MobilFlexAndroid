@@ -50,6 +50,7 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewActivi
         getDatasFromIntent();
         initPresenter();
         initAppDataManager();
+        initWebAPIServices();
         initAppBarLayout();
         loadWebViewFromSettings();
         initSwipeRefreshLayout();
@@ -62,6 +63,11 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewActivi
     private void initAppDataManager(){
         if(webViewActivityPresenter == null) return;
         webViewActivityPresenter.initAppDataManager();
+    }
+
+    private void initWebAPIServices() {
+        if(webViewActivityPresenter == null) return;
+        webViewActivityPresenter.initWebAPIServices();
     }
 
     private void getDatasFromIntent(){

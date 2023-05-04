@@ -18,7 +18,7 @@
             android:id="@+id/logoItemIV"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:layout_marginStart="30dp"
+            android:layout_marginStart="20dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             app:layout_constraintBottom_toBottomOf="parent"

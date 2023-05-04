@@ -66,6 +66,7 @@ public class RFIDFragment extends Fragment implements ILoginFragments {
 
         initPresenter();
         initAppDataManager();
+        initWebAPIServices();
         setControlsValuesBySettings();
         setControlsTextsBySettings();
         initButtonListeners();
@@ -82,6 +83,11 @@ public class RFIDFragment extends Fragment implements ILoginFragments {
         loginFragmentsPresenter.initAppDataManager();
     }
 
+    private void initWebAPIServices() {
+        if(loginFragmentsPresenter == null) return;
+        loginFragmentsPresenter.initWebAPIServices();
+    }
+
     private void setControlsValuesBySettings() {
         if(loginFragmentsPresenter == null) return;
         loginFragmentsPresenter.setControlsValuesBySettings(defaultThemeId, applicationId);
@@ -94,8 +100,15 @@ public class RFIDFragment extends Fragment implements ILoginFragments {
 
     private void initButtonListeners(){
         if(loginButton == null) return;
+        if(loginRFID2 == null) return;
         if(loginFragmentsPresenter == null) return;
-        loginButton.setOnClickListener(v -> { loginFragmentsPresenter.openActivityByEnum(ViewEnums.WEBVIEW_ACTIVITY, applicationId, defaultThemeId); });
+
+        int loginModeEnum = 4;
+
+        loginButton.setOnClickListener(v -> {
+            loginFragmentsPresenter.startLogin(loginRFID2.getText().toString(), null, loginModeEnum);
+            loginFragmentsPresenter.openActivityByEnum(ViewEnums.WEBVIEW_ACTIVITY, applicationId, defaultThemeId);
+        });
     }
 
     @Override

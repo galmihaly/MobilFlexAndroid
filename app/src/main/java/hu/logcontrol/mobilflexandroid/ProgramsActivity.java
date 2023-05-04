@@ -70,23 +70,13 @@ public class ProgramsActivity extends AppCompatActivity implements IProgramsActi
     }
 
     @Override
-    public void getFileNameList(List<String> fileNames){
-        if(fileNames == null) return;
-        if(programsRV == null) return;
-        if(programsPresenter == null) return;
-
-        fileNameList = fileNames;
-        programsPresenter.getDrawablesFromSVGFiles(fileNameList, applicationNumber);
-    }
-
-    @Override
-    public void getDatasFromPresenter(List<ProgramsResultObject> programsResultObjectList) {
+    public void getObjectList(List<ProgramsResultObject> programsResultObjectList){
         if(programsResultObjectList == null) return;
         if(programsRV == null) return;
+        if(programsPresenter == null) return;
 
         ProgramsRecycleAdapter adapter = new ProgramsRecycleAdapter(getApplicationContext(), programsPresenter, programsResultObjectList);
         programsRV.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         programsRV.setAdapter(adapter);
-
     }
 }

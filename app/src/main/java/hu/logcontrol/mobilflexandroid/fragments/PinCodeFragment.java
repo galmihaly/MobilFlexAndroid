@@ -65,6 +65,7 @@ public class PinCodeFragment extends Fragment implements ILoginFragments {
 
         initPresenter();
         initAppDataManager();
+        initWebAPIServices();
         setControlsValuesBySettings();
         setControlsTextsBySettings();
         initButtonListeners();
@@ -82,6 +83,11 @@ public class PinCodeFragment extends Fragment implements ILoginFragments {
         loginFragmentsPresenter.initAppDataManager();
     }
 
+    private void initWebAPIServices() {
+        if(loginFragmentsPresenter == null) return;
+        loginFragmentsPresenter.initWebAPIServices();
+    }
+
     private void setControlsValuesBySettings() {
         if(loginFragmentsPresenter == null) return;
         loginFragmentsPresenter.setControlsValuesBySettings(defaultThemeId, applicationId);
@@ -94,8 +100,15 @@ public class PinCodeFragment extends Fragment implements ILoginFragments {
 
     private void initButtonListeners(){
         if(loginButton == null) return;
+        if(loginPinCode2 == null) return;
         if(loginFragmentsPresenter == null) return;
-        loginButton.setOnClickListener(v -> { loginFragmentsPresenter.openActivityByEnum(ViewEnums.WEBVIEW_ACTIVITY, applicationId, defaultThemeId); });
+
+        int loginModeEnum = 2;
+
+        loginButton.setOnClickListener(v -> {
+            loginFragmentsPresenter.startLogin(loginPinCode2.getText().toString(), null, loginModeEnum);
+            loginFragmentsPresenter.openActivityByEnum(ViewEnums.WEBVIEW_ACTIVITY, applicationId, defaultThemeId);
+        });
     }
 
     @Override

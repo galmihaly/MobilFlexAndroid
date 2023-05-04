@@ -2,10 +2,16 @@ package hu.logcontrol.mobilflexandroid.presenters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.ImageButton;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.List;
 
 import hu.logcontrol.mobilflexandroid.R;
@@ -58,11 +64,19 @@ public class LoginActivityPresenter implements ILoginActivityPresenter {
     public void initAppDataManager() {
         appDataManager = new AppDataManager(context, this);
         appDataManager.createPreferenceFileService();
-        appDataManager.createMainWebAPIService();
         appDataManager.initLanguagesPrefFile();
         appDataManager.initSettingsPrefFile();
         appDataManager.initBaseMessagesPrefFile();
         appDataManager.initTaskManager();
+    }
+
+    @Override
+    public void initWebAPIServices() {
+        if(appDataManager == null) return;
+        String baseUrl = appDataManager.getStringValueFromSettingsFile("loginWebApiUrl");
+        if(baseUrl != null){
+            appDataManager.createMainWebAPIService(baseUrl);
+        }
     }
 
     @Override
@@ -125,14 +139,33 @@ public class LoginActivityPresenter implements ILoginActivityPresenter {
             String backgroundGradientColor = appDataManager.getStringValueFromSettingsFile("backgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
             String foreGroundColor = appDataManager.getStringValueFromSettingsFile("foregroundColor" + '_' + applicationId + '_' + defaultThemeId);
 
-            // TODO ezt majd le kell tölteni egy URL-ről
-//            iLoginActivity.changeStateLoginLogo(R.drawable.ic_mobileflex);
-
             if(message != null && foreGroundColor != null) iLoginActivity.changeStateLoginTV(message, foreGroundColor);
             if(backgroundColor != null && backgroundGradientColor != null) iLoginActivity.changeStateMainActivityCL(backgroundColor, backgroundGradientColor);
             if(applicationLead != null && foreGroundColor != null) iLoginActivity.changeStateApplicationLeadTextbox(applicationLead, foreGroundColor);
             if(applicationName != null && foreGroundColor != null) iLoginActivity.changeStateApplicationTitleTextbox(applicationName, foreGroundColor);
             if(backgroundColor != null) iLoginActivity.changeMobileBarsColors(backgroundColor, backgroundGradientColor);
         }
+    }
+
+    @Override
+    public void getLogoImageFromExternalStorage(int applicationId, int defaultThemeId) {
+        if(iLoginActivity == null) return;
+        if(appDataManager == null) return;
+
+        Bitmap bitmap = null;
+        String fileName = appDataManager.getStringValueFromSettingsFile("logoName" + '_' + applicationId + '_' + defaultThemeId);
+
+        if(fileName != null){
+            File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "MobileFlexAndroid");
+            if(dir.exists()){
+                File file = new File(Environment.getExternalStorageDirectory() + File.separator + "MobileFlexAndroid" + File.separator + fileName);
+
+                if(file.exists()){
+                    bitmap = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory() + File.separator + "MobileFlexAndroid" + File.separator + fileName);
+                }
+            }
+        }
+
+        if(bitmap != null) iLoginActivity.getLogoFromPresenter(bitmap);
     }
 }

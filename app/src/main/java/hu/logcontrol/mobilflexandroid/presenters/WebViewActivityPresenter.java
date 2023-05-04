@@ -64,11 +64,19 @@ public class WebViewActivityPresenter implements IWebViewActivityPresenter {
     public void initAppDataManager() {
         appDataManager = new AppDataManager(context, this);
         appDataManager.createPreferenceFileService();
-        appDataManager.createMainWebAPIService();
         appDataManager.initLanguagesPrefFile();
         appDataManager.initSettingsPrefFile();
         appDataManager.initBaseMessagesPrefFile();
         appDataManager.initTaskManager();
+    }
+
+    @Override
+    public void initWebAPIServices() {
+        if(appDataManager == null) return;
+        String baseUrl = appDataManager.getStringValueFromSettingsFile("loginWebApiUrl");
+        if(baseUrl != null){
+            appDataManager.createMainWebAPIService(baseUrl);
+        }
     }
 
     @Override
