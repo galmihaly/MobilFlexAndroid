@@ -22,7 +22,7 @@ public class AppDataManagerHelper {
             mainPreferenceFileService.saveValueToSettingsPrefFile(key, "");
         }
 
-        Log.e(key, mainPreferenceFileService.getStringValueFromSettingsPrefFile(key));
+//        Log.e(key, mainPreferenceFileService.getStringValueFromSettingsPrefFile(key));
     }
 
     public static void saveIntValueToPrefFile(MainPreferenceFileService mainPreferenceFileService, String key, int value) {
@@ -36,7 +36,7 @@ public class AppDataManagerHelper {
             mainPreferenceFileService.saveValueToSettingsPrefFile(key, -1);
         }
 
-        Log.e(key, String.valueOf(mainPreferenceFileService.getIntValueFromSettingsPrefFile(key)));
+//        Log.e(key, String.valueOf(mainPreferenceFileService.getIntValueFromSettingsPrefFile(key)));
     }
 
     public static void saveColorToSettingsPrefFile(MainPreferenceFileService mainPreferenceFileService, String key, String colorValue) {
@@ -51,7 +51,7 @@ public class AppDataManagerHelper {
             mainPreferenceFileService.saveValueToSettingsPrefFile(key, "#" + colorValue);
         }
 
-        Log.e(key, mainPreferenceFileService.getStringValueFromSettingsPrefFile(key));
+//        Log.e(key, mainPreferenceFileService.getStringValueFromSettingsPrefFile(key));
     }
 
     public static String getDeviceSerialNumber(){

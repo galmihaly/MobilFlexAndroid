@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     private Spinner languageSelector;
 
     private Button button;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +48,16 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         initWebAPIServices();
         saveBaseUrl();
         initLanguagesSpinner();
-        initFunctions();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(messageTV != null && progressBar != null && mainActivityPresenter != null){
+            messageTV.setText("");
+            mainActivityPresenter.startProgram(4000);
+        }
     }
 
     public void startWrite() {
@@ -132,14 +143,6 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         mainActivityPresenter.saveBaseUrl();
     }
 
-    private void initFunctions() {
-        if(button != null){
-            button.setOnClickListener(v -> {
-                mainActivityPresenter.startProgram();
-            });
-        }
-    }
-
     private void initPresenter() {
         mainActivityPresenter = new MainActivityPresenter(this, getApplicationContext());
     }
@@ -159,22 +162,21 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
             setContentView(R.layout.main_activity_mobile_portrait);
             messageTV = findViewById(R.id.messageTV_mobile_portrait);
             languageSelector = findViewById(R.id.languageSelector_mobile_portrait);
-
-            button = findViewById(R.id.button_mobile_portrait);
+            progressBar = findViewById(R.id.progressBar_mobile_portrait);
         }
         else if(wst[0] == WindowSizeTypes.MEDIUM && wst[1] == WindowSizeTypes.COMPACT){
 
             setContentView(R.layout.main_activity_mobile_landscape);
             messageTV = findViewById(R.id.messageTV_mobile_landscape);
             languageSelector = findViewById(R.id.languageSelector_mobile_landscape);
-
-            button = findViewById(R.id.button_mobile_landscape);
+            progressBar = findViewById(R.id.progressBar_mobile_landscape);
         }
         else if(wst[0] == WindowSizeTypes.MEDIUM && wst[1] == WindowSizeTypes.EXPANDED){
 
             setContentView(R.layout.main_activity_tablet_portrait);
             messageTV = findViewById(R.id.messageTV_tablet_portrait);
             languageSelector = findViewById(R.id.languageSelector_tablet_portrait);
+            progressBar = findViewById(R.id.progressBar_mobile_portrait);
 
             button = findViewById(R.id.button_tablet_portrait);
         }
@@ -183,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
             setContentView(R.layout.main_activity_tablet_landscape);
             messageTV = findViewById(R.id.messageTV_tablet_landscape);
             languageSelector = findViewById(R.id.languageSelector_tablet_landscape);
+            progressBar = findViewById(R.id.progressBar_mobile_portrait);
 
             button = findViewById(R.id.button_tablet_landscape);
         }
@@ -209,6 +212,12 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         if(message == null) return;
         if(messageTV == null) return;
         messageTV.setText(message);
+    }
+
+    @Override
+    public void setProgressringVisibility(int isVisible) {
+        if(progressBar == null) return;
+        progressBar.setVisibility(isVisible);
     }
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
 }

@@ -40,6 +40,8 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewActivi
 
     private int defaultThemeId;
     private int applicationId;
+    private boolean isFromLoginPage;
+    private int applicationsSize;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +79,8 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewActivi
         if(i != null){
             defaultThemeId = i.getIntExtra("defaultThemeId", -1);
             applicationId = i.getIntExtra("applicationId", -1);
+            isFromLoginPage = i.getBooleanExtra("isFromLoginPage", false);
+            applicationsSize = i.getIntExtra("applicationsSize", -1);
         }
     }
 
@@ -88,8 +92,13 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewActivi
 
     private void initFunctions() {
         if(logoutBut == null) return;
+
         logoutBut.setOnClickListener(v -> {
-            webViewActivityPresenter.openActivityByEnum(ViewEnums.LOGIN_ACTIVITY, applicationId, defaultThemeId);
+
+            Log.e("isFromLoginPage", String.valueOf(isFromLoginPage));
+
+            if(isFromLoginPage){ webViewActivityPresenter.openActivityByEnum(ViewEnums.LOGIN_ACTIVITY, applicationId, defaultThemeId, applicationsSize); }
+            else { webViewActivityPresenter.openActivityByEnum(ViewEnums.PROGRAMS_ACTIVITY, applicationId, defaultThemeId, applicationsSize); }
         });
     }
 

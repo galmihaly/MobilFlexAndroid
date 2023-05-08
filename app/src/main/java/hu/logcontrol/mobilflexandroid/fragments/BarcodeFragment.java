@@ -33,6 +33,7 @@ public class BarcodeFragment extends Fragment implements ILoginFragments {
     private WindowSizeTypes[] wsc = new WindowSizeTypes[2];
     private int defaultThemeId;
     private int applicationId;
+    private boolean isFromLoginPage;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -41,6 +42,7 @@ public class BarcodeFragment extends Fragment implements ILoginFragments {
         wsc[1] =  (WindowSizeTypes) getArguments().getSerializable("windowWidthEnum");
         defaultThemeId = getArguments().getInt("defaultThemeId");
         applicationId = getArguments().getInt("applicationId");
+        isFromLoginPage = getArguments().getBoolean("isFromLoginPage");
 
         if(wsc[0] != null && wsc[1] != null){
             if((wsc[0] == WindowSizeTypes.COMPACT && wsc[1] == WindowSizeTypes.MEDIUM) ||
@@ -106,7 +108,7 @@ public class BarcodeFragment extends Fragment implements ILoginFragments {
 
         loginButton.setOnClickListener(v -> {
             loginFragmentsPresenter.startLogin(loginBarCode2.getText().toString(), null, loginModeEnum);
-            loginFragmentsPresenter.openActivityByEnum(ViewEnums.WEBVIEW_ACTIVITY, applicationId, defaultThemeId);
+            loginFragmentsPresenter.openActivityByEnum(ViewEnums.WEBVIEW_ACTIVITY, applicationId, defaultThemeId, isFromLoginPage);
         });
     }
 

@@ -7,7 +7,7 @@ public interface ILoginFragmentsPresenter {
     void initAppDataManager();
     void setControlsValuesBySettings(int defaultThemeId, int applicationId);
     void setControlsTextBySettings(FragmentTypes fragmentType);
-    void openActivityByEnum(ViewEnums viewEnum, int applicationId, int defaultTheme);
+    void openActivityByEnum(ViewEnums viewEnum, int applicationId, int defaultTheme, boolean isFromLoginPage);
     void initWebAPIServices();
     void startLogin(String identifier, String authenticationToken, int loginModeEnum);
 }

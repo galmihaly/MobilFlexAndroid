@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.List;
@@ -23,14 +24,14 @@ public class ProgramsActivity extends AppCompatActivity implements IProgramsActi
     private ProgramsPresenter programsPresenter;
     private int applicationNumber;
 
-    private List<String> fileNameList;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_programs);
 
-        applicationNumber = getIntent().getIntExtra("applicationNumber", applicationNumber);
+        applicationNumber = getIntent().getIntExtra("applicationsSize", -1);
+
+        Log.e("ProgramsActivity_applicationNumber", String.valueOf(applicationNumber));
 
         initView();
         initPresenter();

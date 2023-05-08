@@ -62,11 +62,29 @@ public class ProgramsRecycleAdapter extends RecyclerView.Adapter<ProgramsRecycle
             GradientDrawable g = new GradientDrawable(GradientDrawable.Orientation.RIGHT_LEFT, colors);
             holder.getProgramsItemCL().setBackground(g);
 
-            holder.getProgramsItemCL().setOnClickListener(v -> programsPresenter.openActivityByEnum(
-                    ViewEnums.LOGIN_ACTIVITY,
-                    programsResultObjectList.get(position).getDefaultThemeId(),
-                    programsResultObjectList.get(position).getApplicationId()
-            ));
+            int applicationEnabledLoginFlag = programsResultObjectList.get(position).getApplicationEnabledLoginFlag();
+
+            holder.getProgramsItemCL().setOnClickListener(v -> {
+                if(applicationEnabledLoginFlag == 0){
+                    programsPresenter.openActivityByEnum(
+                            ViewEnums.WEBVIEW_ACTIVITY,
+                            programsResultObjectList.get(position).getDefaultThemeId(),
+                            programsResultObjectList.get(position).getApplicationId(),
+                            false,
+                            programsResultObjectList.get(position).getApplicationsSize()
+                    );
+                }
+                else {
+                    programsPresenter.openActivityByEnum(
+                            ViewEnums.LOGIN_ACTIVITY,
+                            programsResultObjectList.get(position).getDefaultThemeId(),
+                            programsResultObjectList.get(position).getApplicationId(),
+                            true,
+                            programsResultObjectList.get(position).getApplicationsSize()
+                    );
+                }
+
+            });
         }
     }
 

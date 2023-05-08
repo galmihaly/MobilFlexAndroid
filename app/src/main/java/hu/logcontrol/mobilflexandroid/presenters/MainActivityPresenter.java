@@ -2,7 +2,9 @@ package hu.logcontrol.mobilflexandroid.presenters;
 
 import android.content.Context;
 import android.content.Intent;
-
+import android.os.Handler;
+import android.os.Looper;
+import android.view.View;
 import hu.logcontrol.mobilflexandroid.LoginActivity;
 import hu.logcontrol.mobilflexandroid.ProgramsActivity;
 import hu.logcontrol.mobilflexandroid.adapters.LanguagesSpinnerAdapter;
@@ -40,19 +42,16 @@ public class MainActivityPresenter implements IMainActivityPresenter {
         switch (viewEnum){
             case LOGIN_ACTIVITY:{
                 intent = new Intent(context, LoginActivity.class);
-                intent.putExtra("applicationNumber", applicationNumber);
+                intent.putExtra("applicationsSize", applicationNumber);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 break;
             }
             case PROGRAMS_ACTIVITY:{
                 intent = new Intent(context, ProgramsActivity.class);
-                intent.putExtra("applicationNumber", applicationNumber);
+                intent.putExtra("applicationsSize", applicationNumber);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 break;
             }
-//            case SETTINSG_ACTIVITY:{
-//                intent = new Intent(context, ProgramsActivity.class);
-//                intent.putExtra("applicationsSize", applicationNumber);
-//                break;
-//            }
         }
 
         if(intent == null) return;
@@ -132,14 +131,14 @@ public class MainActivityPresenter implements IMainActivityPresenter {
     }
 
     @Override
-    public void startProgram() {
+    public void startProgram(int delay) {
         if(appDataManager == null) return;
         if(iMainActivity == null) return;
 
-        String loginWebApiUrl = appDataManager.getStringValueFromSettingsFile("loginWebApiUrl");
-        if(loginWebApiUrl != null){
-            initCallingWebAPI();
-        }
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            String loginWebApiUrl = appDataManager.getStringValueFromSettingsFile("loginWebApiUrl");
+            if(loginWebApiUrl != null){ initCallingWebAPI(); }
+        }, delay);
     }
 
     private void initCallingWebAPI(){
@@ -166,6 +165,7 @@ public class MainActivityPresenter implements IMainActivityPresenter {
     public void sendMessageToPresenter(String resultMessage) {
         if(resultMessage == null) return;
         if(iMainActivity == null) return;
+        if(appDataManager == null) return;
 
         String message = null;
 
@@ -184,6 +184,7 @@ public class MainActivityPresenter implements IMainActivityPresenter {
                 openActivityByEnum(ViewEnums.PROGRAMS_ACTIVITY, applicationNumber);
             }
             else {
+                iMainActivity.setProgressringVisibility(View.INVISIBLE);
                 openActivityByEnum(ViewEnums.PROGRAMS_ACTIVITY, applicationNumber);
             }
         }

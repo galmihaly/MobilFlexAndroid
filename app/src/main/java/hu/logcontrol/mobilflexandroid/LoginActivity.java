@@ -70,6 +70,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
 
     private int defaultThemeId;
     private int applicationId;
+    private boolean isFromLoginPage;
 
     @SuppressLint("HardwareIds")
     @Override
@@ -122,6 +123,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
         if(i != null){
             defaultThemeId = i.getIntExtra("defaultThemeId", -1);
             applicationId = i.getIntExtra("applicationId", -1);
+            isFromLoginPage = i.getBooleanExtra("isFromLoginPage", isFromLoginPage);
         }
     }
 
@@ -284,10 +286,10 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
                     Fragment fragment = new UserPassFragment();
 
                     if(wst != null && defaultThemeId != -1 && applicationId != -1) {
-                        Helper.sendDisplaySizesToFragments(fragment, wst, defaultThemeId, applicationId);
+                        Helper.sendDisplaySizesToFragments(fragment, wst, defaultThemeId, applicationId, isFromLoginPage);
                     }
 
-                    llay.addView(loginAccAndPassButton);
+                    if(createdButtons.size() != 1) llay.addView(loginAccAndPassButton);
                     loginModesPagerAdapter.addButtonToList(loginAccAndPassButton);
                     loginModesPagerAdapter.addFragment(fragment);
                     loginModesPagerAdapter.addItemToHashMap(FragmentTypes.USERPASSFRAGMENT, fragment);
@@ -300,10 +302,10 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
                     Fragment fragment = new PinCodeFragment();
 
                     if(wst != null && defaultThemeId != -1 && applicationId != -1) {
-                        Helper.sendDisplaySizesToFragments(fragment, wst, defaultThemeId, applicationId);
+                        Helper.sendDisplaySizesToFragments(fragment, wst, defaultThemeId, applicationId, isFromLoginPage);
                     }
 
-                    llay.addView(loginPinButton);
+                    if(createdButtons.size() != 1) llay.addView(loginPinButton);
                     loginModesPagerAdapter.addButtonToList(loginPinButton);
                     loginModesPagerAdapter.addFragment(fragment);
                     loginModesPagerAdapter.addItemToHashMap(FragmentTypes.PINCODEFRAGMENT, fragment);
@@ -316,10 +318,10 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
                     Fragment fragment = new RFIDFragment();
 
                     if(wst != null && defaultThemeId != -1 && applicationId != -1) {
-                        Helper.sendDisplaySizesToFragments(fragment, wst, defaultThemeId, applicationId);
+                        Helper.sendDisplaySizesToFragments(fragment, wst, defaultThemeId, applicationId, isFromLoginPage);
                     }
 
-                    llay.addView(loginRFIDButton);
+                    if(createdButtons.size() != 1) llay.addView(loginRFIDButton);
                     loginModesPagerAdapter.addButtonToList(loginRFIDButton);
                     loginModesPagerAdapter.addFragment(fragment);
                     loginModesPagerAdapter.addItemToHashMap(FragmentTypes.RFIDFRAGMENT, fragment);
@@ -332,10 +334,10 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
                     Fragment fragment = new BarcodeFragment();
 
                     if(wst != null && defaultThemeId != -1 && applicationId != -1) {
-                        Helper.sendDisplaySizesToFragments(fragment, wst, defaultThemeId, applicationId);
+                        Helper.sendDisplaySizesToFragments(fragment, wst, defaultThemeId, applicationId, isFromLoginPage);
                     }
 
-                    llay.addView(loginBarcodeButton);
+                    if(createdButtons.size() != 1) llay.addView(loginBarcodeButton);
                     loginModesPagerAdapter.addButtonToList(loginBarcodeButton);
                     loginModesPagerAdapter.addFragment(fragment);
                     loginModesPagerAdapter.addItemToHashMap(FragmentTypes.BARCODEFRAGMENT, fragment);

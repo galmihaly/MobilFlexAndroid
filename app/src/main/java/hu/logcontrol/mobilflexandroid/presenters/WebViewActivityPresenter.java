@@ -14,6 +14,8 @@ import androidx.security.crypto.MasterKeys;
 import java.lang.ref.WeakReference;
 
 import hu.logcontrol.mobilflexandroid.LoginActivity;
+import hu.logcontrol.mobilflexandroid.ProgramsActivity;
+import hu.logcontrol.mobilflexandroid.WebViewActivity;
 import hu.logcontrol.mobilflexandroid.datamanager.AppDataManager;
 import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
 import hu.logcontrol.mobilflexandroid.interfaces.IWebViewActivity;
@@ -41,7 +43,7 @@ public class WebViewActivityPresenter implements IWebViewActivityPresenter {
 
 
     @Override
-    public void openActivityByEnum(ViewEnums viewEnum, int applicationId, int defaultThemeId) {
+    public void openActivityByEnum(ViewEnums viewEnum, int applicationId, int defaultThemeId, int applicationsSize) {
         if(viewEnum == null) return;
         if(webViewActivity == null) return;
 
@@ -52,6 +54,13 @@ public class WebViewActivityPresenter implements IWebViewActivityPresenter {
                 intent = new Intent(context, LoginActivity.class);
                 intent.putExtra("defaultThemeId", defaultThemeId);
                 intent.putExtra("applicationId", applicationId);
+                break;
+            }
+            case PROGRAMS_ACTIVITY:{
+                intent = new Intent(context, ProgramsActivity.class);
+                intent.putExtra("defaultThemeId", defaultThemeId);
+                intent.putExtra("applicationId", applicationId);
+                intent.putExtra("applicationsSize", applicationsSize);
                 break;
             }
         }
@@ -83,9 +92,6 @@ public class WebViewActivityPresenter implements IWebViewActivityPresenter {
     public void getValuesFromSettingsPrefFile(int applicationId, int defaultThemeId) {
         if(appDataManager == null) return;
         if(webViewActivity == null) return;
-
-        Log.e("webViewActivity_applicationId", String.valueOf(applicationId));
-        Log.e("webViewActivity_defaultThemeId", String.valueOf(defaultThemeId));
 
         if(applicationId != -1 && defaultThemeId != -1){
             String appBarBackgroundColor = appDataManager.getStringValueFromSettingsFile("backgroundColor" + '_' + applicationId + '_' + defaultThemeId);

@@ -14,7 +14,7 @@ public interface IMainActivityPresenter {
     void saveLanguageToSettingsFile(String languageID);
     int getCurrentLanguageFromSettingsFile();
     void initAppDataManager();
-    void startProgram();
+    void startProgram(int delay);
     void sendMessageToPresenter(String resultMessage);
     void initWebAPIServices();
 }

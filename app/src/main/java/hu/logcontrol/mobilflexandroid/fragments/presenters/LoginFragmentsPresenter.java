@@ -117,7 +117,7 @@ public class LoginFragmentsPresenter implements ILoginFragmentsPresenter {
     }
 
     @Override
-    public void openActivityByEnum(ViewEnums viewEnum, int applicationId, int defaultThemeId) {
+    public void openActivityByEnum(ViewEnums viewEnum, int applicationId, int defaultThemeId, boolean isFromLoginPage) {
         if(viewEnum == null) return;
         if(iLoginFragments == null) return;
 
@@ -128,6 +128,7 @@ public class LoginFragmentsPresenter implements ILoginFragmentsPresenter {
                 intent = new Intent(context, WebViewActivity.class);
                 intent.putExtra("applicationId", applicationId);
                 intent.putExtra("defaultThemeId", defaultThemeId);
+                intent.putExtra("isFromLoginPage", isFromLoginPage);
                 break;
             }
         }

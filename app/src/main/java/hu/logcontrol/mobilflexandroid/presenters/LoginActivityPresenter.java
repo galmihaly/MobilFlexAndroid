@@ -154,14 +154,15 @@ public class LoginActivityPresenter implements ILoginActivityPresenter {
 
         Bitmap bitmap = null;
         String fileName = appDataManager.getStringValueFromSettingsFile("logoName" + '_' + applicationId + '_' + defaultThemeId);
+        String directionName = Environment.getExternalStorageDirectory() + File.separator + "MobileFlexAndroid";
 
         if(fileName != null){
-            File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "MobileFlexAndroid");
+            File dir = new File(directionName);
             if(dir.exists()){
-                File file = new File(Environment.getExternalStorageDirectory() + File.separator + "MobileFlexAndroid" + File.separator + fileName);
+                File file = new File(directionName + File.separator + fileName);
 
                 if(file.exists()){
-                    bitmap = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory() + File.separator + "MobileFlexAndroid" + File.separator + fileName);
+                    bitmap = BitmapFactory.decodeFile(directionName + File.separator + fileName);
                 }
             }
         }

@@ -10,18 +10,21 @@ public class ProgramsResultObject {
     private String title;
     private String backgroundColor;
     private String backgroundGradientColor;
-//    private Bitmap logo;
     private Drawable logo;
     private int defaultThemeId;
     private int applicationId;
+    private int applicationEnabledLoginFlag;
+    private int applicationsSize;
 
-    public ProgramsResultObject(String title, String backgroundColor, String backgroundGradientColor, Drawable logo, int defaultThemeId, int applicationId) {
+    public ProgramsResultObject(String title, String backgroundColor, String backgroundGradientColor, Drawable logo, int defaultThemeId, int applicationId, int applicationEnabledLoginFlag, int applicationsSize) {
         this.title = title;
         this.backgroundColor = backgroundColor;
         this.backgroundGradientColor = backgroundGradientColor;
         this.logo = logo;
         this.defaultThemeId = defaultThemeId;
         this.applicationId = applicationId;
+        this.applicationEnabledLoginFlag = applicationEnabledLoginFlag;
+        this.applicationsSize = applicationsSize;
     }
 
     public String getTitle() {
@@ -46,5 +49,13 @@ public class ProgramsResultObject {
 
     public int getApplicationId() {
         return applicationId;
+    }
+
+    public int getApplicationEnabledLoginFlag() {
+        return applicationEnabledLoginFlag;
+    }
+
+    public int getApplicationsSize() {
+        return applicationsSize;
     }
 }

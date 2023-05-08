@@ -2,11 +2,11 @@ package hu.logcontrol.mobilflexandroid.presenters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import java.util.List;
 
 import hu.logcontrol.mobilflexandroid.LoginActivity;
+import hu.logcontrol.mobilflexandroid.WebViewActivity;
 import hu.logcontrol.mobilflexandroid.datamanager.AppDataManager;
 import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
 import hu.logcontrol.mobilflexandroid.interfaces.IProgramsActivity;
@@ -26,7 +26,7 @@ public class ProgramsPresenter implements IProgramsPresenter {
     }
 
     @Override
-    public void openActivityByEnum(ViewEnums viewEnum, int defaultThemeId, int applicationId) {
+    public void openActivityByEnum(ViewEnums viewEnum, int defaultThemeId, int applicationId, boolean isFromLoginPage, int applicationsSize) {
         if(viewEnum == null) return;
         if(defaultThemeId == -1) return;
         if(applicationId == -1) return;
@@ -35,15 +35,20 @@ public class ProgramsPresenter implements IProgramsPresenter {
 
         Intent intent = null;
 
-
-        Log.e("ProgramsPresenter_defaultThemeId", String.valueOf(defaultThemeId));
-        Log.e("ProgramsPresenter_applicationId", String.valueOf(applicationId));
-
         switch (viewEnum){
-            case LOGIN_ACTIVITY:{
+            case LOGIN_ACTIVITY: {
                 intent = new Intent(context, LoginActivity.class);
                 intent.putExtra("defaultThemeId", defaultThemeId);
                 intent.putExtra("applicationId", applicationId);
+                intent.putExtra("isFromLoginPage", isFromLoginPage);
+                break;
+            }
+            case WEBVIEW_ACTIVITY: {
+                intent = new Intent(context, WebViewActivity.class);
+                intent.putExtra("defaultThemeId", defaultThemeId);
+                intent.putExtra("applicationId", applicationId);
+                intent.putExtra("isFromLoginPage", isFromLoginPage);
+                intent.putExtra("applicationsSize", applicationsSize);
                 break;
             }
         }

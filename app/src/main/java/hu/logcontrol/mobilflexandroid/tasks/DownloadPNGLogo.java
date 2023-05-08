@@ -1,13 +1,11 @@
 package hu.logcontrol.mobilflexandroid.tasks;
 
 import android.annotation.SuppressLint;
-import android.app.DownloadManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Environment;
 import android.os.Message;
 import android.util.Log;
@@ -45,6 +43,7 @@ public class DownloadPNGLogo implements Callable {
     private String backgroundColor;
     private String backgroundGradientColor;
     private String logoUrl;
+    private int applicationEnabledLoginFlag;
     private Drawable drawable;
 
     private int responseCode;
@@ -84,12 +83,7 @@ public class DownloadPNGLogo implements Callable {
                     backgroundColor = mainPreferenceFileService.getStringValueFromSettingsPrefFile("backgroundColor" + '_' + (i + 1) + '_' + defaultThemeId);
                     backgroundGradientColor = mainPreferenceFileService.getStringValueFromSettingsPrefFile("backgroundGradientColor" + '_' + (i + 1) + '_' + defaultThemeId);
                     logoUrl = mainPreferenceFileService.getStringValueFromSettingsPrefFile("logoUrl" + '_' + (i + 1) + '_' + defaultThemeId);
-
-                    Log.e("defaultThemeId", String.valueOf(defaultThemeId));
-                    Log.e("applicationTitle", applicationTitle);
-                    Log.e("backgroundColor", backgroundColor);
-                    Log.e("backgroundGradientColor", backgroundGradientColor);
-                    Log.e("logoUrl", logoUrl);
+                    applicationEnabledLoginFlag = mainPreferenceFileService.getIntValueFromSettingsPrefFile("applicationEnabledLoginFlag" + '_' + (i + 1));
 
                     String fileName = getFileNameFromUrl();
                     mainPreferenceFileService.saveValueToSettingsPrefFile("logoName" + '_' + (i + 1) + '_' + defaultThemeId, fileName);
@@ -124,7 +118,16 @@ public class DownloadPNGLogo implements Callable {
                     }
 
 
-                    p = new ProgramsResultObject(applicationTitle, backgroundColor, backgroundGradientColor, drawable, defaultThemeId, i + 1);
+                    p = new ProgramsResultObject(
+                            applicationTitle,
+                            backgroundColor,
+                            backgroundGradientColor,
+                            drawable,
+                            defaultThemeId,
+                            i + 1,
+                            applicationEnabledLoginFlag,
+                            applicationsSize
+                    );
                     pList.add(p);
                 }
             }

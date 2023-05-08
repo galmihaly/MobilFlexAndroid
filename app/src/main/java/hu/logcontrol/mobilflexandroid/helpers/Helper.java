@@ -75,7 +75,7 @@ public class Helper {
         }
     }
 
-    public static void sendDisplaySizesToFragments(Fragment fragment, WindowSizeTypes[] windowSizeClasses, int defaultThemeId, int applicationId) {
+    public static void sendDisplaySizesToFragments(Fragment fragment, WindowSizeTypes[] windowSizeClasses, int defaultThemeId, int applicationId, boolean isFromLoginPage) {
         if(fragment == null) return;
         if(windowSizeClasses == null) return;
 
@@ -84,6 +84,7 @@ public class Helper {
         bundle.putSerializable("windowWidthEnum", windowSizeClasses[1]);
         bundle.putInt("defaultThemeId", defaultThemeId);
         bundle.putInt("applicationId", applicationId);
+        bundle.putBoolean("isFromLoginPage", isFromLoginPage);
 
         fragment.setArguments(bundle);
     }

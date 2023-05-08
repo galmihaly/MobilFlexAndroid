@@ -370,6 +370,7 @@ public class AppDataManager implements PresenterThreadCallback, IAppDataManagerH
                     AppDataManagerHelper.saveIntValueToPrefFile(mainPreferenceFileService, "defaultThemeId" + '_' + (i + 1), applications.get(i).getDefaultThemeId());
                     AppDataManagerHelper.saveStringValueToPrefFile(mainPreferenceFileService, "logoUrl" + '_' + (i + 1), applications.get(i).getLogoUrl());
 
+
                     List<ApplicationTheme> applicationThemes = applications.get(i).getApplicationThemeList();
                     if(applicationThemes != null){
 
