@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     private TextView messageTV;
     private Spinner languageSelector;
 
-    private Button button;
     private ProgressBar progressBar;
 
     @Override
@@ -45,14 +44,14 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         startWrite();
         initPresenter();
         initAppDataManager();
-        initWebAPIServices();
-        saveBaseUrl();
         initLanguagesSpinner();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        setProgressRingVisibility(View.VISIBLE);
 
         if(messageTV != null && progressBar != null && mainActivityPresenter != null){
             messageTV.setText("");
@@ -90,11 +89,6 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     private void initAppDataManager() {
         if(mainActivityPresenter == null) return;
         mainActivityPresenter.initAppDataManager();
-    }
-
-    private void initWebAPIServices() {
-        if(mainActivityPresenter == null) return;
-        mainActivityPresenter.initWebAPIServices();
     }
 
     private void initLanguagesSpinner() {
@@ -138,13 +132,8 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         }
     }
 
-    private void saveBaseUrl() {
-        if(mainActivityPresenter == null) return;
-        mainActivityPresenter.saveBaseUrl();
-    }
-
     private void initPresenter() {
-        mainActivityPresenter = new MainActivityPresenter(this, getApplicationContext());
+        mainActivityPresenter = new MainActivityPresenter(this, getApplicationContext(), Looper.getMainLooper());
     }
 
 
@@ -177,8 +166,6 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
             messageTV = findViewById(R.id.messageTV_tablet_portrait);
             languageSelector = findViewById(R.id.languageSelector_tablet_portrait);
             progressBar = findViewById(R.id.progressBar_mobile_portrait);
-
-            button = findViewById(R.id.button_tablet_portrait);
         }
         else if(wst[0] == WindowSizeTypes.EXPANDED && wst[1] == WindowSizeTypes.MEDIUM){
 
@@ -186,8 +173,6 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
             messageTV = findViewById(R.id.messageTV_tablet_landscape);
             languageSelector = findViewById(R.id.languageSelector_tablet_landscape);
             progressBar = findViewById(R.id.progressBar_mobile_portrait);
-
-            button = findViewById(R.id.button_tablet_landscape);
         }
 
         if(messageTV != null) messageTV.setText(null);
@@ -215,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     }
 
     @Override
-    public void setProgressringVisibility(int isVisible) {
+    public void setProgressRingVisibility(int isVisible) {
         if(progressBar == null) return;
         progressBar.setVisibility(isVisible);
     }

@@ -3,6 +3,7 @@ package hu.logcontrol.mobilflexandroid.tasks;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Message;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
@@ -25,7 +26,6 @@ public class CreateLoginButtons implements Callable {
     private Context context;
     private List<Integer> typesOfLoginButton = new ArrayList<>();
     private WindowSizeTypes[] wsc;
-    private int[] colors;
 
     //LoginButtons
     private ImageButton loginAccAndPassButton = null;
@@ -41,17 +41,15 @@ public class CreateLoginButtons implements Callable {
     private int imageRFIDId;
     private int imageBarcodeId;
     private int imagePincodeId;
-    private boolean isMiniPDA;
 
     //Message
     private Message message;
     private List<ImageButton> resultImageButtonList;
 
-    public CreateLoginButtons(Context context, int modeNumber, WindowSizeTypes[] wsc, int[] colors) {
+    public CreateLoginButtons(Context context, int modeNumber, WindowSizeTypes[] wsc) {
         this.modesNumber = modeNumber;
         this.context = context;
         this.wsc = wsc;
-        this.colors = colors;
     }
 
     public void setCustomThreadPoolManager(CustomThreadPoolManager customThreadPoolManager) {
@@ -165,8 +163,7 @@ public class CreateLoginButtons implements Callable {
                                 imageUserPassId,
                                 margins,
                                 width,
-                                height,
-                                colors
+                                height
                         );
 
                         savingGlobalMessageHandling(2, null);
@@ -184,8 +181,7 @@ public class CreateLoginButtons implements Callable {
                                 imagePincodeId,
                                 margins,
                                 width,
-                                height,
-                                colors
+                                height
                         );
 
                         savingGlobalMessageHandling(4, null);
@@ -203,8 +199,7 @@ public class CreateLoginButtons implements Callable {
                                 imageRFIDId,
                                 margins,
                                 width,
-                                height,
-                                colors
+                                height
                         );
 
                         savingGlobalMessageHandling(6, null);
@@ -222,8 +217,7 @@ public class CreateLoginButtons implements Callable {
                                 imageBarcodeId,
                                 margins,
                                 width,
-                                height,
-                                colors
+                                height
                         );
 
                         savingGlobalMessageHandling(8, null);
@@ -270,14 +264,11 @@ public class CreateLoginButtons implements Callable {
         }
     }
 
-    private void setStyleForButton(ImageButton button, int imageId, int[] margins, int width, int height, int[] colors) {
+    private void setStyleForButton(ImageButton button, int imageId, int[] margins, int width, int height) {
         if(button == null) return;
-
-        GradientDrawable g = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, colors);
-        g.setCornerRadius(60);
+        if(margins == null) return;
 
         button.setImageResource(imageId);
-        button.setBackground(g);
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(width, height);
         lp.setMargins(margins[0],margins[1], margins[2], margins[3]);

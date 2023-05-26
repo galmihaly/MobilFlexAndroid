@@ -1,6 +1,6 @@
 package hu.logcontrol.mobilflexandroid.enums;
 
-public class LoginModeIdentifiers {
+public class LoginModes {
     public static final int NotRequired = 0;
     public static final int AccountAndPassword  = 1;
     public static final int Pin  = 2;

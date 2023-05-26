@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.HashMap;
 import java.util.List;
 
 import hu.logcontrol.mobilflexandroid.adapters.ProgramsRecycleAdapter;
@@ -29,18 +30,21 @@ public class ProgramsActivity extends AppCompatActivity implements IProgramsActi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_programs);
 
-        applicationNumber = getIntent().getIntExtra("applicationsSize", -1);
-
-        Log.e("ProgramsActivity_applicationNumber", String.valueOf(applicationNumber));
-
         initView();
-        initPresenter();
-        initAppDataManager();
-        downloadSVGLogoFromWeb();
     }
 
     void initView(){
         programsRV = findViewById(R.id.programsRV);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        getDatasFromIntent();
+        initPresenter();
+        initAppDataManager();
+        downloadSVGLogoFromWeb();
     }
 
     private void initPresenter(){
@@ -55,6 +59,15 @@ public class ProgramsActivity extends AppCompatActivity implements IProgramsActi
     private void downloadSVGLogoFromWeb() {
         if(programsPresenter == null) return;
         programsPresenter.getDownloadedLogoFromWeb(applicationNumber);
+    }
+
+    private void getDatasFromIntent(){
+
+        Intent i = getIntent();
+
+        if(i != null){
+            applicationNumber = getIntent().getIntExtra("applicationsSize", -1);
+        }
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -79,5 +92,6 @@ public class ProgramsActivity extends AppCompatActivity implements IProgramsActi
         ProgramsRecycleAdapter adapter = new ProgramsRecycleAdapter(getApplicationContext(), programsPresenter, programsResultObjectList);
         programsRV.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         programsRV.setAdapter(adapter);
+        adapter.refreshAdapterData();
     }
 }

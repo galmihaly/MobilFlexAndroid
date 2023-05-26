@@ -7,32 +7,40 @@ import com.google.gson.JsonObject;
 import hu.logcontrol.mobilflexandroid.interfaces.IRetrofitAPI;
 import hu.logcontrol.mobilflexandroid.interfaces.ISettingsWebAPIService;
 import hu.logcontrol.mobilflexandroid.models.SettingsWebAPIResponseObject;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class SettingsWebAPIService implements Callback<SettingsWebAPIResponseObject> {
+public class LoginWebAPIService implements Callback<SettingsWebAPIResponseObject> {
 
-    private static SettingsWebAPIService mIsntance;
+    private static LoginWebAPIService mIsntance;
     private ISettingsWebAPIService iSettingsWebAPIService;
     private IRetrofitAPI iRetrofitAPI;
 
-    private SettingsWebAPIService(String baseUrl, ISettingsWebAPIService iSettingsWebAPIService){
+    private static int appId = -1;
+    private static int isFromPage = -1;
+
+    private LoginWebAPIService(String baseUrl, ISettingsWebAPIService iSettingsWebAPIService){
+
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
         this.iRetrofitAPI = new retrofit2.Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
                 .build()
                 .create(IRetrofitAPI.class);
 
         this.iSettingsWebAPIService = iSettingsWebAPIService;
     }
 
-    public static SettingsWebAPIService getRetrofitInstance(String baseUrl, ISettingsWebAPIService iSettingsWebAPIService) {
-        if (mIsntance == null) {
-            mIsntance = new SettingsWebAPIService(baseUrl, iSettingsWebAPIService);
-        }
+    public synchronized static LoginWebAPIService getInstance(String baseUrl, ISettingsWebAPIService iSettingsWebAPIService) {
+        mIsntance = new LoginWebAPIService(baseUrl, iSettingsWebAPIService);
         return mIsntance;
     }
 
@@ -41,15 +49,12 @@ public class SettingsWebAPIService implements Callback<SettingsWebAPIResponseObj
         mIsntance = null;
     }
 
-    public void sendLoginDetails(int loginModeEnum, String identifier, String authenticationToken, String data, boolean createSession){
+    public void sendLoginDetails(int loginModeEnum, String identifier, String authenticationToken, String data, boolean createSession, int applicationId, int isFromLoginPage, String serverName){
         if(iRetrofitAPI == null) return;
         if(iSettingsWebAPIService == null) return;
 
-        Log.e("loginModeEnum", String.valueOf(loginModeEnum));
-        Log.e("identifier", identifier);
-        Log.e("authenticationToken", authenticationToken);
-        Log.e("data", data);
-        Log.e("createSession", String.valueOf(createSession));
+        appId = applicationId;
+        isFromPage = isFromLoginPage;
 
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("loginModeEnum", loginModeEnum);
@@ -58,15 +63,14 @@ public class SettingsWebAPIService implements Callback<SettingsWebAPIResponseObj
         jsonObject.addProperty("data", data);
         jsonObject.addProperty("createSession", createSession);
 
-        Call<SettingsWebAPIResponseObject> userCall = iRetrofitAPI.postLoginRequestObject(jsonObject);
+        Call<SettingsWebAPIResponseObject> userCall = iRetrofitAPI.postLoginRequestObject(serverName, jsonObject);
         userCall.enqueue(this);
     }
 
     @Override
     public void onResponse(Call<SettingsWebAPIResponseObject> call, Response<SettingsWebAPIResponseObject> response) {
         if(response.isSuccessful() && response.body() != null){
-            SettingsWebAPIResponseObject s = response.body();
-            iSettingsWebAPIService.onSuccesSettingsWebAPI(s);
+            iSettingsWebAPIService.onSuccesSettingsWebAPI(response.body(), appId, isFromPage);
         }
     }
 

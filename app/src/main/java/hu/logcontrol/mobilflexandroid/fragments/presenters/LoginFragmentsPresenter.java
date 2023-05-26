@@ -2,14 +2,17 @@ package hu.logcontrol.mobilflexandroid.fragments.presenters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 
 import hu.logcontrol.mobilflexandroid.WebViewActivity;
 import hu.logcontrol.mobilflexandroid.datamanager.AppDataManager;
 import hu.logcontrol.mobilflexandroid.enums.FragmentTypes;
+import hu.logcontrol.mobilflexandroid.enums.LoginResponse;
 import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
 import hu.logcontrol.mobilflexandroid.fragments.interfaces.ILoginFragmentsPresenter;
 import hu.logcontrol.mobilflexandroid.fragments.interfaces.ILoginFragments;
+import hu.logcontrol.mobilflexandroid.helpers.Helper;
 
 public class LoginFragmentsPresenter implements ILoginFragmentsPresenter {
 
@@ -37,11 +40,17 @@ public class LoginFragmentsPresenter implements ILoginFragmentsPresenter {
     }
 
     @Override
-    public void initWebAPIServices() {
+    public void initWebAPIServices(int applicationId) {
         if(appDataManager == null) return;
-        String baseUrl = appDataManager.getStringValueFromSettingsFile("loginWebApiUrl");
-        if(baseUrl != null){
-            appDataManager.createSettingsWebAPIService(baseUrl);
+
+        // TODO api singleton megváltoztatása, mivel alkalmazásonként változhat a meghívandó api címe
+
+        String loginUrl = appDataManager.getStringValueFromSettingsFile("loginUrl" + "_" + applicationId);
+        if(loginUrl != null && !loginUrl.equals("")){
+            Uri uri = Uri.parse(loginUrl);
+
+            appDataManager.saveStringValueToSettinsPrefFile("SettingsServerName" + "_" + applicationId, uri.getPathSegments().get(0));
+            appDataManager.createLoginWebAPIService("https://" + uri.getHost() +"/");
         }
     }
 
@@ -117,7 +126,7 @@ public class LoginFragmentsPresenter implements ILoginFragmentsPresenter {
     }
 
     @Override
-    public void openActivityByEnum(ViewEnums viewEnum, int applicationId, int defaultThemeId, boolean isFromLoginPage) {
+    public void openActivityByEnum(ViewEnums viewEnum, int applicationId, int isFromLoginPage) {
         if(viewEnum == null) return;
         if(iLoginFragments == null) return;
 
@@ -127,30 +136,31 @@ public class LoginFragmentsPresenter implements ILoginFragmentsPresenter {
             case WEBVIEW_ACTIVITY:{
                 intent = new Intent(context, WebViewActivity.class);
                 intent.putExtra("applicationId", applicationId);
-                intent.putExtra("defaultThemeId", defaultThemeId);
                 intent.putExtra("isFromLoginPage", isFromLoginPage);
                 break;
             }
         }
 
         if(intent == null) return;
-        if(iLoginFragments != null) iLoginFragments.openViewByIntent(intent);
+        iLoginFragments.sendIntentToView(intent);
 
     }
 
     @Override
-    public void setControlsValuesBySettings(int defaultThemeId, int applicationId) {
+    public void setControlsValuesBySettings(int applicationId) {
         if(iLoginFragments == null) return;
         if(appDataManager == null) return;
 
-        if(defaultThemeId != -1 && applicationId != -1){
+        int currentSelectedThemeId = appDataManager.getIntValueFromSettingsFile("currentSelectedThemeId" + '_' + applicationId);
 
-            String controlColor = appDataManager.getStringValueFromSettingsFile("controlColor" + '_' + applicationId + '_' + defaultThemeId);
-            String textColor = appDataManager.getStringValueFromSettingsFile("foregroundColor" + '_' + applicationId + '_' + defaultThemeId);
+        if(currentSelectedThemeId != -1 && applicationId != -1){
 
-            String buttonBackgroundColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundColor" + '_' + applicationId + '_' + defaultThemeId);
-            String buttonBackgroundGradientColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
-            String buttonForeGroundColor = appDataManager.getStringValueFromSettingsFile("buttonForegroundColor" + '_' + applicationId + '_' + defaultThemeId);
+            String controlColor = appDataManager.getStringValueFromSettingsFile("controlColor" + '_' + applicationId + '_' + currentSelectedThemeId);
+            String textColor = appDataManager.getStringValueFromSettingsFile("foregroundColor" + '_' + applicationId + '_' + currentSelectedThemeId);
+
+            String buttonBackgroundColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundColor" + '_' + applicationId + '_' + currentSelectedThemeId);
+            String buttonBackgroundGradientColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundGradientColor" + '_' + applicationId + '_' + currentSelectedThemeId);
+            String buttonForeGroundColor = appDataManager.getStringValueFromSettingsFile("buttonForegroundColor" + '_' + applicationId + '_' + currentSelectedThemeId);
 
             String currentLanguage = appDataManager.getStringValueFromSettingsFile("CurrentSelectedLanguage");
             String buttonLabel = null;
@@ -179,13 +189,51 @@ public class LoginFragmentsPresenter implements ILoginFragmentsPresenter {
     }
 
     @Override
-    public void startLogin(String identifier, String authenticationToken, int loginModeEnum) {
+    public void startLogin(String identifier, String authenticationToken, int loginModeEnum, int applicationId, int isFromLoginPage) {
         if(appDataManager == null) return;
         if(identifier == null) return;
 
-        String data = "";
-        boolean createSession = true;
+        boolean isNetWokAvailable = Helper.isInternetConnection(context);
 
-        appDataManager.callSettingsWebAPI(loginModeEnum, identifier, authenticationToken, data, createSession);
+        if(isNetWokAvailable){
+            String data = "";
+            boolean createSession = true;
+            String serverName = appDataManager.getStringValueFromSettingsFile("SettingsServerName" + "_" + applicationId);
+            appDataManager.callSettingsWebAPI(loginModeEnum, identifier, authenticationToken, data, createSession, applicationId, isFromLoginPage, serverName);
+        }
+    }
+
+    @Override
+    public void sendMessageToView(String message) {
+        if(message == null) return;
+        if(iLoginFragments == null) return;
+        iLoginFragments.sendMessageToView(message);
+    }
+
+    @Override
+    public void processResultMessage(int responseCode, int applicationId, int isFromLoginPage) {
+        if(appDataManager == null) return;
+        if(iLoginFragments == null) return;
+
+        String message = null;
+
+        switch (responseCode){
+            case LoginResponse.Undefined: message = appDataManager.getMessageFromLanguagesFiles( "WC_UNDEFINED", "$"); break;
+            case LoginResponse.InvalidRequestGuid: message = appDataManager.getMessageFromLanguagesFiles( "WC_INVALID_REQUEST_GUID", "$"); break;
+            case LoginResponse.SqlError: message = appDataManager.getMessageFromLanguagesFiles( "WC_SQL_ERROR", "$"); break;
+            case LoginResponse.DataServiceInstanceDoesNotExist: message = appDataManager.getMessageFromLanguagesFiles( "WC_DATASERVICE_INSTANCE_DOES_NOT_EXIST", "$"); break;
+            case LoginResponse.UserDoesNotExists: message = appDataManager.getMessageFromLanguagesFiles( "WC_USER_DOES_NOT_EXIST", "$"); break;
+            case LoginResponse.UserInactive: message = appDataManager.getMessageFromLanguagesFiles( "WC_USER_INACTIVE", "$"); break;
+            case LoginResponse.UserAccessDenied: message = appDataManager.getMessageFromLanguagesFiles( "WC_USER_ACCESS_DENIED", "$"); break;
+            case LoginResponse.InvalidCredentials: message = appDataManager.getMessageFromLanguagesFiles( "WC_INVALID_CREDENTIALS", "$"); break;
+
+            case LoginResponse.OK: {
+                message = appDataManager.getMessageFromLanguagesFiles("WC_LOGIN_SUCCES", "$");
+                openActivityByEnum(ViewEnums.WEBVIEW_ACTIVITY, applicationId, isFromLoginPage);
+                break;
+            }
+        }
+
+        if(message != null) iLoginFragments.sendMessageToView(message);
     }
 }

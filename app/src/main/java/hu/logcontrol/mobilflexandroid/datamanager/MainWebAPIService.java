@@ -31,7 +31,7 @@ public class MainWebAPIService implements Callback<MainWebAPIResponseObject>{
         this.iMainWebAPIService = iMainWebAPIService;
     }
 
-    public static MainWebAPIService getRetrofitInstance(String baseUrl, IMainWebAPIService iMainWebAPIService) {
+    public synchronized static MainWebAPIService getRetrofitInstance(String baseUrl, IMainWebAPIService iMainWebAPIService) {
         if (mIsntance == null) {
             mIsntance = new MainWebAPIService(baseUrl, iMainWebAPIService);
         }
@@ -43,29 +43,29 @@ public class MainWebAPIService implements Callback<MainWebAPIResponseObject>{
         mIsntance = null;
     }
 
-    public void sendDeviceDetails(String id, String deviceId, String deviceName){
+    public void sendDeviceDetails(String id, String deviceId, String deviceName, String serverName){
         if(iRetrofitAPI == null) return;
         if(iMainWebAPIService == null) return;
+        if(serverName == null) return;
 
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("id", id);
         jsonObject.addProperty("deviceId", deviceId);
         jsonObject.addProperty("deviceName", deviceName);
 
-        Call<MainWebAPIResponseObject> userCall = iRetrofitAPI.postDeviceRequestObject(jsonObject);
+        Call<MainWebAPIResponseObject> userCall = iRetrofitAPI.postDeviceRequestObject(serverName ,jsonObject);
         userCall.enqueue(this);
     }
 
     @Override
     public void onResponse(Call<MainWebAPIResponseObject> call, Response<MainWebAPIResponseObject> response) {
-        if(response.isSuccessful() && response.body() != null && response.body().getDevice() != null){
-            MainWebAPIResponseObject mainWebAPIResponseObject = response.body();
-            iMainWebAPIService.onSuccesMainWebAPI(mainWebAPIResponseObject);
+        if(response.isSuccessful() && response.body() != null){
+            iMainWebAPIService.onSuccesMainWebAPI(response.body());
         }
     }
 
     @Override
     public void onFailure(Call<MainWebAPIResponseObject> call, Throwable t) {
-        iMainWebAPIService.onFailureMainWebAPI();
+        iMainWebAPIService.onFailureMainWebAPI(t.getMessage());
     }
 }

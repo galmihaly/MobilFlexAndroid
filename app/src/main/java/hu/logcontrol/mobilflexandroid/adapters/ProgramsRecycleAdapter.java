@@ -68,18 +68,16 @@ public class ProgramsRecycleAdapter extends RecyclerView.Adapter<ProgramsRecycle
                 if(applicationEnabledLoginFlag == 0){
                     programsPresenter.openActivityByEnum(
                             ViewEnums.WEBVIEW_ACTIVITY,
-                            programsResultObjectList.get(position).getDefaultThemeId(),
                             programsResultObjectList.get(position).getApplicationId(),
-                            false,
+                            0,
                             programsResultObjectList.get(position).getApplicationsSize()
                     );
                 }
                 else {
                     programsPresenter.openActivityByEnum(
                             ViewEnums.LOGIN_ACTIVITY,
-                            programsResultObjectList.get(position).getDefaultThemeId(),
                             programsResultObjectList.get(position).getApplicationId(),
-                            true,
+                            1,
                             programsResultObjectList.get(position).getApplicationsSize()
                     );
                 }
@@ -91,6 +89,10 @@ public class ProgramsRecycleAdapter extends RecyclerView.Adapter<ProgramsRecycle
     @Override
     public long getItemId(int position) {
         return position;
+    }
+
+    public void refreshAdapterData(){
+        notifyDataSetChanged();
     }
 
     @Override

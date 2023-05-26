@@ -26,7 +26,7 @@ public class StateChangeHelper {
         button.setBackground(g);
     }
 
-    public static void changeStateLogoutButton(ImageButton logoutBut, String buttonBackgroundColor, String buttonBackgroundGradientColor) {
+    public static void changeStateButton(ImageButton logoutBut, String buttonBackgroundColor, String buttonBackgroundGradientColor) {
         if(logoutBut == null) return;
         if(buttonBackgroundColor == null) return;
         if(buttonBackgroundGradientColor == null) return;

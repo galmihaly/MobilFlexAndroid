@@ -1,14 +1,10 @@
 package hu.logcontrol.mobilflexandroid.models;
 
-import androidx.annotation.StringRes;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 import java.util.UUID;
-
-import hu.logcontrol.mobilflexandroid.enums.LoginMode;
 
 public class Application {
 

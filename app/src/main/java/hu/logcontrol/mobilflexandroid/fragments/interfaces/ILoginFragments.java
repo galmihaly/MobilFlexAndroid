@@ -7,4 +7,6 @@ public interface ILoginFragments {
     void changeStateLoginButton(String buttonBackgroundColor, String buttonBackgroundGradientColor, String buttonForeGroundColor, String buttonLabel);
     void changeTextInputElemenets(String changeText1, String changeText2);
     void openViewByIntent(Intent intent);
+    void sendMessageToView(String message);
+    void sendIntentToView(Intent intent);
 }

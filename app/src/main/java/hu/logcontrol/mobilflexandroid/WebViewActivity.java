@@ -8,21 +8,26 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.net.http.SslError;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import hu.logcontrol.mobilflexandroid.adapters.ThemesSpinnerAdapter;
 import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
 import hu.logcontrol.mobilflexandroid.helpers.StateChangeHelper;
 import hu.logcontrol.mobilflexandroid.interfaces.IWebViewActivity;
@@ -35,12 +40,12 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewActivi
     private WebView webView;
     private ImageButton logoutBut;
     private ConstraintLayout appBarCL;
+    private Spinner themeSelector;
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
-    private int defaultThemeId;
     private int applicationId;
-    private boolean isFromLoginPage;
+    private int isFromLoginPage;
     private int applicationsSize;
 
     @Override
@@ -77,9 +82,8 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewActivi
         Intent i = getIntent();
 
         if(i != null){
-            defaultThemeId = i.getIntExtra("defaultThemeId", -1);
             applicationId = i.getIntExtra("applicationId", -1);
-            isFromLoginPage = i.getBooleanExtra("isFromLoginPage", false);
+            isFromLoginPage = i.getIntExtra("isFromLoginPage", -1);
             applicationsSize = i.getIntExtra("applicationsSize", -1);
         }
     }
@@ -94,11 +98,20 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewActivi
         if(logoutBut == null) return;
 
         logoutBut.setOnClickListener(v -> {
-
-            Log.e("isFromLoginPage", String.valueOf(isFromLoginPage));
-
-            if(isFromLoginPage){ webViewActivityPresenter.openActivityByEnum(ViewEnums.LOGIN_ACTIVITY, applicationId, defaultThemeId, applicationsSize); }
-            else { webViewActivityPresenter.openActivityByEnum(ViewEnums.PROGRAMS_ACTIVITY, applicationId, defaultThemeId, applicationsSize); }
+            if(isFromLoginPage == 0){
+                if(applicationsSize == 1){
+                    webViewActivityPresenter.openActivityByEnum(ViewEnums.MAIN_ACTIVITY, applicationId, applicationsSize);
+                }
+                else {
+                    webViewActivityPresenter.openActivityByEnum(ViewEnums.PROGRAMS_ACTIVITY, applicationId, applicationsSize);
+                }
+            }
+            else if(isFromLoginPage == 1) {
+                webViewActivityPresenter.openActivityByEnum(ViewEnums.LOGIN_ACTIVITY, applicationId, applicationsSize);
+            }
+            else if(isFromLoginPage == 2) {
+                webViewActivityPresenter.openActivityByEnum(ViewEnums.PROGRAMS_ACTIVITY, applicationId, applicationsSize);
+            }
         });
     }
 
@@ -108,7 +121,8 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewActivi
 
     private void initAppBarLayout() {
         if(webViewActivityPresenter == null) return;
-        webViewActivityPresenter.getValuesFromSettingsPrefFile(applicationId, defaultThemeId);
+        webViewActivityPresenter.getValuesFromSettingsPrefFile(applicationId);
+        webViewActivityPresenter.getThemesSpinnerValues(applicationId);
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -117,6 +131,7 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewActivi
         logoutBut = findViewById(R.id.logoutBut_portrait_mobile);
         appBarCL = findViewById(R.id.appBarCL_portrait_mobile);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout_portrait_mobile);
+        themeSelector = findViewById(R.id.themeSelector);
 
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -186,7 +201,7 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewActivi
         if(buttonBackgroundGradientColor == null) return;
         if(logoutBut == null) return;
 
-        StateChangeHelper.changeStateLogoutButton(logoutBut, buttonBackgroundColor, buttonBackgroundGradientColor);
+        StateChangeHelper.changeStateButton(logoutBut, buttonBackgroundColor, buttonBackgroundGradientColor);
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -203,5 +218,35 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewActivi
         }
 
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void initThemesSpinner(ThemesSpinnerAdapter adapter, int currentThemeId, HashMap<Integer, Integer> vaulePairs) {
+        if(adapter == null) return;
+        if(currentThemeId == -1) return;
+        if(themeSelector == null) return;
+        if(vaulePairs == null) return;
+
+        themeSelector.setAdapter(adapter);
+        themeSelector.setSelection(currentThemeId);
+
+        themeSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                for (Map.Entry<Integer, Integer> entry : vaulePairs.entrySet()){
+                    if(entry.getKey() == position){
+                        webViewActivityPresenter.saveValueToCurrentThemeId(applicationId, (int)entry.getValue());
+                        break;
+                    }
+                }
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
+    @Override
+    public void hideThemesSpinner() {
+        if(themeSelector == null) return;
+        themeSelector.setVisibility(View.INVISIBLE);
     }
 }

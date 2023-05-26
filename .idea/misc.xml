@@ -46,20 +46,37 @@
         <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/activity_background.xml" value="0.2405" />
         <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/application_progressring.xml" value="0.2405" />
         <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/circle_background.xml" value="0.2405" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/ic_back_arrow_large.xml" value="0.2405" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/ic_back_arrow_small.xml" value="0.2405" />
         <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/ic_brit.xml" value="0.2405" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/ic_logout_icon.xml" value="0.2405" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/ic_mobileflex.xml" value="0.2405" />
         <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/loginbutton_background.xml" value="0.2405" />
         <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/programs_activity_background.xml" value="0.2405" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/progressring_mobile.xml" value="0.2405" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/progressring_tablet.xml" value="0.2405" />
         <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/settings_button_background.xml" value="0.2405" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/settings_button_background_large.xml" value="0.2405" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/settings_button_background_small.xml" value="0.2405" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/spinner_background.xml" value="0.2405" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/drawable/spinner_circle_background.xml" value="0.2405" />
         <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/activity_programs.xml" value="0.19269369731031713" />
-        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/activity_web_view.xml" value="0.20521590423257802" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/activity_web_view.xml" value="0.3305785123966942" />
         <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/fragment_pincode_mobile.xml" value="0.20521590423257802" />
         <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/fragment_pincode_tablet.xml" value="0.20521590423257802" />
-        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/main_activity_mobile_landscape.xml" value="0.264" />
-        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/main_activity_mobile_portrait.xml" value="0.20521590423257802" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/fragment_rfid_mobile.xml" value="0.11716171617161716" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/fragment_rfid_tablet.xml" value="0.11716171617161716" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/login_activity_mobile_landscape.xml" value="0.20521590423257802" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/login_activity_mobile_portrait.xml" value="0.20521590423257802" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/login_activity_tablet_landscape.xml" value="0.11716171617161716" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/login_activity_tablet_portrait.xml" value="0.11716171617161716" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/main_activity_mobile_landscape.xml" value="0.10400000000000001" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/main_activity_mobile_portrait.xml" value="0.10400000000000001" />
         <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/main_activity_pda_portrait.xml" value="0.20521590423257802" />
-        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/main_activity_tablet_landscape.xml" value="0.20521590423257802" />
-        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/main_activity_tablet_portrait.xml" value="0.20521590423257802" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/main_activity_tablet_landscape.xml" value="0.152" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/main_activity_tablet_portrait.xml" value="0.1" />
         <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/program_item_layout.xml" value="0.4" />
+        <entry key="..\:/Munkahely_Programok/MobilFlexAndroid/MobilFlexAndroid/MobilFlexAndroid/app/src/main/res/layout/themes_text.xml" value="0.4" />
       </map>
     </option>
   </component>

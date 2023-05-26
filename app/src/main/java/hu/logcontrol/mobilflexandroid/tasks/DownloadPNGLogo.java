@@ -38,7 +38,7 @@ public class DownloadPNGLogo implements Callable {
     private MainPreferenceFileService mainPreferenceFileService;
     private int applicationsSize;
 
-    private int defaultThemeId;
+    private int currentSelectedThemeId;
     private String applicationTitle;
     private String backgroundColor;
     private String backgroundGradientColor;
@@ -49,12 +49,12 @@ public class DownloadPNGLogo implements Callable {
     private int responseCode;
     private Bitmap bmp;
     private InputStream in;
-    private FileWriter fileWriter;
 
     private final List<ProgramsResultObject> pList = new ArrayList<>();
     private ProgramsResultObject p;
     private Message message;
-
+    private boolean isNetWokAvailable;
+    private String directionName;
 
     public DownloadPNGLogo(Context context, MainPreferenceFileService mainPreferenceFileService, int applicationsSize) {
         this.context = context.getApplicationContext();
@@ -66,69 +66,88 @@ public class DownloadPNGLogo implements Callable {
         this.ctpmw = new WeakReference<>(customThreadPoolManager);
     }
 
-    // TODO ez itt még nem teljesen működik, majd meg kell csinálni
-    // sokszor jön létre a fájl a Environment.getExternalStorageDirectory().getPath() útvonalon
-
     @SuppressLint("CheckResult")
     @Override
-    public Object call() throws Exception {
+    public Object call() {
         try {
             if (Thread.interrupted()) throw new InterruptedException();
+
+            String fileName = null;
 
             if(mainPreferenceFileService != null){
                 for (int i = 0; i < applicationsSize; i++) {
 
-                    defaultThemeId = mainPreferenceFileService.getIntValueFromSettingsPrefFile("defaultThemeId" + '_' + (i + 1));
+                    currentSelectedThemeId = mainPreferenceFileService.getIntValueFromSettingsPrefFile("currentSelectedThemeId" + '_' + (i + 1));
                     applicationTitle = mainPreferenceFileService.getStringValueFromSettingsPrefFile("applicationTitle" + '_' + (i + 1));
-                    backgroundColor = mainPreferenceFileService.getStringValueFromSettingsPrefFile("backgroundColor" + '_' + (i + 1) + '_' + defaultThemeId);
-                    backgroundGradientColor = mainPreferenceFileService.getStringValueFromSettingsPrefFile("backgroundGradientColor" + '_' + (i + 1) + '_' + defaultThemeId);
-                    logoUrl = mainPreferenceFileService.getStringValueFromSettingsPrefFile("logoUrl" + '_' + (i + 1) + '_' + defaultThemeId);
                     applicationEnabledLoginFlag = mainPreferenceFileService.getIntValueFromSettingsPrefFile("applicationEnabledLoginFlag" + '_' + (i + 1));
 
-                    String fileName = getFileNameFromUrl();
-                    mainPreferenceFileService.saveValueToSettingsPrefFile("logoName" + '_' + (i + 1) + '_' + defaultThemeId, fileName);
+                    if(currentSelectedThemeId != Integer.MAX_VALUE){
+                        logoUrl = mainPreferenceFileService.getStringValueFromSettingsPrefFile("logoUrl" + '_' + (i + 1) + '_' + currentSelectedThemeId);
+                        backgroundColor = mainPreferenceFileService.getStringValueFromSettingsPrefFile("backgroundColor" + '_' + (i + 1) + '_' + currentSelectedThemeId);
+                        backgroundGradientColor = mainPreferenceFileService.getStringValueFromSettingsPrefFile("backgroundGradientColor" + '_' + (i + 1) + '_' + currentSelectedThemeId);
 
-                    if(logoUrl != null && fileName != null){
-                        URL url = new URL(logoUrl);
-                        HttpURLConnection con = (HttpURLConnection)url.openConnection();
-                        con.setDoInput(true);
-                        con.connect();
-                        responseCode = con.getResponseCode();
-                        if(responseCode == HttpURLConnection.HTTP_OK)
-                        {
-                            in = con.getInputStream();
-                            bmp = BitmapFactory.decodeStream(in);
-                            drawable = new BitmapDrawable(context.getResources(), bmp);
+                        fileName = getFileNameFromUrl();
+                        mainPreferenceFileService.saveValueToSettingsPrefFile("logoName" + '_' + (i + 1) + '_' + currentSelectedThemeId, fileName);
 
-                            File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "MobileFlexAndroid");
-                            if(!dir.exists()){ dir.mkdir(); }
+                        isNetWokAvailable = Helper.isInternetConnection(context);
+                        if(isNetWokAvailable){
+                            if(logoUrl != null && fileName != null){
+                                URL url = new URL(logoUrl);
+                                HttpURLConnection con = (HttpURLConnection)url.openConnection();
+                                con.setDoInput(true);
+                                con.connect();
+                                responseCode = con.getResponseCode();
+                                if(responseCode == HttpURLConnection.HTTP_OK)
+                                {
+                                    in = con.getInputStream();
+                                    bmp = BitmapFactory.decodeStream(in);
+                                    drawable = new BitmapDrawable(context.getResources(), bmp);
 
-                            File file = new File(dir, fileName);
-                            if(!file.exists()) file.createNewFile();
+                                    File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "MobileFlexAndroid");
+                                    if(!dir.exists()){ dir.mkdir(); }
 
-                            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                            bmp.compress(Bitmap.CompressFormat.PNG, 100, bytes);
+                                    File file = new File(dir, fileName);
+                                    if(!file.exists()) file.createNewFile();
 
-                            FileOutputStream fos = new FileOutputStream(file);
-                            fos.write(bytes.toByteArray());
+                                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                                    bmp.compress(Bitmap.CompressFormat.PNG, 100, bytes);
 
-                            fos.close();
-                            in.close();
+                                    FileOutputStream fos = new FileOutputStream(file);
+                                    fos.write(bytes.toByteArray());
+
+                                    fos.close();
+                                    in.close();
+                                }
+                            }
                         }
+                        else {
+                            fileName = mainPreferenceFileService.getStringValueFromSettingsPrefFile("logoName" + '_' + (i + 1) + '_' + currentSelectedThemeId);
+                            directionName = Environment.getExternalStorageDirectory() + File.separator + "MobileFlexAndroid";
+
+                            if(fileName != null){
+                                File dir = new File(directionName);
+                                if(dir.exists()){
+                                    File file = new File(directionName + File.separator + fileName);
+
+                                    if(file.exists()){
+                                        Bitmap bitmap = BitmapFactory.decodeFile(directionName + File.separator + fileName);
+                                        drawable = new BitmapDrawable(context.getResources(), bitmap);
+                                    }
+                                }
+                            }
+                        }
+
+                        p = new ProgramsResultObject(
+                                applicationTitle,
+                                backgroundColor,
+                                backgroundGradientColor,
+                                drawable,
+                                i + 1,
+                                applicationEnabledLoginFlag,
+                                applicationsSize
+                        );
+                        pList.add(p);
                     }
-
-
-                    p = new ProgramsResultObject(
-                            applicationTitle,
-                            backgroundColor,
-                            backgroundGradientColor,
-                            drawable,
-                            defaultThemeId,
-                            i + 1,
-                            applicationEnabledLoginFlag,
-                            applicationsSize
-                    );
-                    pList.add(p);
                 }
             }
 

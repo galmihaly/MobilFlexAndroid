@@ -26,9 +26,8 @@ public class ProgramsPresenter implements IProgramsPresenter {
     }
 
     @Override
-    public void openActivityByEnum(ViewEnums viewEnum, int defaultThemeId, int applicationId, boolean isFromLoginPage, int applicationsSize) {
+    public void openActivityByEnum(ViewEnums viewEnum, int applicationId, int isFromLoginPage, int applicationsSize) {
         if(viewEnum == null) return;
-        if(defaultThemeId == -1) return;
         if(applicationId == -1) return;
         if(iProgramsActivity == null) return;
         if(appDataManager == null) return;
@@ -38,14 +37,12 @@ public class ProgramsPresenter implements IProgramsPresenter {
         switch (viewEnum){
             case LOGIN_ACTIVITY: {
                 intent = new Intent(context, LoginActivity.class);
-                intent.putExtra("defaultThemeId", defaultThemeId);
                 intent.putExtra("applicationId", applicationId);
                 intent.putExtra("isFromLoginPage", isFromLoginPage);
                 break;
             }
             case WEBVIEW_ACTIVITY: {
                 intent = new Intent(context, WebViewActivity.class);
-                intent.putExtra("defaultThemeId", defaultThemeId);
                 intent.putExtra("applicationId", applicationId);
                 intent.putExtra("isFromLoginPage", isFromLoginPage);
                 intent.putExtra("applicationsSize", applicationsSize);

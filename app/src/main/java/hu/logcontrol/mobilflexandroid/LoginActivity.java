@@ -5,7 +5,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -13,7 +12,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
@@ -27,18 +25,21 @@ import java.util.List;
 import hu.logcontrol.mobilflexandroid.adapters.LoginModesPagerAdapter;
 import hu.logcontrol.mobilflexandroid.enums.FragmentTypes;
 import hu.logcontrol.mobilflexandroid.enums.MessageIdentifiers;
+import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
 import hu.logcontrol.mobilflexandroid.enums.WindowSizeTypes;
 import hu.logcontrol.mobilflexandroid.fragments.BarcodeFragment;
 import hu.logcontrol.mobilflexandroid.fragments.PinCodeFragment;
 import hu.logcontrol.mobilflexandroid.fragments.RFIDFragment;
 import hu.logcontrol.mobilflexandroid.fragments.UserPassFragment;
 import hu.logcontrol.mobilflexandroid.helpers.Helper;
+import hu.logcontrol.mobilflexandroid.helpers.StateChangeHelper;
 import hu.logcontrol.mobilflexandroid.interfaces.ILoginActivity;
+import hu.logcontrol.mobilflexandroid.interfaces.IMessageListener;
 import hu.logcontrol.mobilflexandroid.listeners.LoginButtonListener;
 import hu.logcontrol.mobilflexandroid.listeners.ViewPagerListener;
 import hu.logcontrol.mobilflexandroid.presenters.LoginActivityPresenter;
 
-public class LoginActivity extends AppCompatActivity implements ILoginActivity {
+public class LoginActivity extends AppCompatActivity implements ILoginActivity, IMessageListener {
 
     private LoginActivityPresenter loginActivityPresenter;
     private WindowSizeTypes[] wst;
@@ -67,28 +68,52 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
     private LoginButtonListener barcodeLogButListener;
 
     private LoginModesPagerAdapter loginModesPagerAdapter;
+    private List<ImageButton> pagerButtons;
 
-    private int defaultThemeId;
+    private ImageButton backButton;
+
     private int applicationId;
-    private boolean isFromLoginPage;
+    private int isFromLoginPage;
 
-    @SuppressLint("HardwareIds")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initView();
-        getDatasFromIntent();
         initPresenter();
         initAppDataManager();
+        getDatasFromIntent();
         initWebAPIServices();
         setControlsValuesBySettings();
         getLogoFromExternalStorage();
         initLoginButtons();
+        initBackButton();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        setControlsValuesBySettings();
+        getLogoFromExternalStorage();
+        refreshViewButtonsAndPager();
+    }
+
+    private void refreshViewButtonsAndPager() {
+        if(pagerButtons == null) return;
+        if(llay == null) return;
+        if(loginModesPagerAdapter == null) return;
+
+        GradientDrawable[] g = loginActivityPresenter.getCurrentThemeForButton(applicationId);
+
+        loginModesPagerAdapter.setBackgroundToButtons(g[0]);
+        loginModesPagerAdapter.setHighAlphaBackground(g[0]);
+        loginModesPagerAdapter.setLowAlphaBackground(g[1]);
+        viewPagerListener.onPageSelected(loginModesPager.getCurrentItem());
     }
 
     private void getLogoFromExternalStorage() {
         if(loginActivityPresenter == null) return;
-        loginActivityPresenter.getLogoImageFromExternalStorage(applicationId, defaultThemeId);
+        loginActivityPresenter.getLogoImageFromExternalStorage(applicationId);
     }
 
     private void initPresenter(){
@@ -107,13 +132,13 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
 
     private void setControlsValuesBySettings() {
         if(loginActivityPresenter == null) return;
-        loginActivityPresenter.setControlsValuesBySettings(applicationId, defaultThemeId);
+        loginActivityPresenter.setControlsValuesBySettings(applicationId);
     }
 
     private void initLoginButtons() {
         if(loginActivityPresenter == null) return;
         if(wst == null) return;
-        loginActivityPresenter.initButtonsByLoginModesNumber(wst, applicationId, defaultThemeId);
+        loginActivityPresenter.initButtonsByLoginModesNumber(wst, applicationId);
     }
 
     private void getDatasFromIntent(){
@@ -121,10 +146,18 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
         Intent i = getIntent();
 
         if(i != null){
-            defaultThemeId = i.getIntExtra("defaultThemeId", -1);
             applicationId = i.getIntExtra("applicationId", -1);
-            isFromLoginPage = i.getBooleanExtra("isFromLoginPage", isFromLoginPage);
+            isFromLoginPage = i.getIntExtra("isFromLoginPage", -1);
         }
+    }
+
+    private void initBackButton(){
+        if(loginActivityPresenter == null) return;
+        if(backButton == null) return;
+
+        backButton.setOnClickListener(v -> {
+            loginActivityPresenter.openActivityByEnum(ViewEnums.PROGRAMS_ACTIVITY, applicationId);
+        });
     }
 
     void initView(){
@@ -147,6 +180,8 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
 
             applicationLeadTV = findViewById(R.id.applicationLead_mobile_portrait);
             applicationTitleTV = findViewById(R.id.applicationTitle_mobile_portrait);
+
+            backButton = findViewById(R.id.backbutton_mobile_portrait);
         }
         else if(wst[0] == WindowSizeTypes.MEDIUM && wst[1] == WindowSizeTypes.COMPACT){
 
@@ -159,6 +194,8 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
 
             applicationLeadTV = findViewById(R.id.applicationLead_mobile_landscape);
             applicationTitleTV = findViewById(R.id.applicationTitle_mobile_landscape);
+
+            backButton = findViewById(R.id.backbutton_mobile_landscape);
         }
         else if(wst[0] == WindowSizeTypes.MEDIUM && wst[1] == WindowSizeTypes.EXPANDED){
 
@@ -171,6 +208,8 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
 
             applicationLeadTV = findViewById(R.id.applicationLead_tablet_portrait);
             applicationTitleTV = findViewById(R.id.applicationTitle_tablet_portrait);
+
+            backButton = findViewById(R.id.backbutton_tablet_portrait);
         }
         else if(wst[0] == WindowSizeTypes.EXPANDED && wst[1] == WindowSizeTypes.MEDIUM){
 
@@ -183,6 +222,8 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
 
             applicationLeadTV = findViewById(R.id.applicationLead_tablet_landscape);
             applicationTitleTV = findViewById(R.id.applicationTitle_tablet_landscape);
+
+            backButton = findViewById(R.id.backbutton_tablet_landscape);
         }
     }
 
@@ -207,12 +248,6 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
 
         loginTV.setText(message);
         loginTV.setTextColor(Color.parseColor(color));
-    }
-
-    @Override
-    public void changeStateLoginLogo(int logoID) {
-        if(loginLogo == null) return;
-        loginLogo.setImageResource(logoID);
     }
 
     @Override
@@ -264,29 +299,39 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
     }
 
     @Override
-    public void openWebViewActivity(String applicationId, String defaultThemeId) {
-        if(applicationId == null) return;
-        if(defaultThemeId == null) return;
+    public void changeBackButtonColors(String buttonBackgroundColor, String buttonBackgroundGradientColor){
+        if(backButton == null) return;
+        if(buttonBackgroundColor == null) return;
+        if(buttonBackgroundGradientColor == null) return;
 
+        StateChangeHelper.changeStateButton(backButton, buttonBackgroundColor, buttonBackgroundGradientColor);
     }
 
     @Override
     public void sendCreatedButtonsToView(List<ImageButton> createdButtons) {
         if(llay == null) return;
         if(createdButtons == null) return;
+        if(loginActivityPresenter == null) return;
+
+        pagerButtons = createdButtons;
+
         llay.invalidate();
 
         loginModesPagerAdapter = new LoginModesPagerAdapter(getSupportFragmentManager(), getLifecycle());
+
+        GradientDrawable[] g = loginActivityPresenter.getCurrentThemeForButton(applicationId);
 
         for (int i = 0; i < createdButtons.size(); i++) {
             switch (createdButtons.get(i).getId()){
                 case MessageIdentifiers.BUTTON_USER_PASS:{
                     loginAccAndPassButton = createdButtons.get(i);
 
+                    if(g != null) loginAccAndPassButton.setBackground(g[0]);
+
                     Fragment fragment = new UserPassFragment();
 
-                    if(wst != null && defaultThemeId != -1 && applicationId != -1) {
-                        Helper.sendDisplaySizesToFragments(fragment, wst, defaultThemeId, applicationId, isFromLoginPage);
+                    if(wst != null && applicationId != -1) {
+                        Helper.sendDisplaySizesToFragments(fragment, wst, applicationId, isFromLoginPage);
                     }
 
                     if(createdButtons.size() != 1) llay.addView(loginAccAndPassButton);
@@ -299,10 +344,12 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
                 case MessageIdentifiers.BUTTON_PINCODE:{
                     loginPinButton = createdButtons.get(i);
 
+                    if(g != null) loginPinButton.setBackground(g[0]);
+
                     Fragment fragment = new PinCodeFragment();
 
-                    if(wst != null && defaultThemeId != -1 && applicationId != -1) {
-                        Helper.sendDisplaySizesToFragments(fragment, wst, defaultThemeId, applicationId, isFromLoginPage);
+                    if(wst != null && applicationId != -1) {
+                        Helper.sendDisplaySizesToFragments(fragment, wst, applicationId, isFromLoginPage);
                     }
 
                     if(createdButtons.size() != 1) llay.addView(loginPinButton);
@@ -315,10 +362,12 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
                 case MessageIdentifiers.BUTTON_RFID:{
                     loginRFIDButton = createdButtons.get(i);
 
+                    if(g != null) loginRFIDButton.setBackground(g[0]);
+
                     Fragment fragment = new RFIDFragment();
 
-                    if(wst != null && defaultThemeId != -1 && applicationId != -1) {
-                        Helper.sendDisplaySizesToFragments(fragment, wst, defaultThemeId, applicationId, isFromLoginPage);
+                    if(wst != null && applicationId != -1) {
+                        Helper.sendDisplaySizesToFragments(fragment, wst, applicationId, isFromLoginPage);
                     }
 
                     if(createdButtons.size() != 1) llay.addView(loginRFIDButton);
@@ -331,10 +380,12 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
                 case MessageIdentifiers.BUTTON_BARCODE:{
                     loginBarcodeButton = createdButtons.get(i);
 
+                    if(g != null) loginBarcodeButton.setBackground(g[0]);
+
                     Fragment fragment = new BarcodeFragment();
 
-                    if(wst != null && defaultThemeId != -1 && applicationId != -1) {
-                        Helper.sendDisplaySizesToFragments(fragment, wst, defaultThemeId, applicationId, isFromLoginPage);
+                    if(wst != null && applicationId != -1) {
+                        Helper.sendDisplaySizesToFragments(fragment, wst, applicationId, isFromLoginPage);
                     }
 
                     if(createdButtons.size() != 1) llay.addView(loginBarcodeButton);
@@ -346,6 +397,9 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
                 }
             }
         }
+
+        loginModesPagerAdapter.setHighAlphaBackground(g[0]);
+        loginModesPagerAdapter.setLowAlphaBackground(g[1]);
 
         if(loginModesPager != null) loginModesPager.setAdapter(loginModesPagerAdapter);
         viewPagerListener = new ViewPagerListener(loginModesPagerAdapter);
@@ -377,6 +431,17 @@ public class LoginActivity extends AppCompatActivity implements ILoginActivity {
             loginRFIDButton.setOnClickListener(rfidLogButListener);
         }
     }
-
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+    @Override
+    public void sendMessage(String message) {
+        if(message == null) return;
+        new Handler(Looper.getMainLooper()).post(() -> { Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show(); });
+    }
+
+    @Override
+    public void sendIntent(Intent intent) {
+        if(intent == null) return;
+        startActivity(intent);
+    }
 }

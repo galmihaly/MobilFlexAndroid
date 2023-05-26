@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+<!--    <item android:id="@android:id/background">-->
+<!--        <shape-->
+<!--            android:innerRadiusRatio="7"-->
+<!--            android:thickness="10dp"-->
+<!--            android:shape="ring"-->
+<!--            android:useLevel="false" >-->
+<!--            <solid android:color="#FFbcbec0"/>-->
+<!--        </shape>-->
+<!--    </item>-->
+
+    <item android:id="@android:id/progress">
+
+        <rotate
+            android:pivotX="50%"
+            android:pivotY="50%"
+            android:fromDegrees="0"
+            android:toDegrees="1800"
+            android:duration="1">
+
+            <shape
+                android:shape="ring"
+                android:useLevel="true"
+                android:thickness="6dp"
+                android:innerRadiusRatio="2.8" >
+                <solid android:color="#FFBCBEC0"/>
+            </shape>
+
+        </rotate>
+
+    </item>
+
+    <item android:id="@android:id/progress">
+
+        <rotate
+            android:pivotX="50%"
+            android:pivotY="50%"
+            android:fromDegrees="0"
+            android:toDegrees="1440"
+            android:duration="1">
+
+            <shape
+                android:shape="ring"
+                android:useLevel="true"
+                android:thickness="6dp"
+                android:innerRadiusRatio="4.5" >
+                <solid android:color="#FFF37920"/>
+            </shape>
+
+        </rotate>
+
+    </item>
+
+    <item android:id="@android:id/progress">
+
+        <rotate
+            android:pivotX="50%"
+            android:pivotY="50%"
+            android:fromDegrees="0"
+            android:toDegrees="1080"
+            android:duration="1">
+
+            <shape
+                android:shape="ring"
+                android:useLevel="true"
+                android:thickness="6dp"
+                android:innerRadiusRatio="11" >
+                <solid android:color="#FFFFFFFF"/>
+            </shape>
+
+        </rotate>
+
+    </item>
+</layer-list>

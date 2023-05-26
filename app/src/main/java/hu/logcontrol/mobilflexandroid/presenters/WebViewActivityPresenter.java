@@ -2,39 +2,31 @@ package hu.logcontrol.mobilflexandroid.presenters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.http.SslError;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 
-import androidx.security.crypto.EncryptedSharedPreferences;
-import androidx.security.crypto.MasterKeys;
-
-import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import hu.logcontrol.mobilflexandroid.LoginActivity;
+import hu.logcontrol.mobilflexandroid.MainActivity;
 import hu.logcontrol.mobilflexandroid.ProgramsActivity;
-import hu.logcontrol.mobilflexandroid.WebViewActivity;
+import hu.logcontrol.mobilflexandroid.adapters.ThemesSpinnerAdapter;
 import hu.logcontrol.mobilflexandroid.datamanager.AppDataManager;
 import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
+import hu.logcontrol.mobilflexandroid.helpers.Helper;
 import hu.logcontrol.mobilflexandroid.interfaces.IWebViewActivity;
 import hu.logcontrol.mobilflexandroid.interfaces.IWebViewActivityPresenter;
-import hu.logcontrol.mobilflexandroid.logger.ApplicationLogger;
-import hu.logcontrol.mobilflexandroid.logger.LogLevel;
-import hu.logcontrol.mobilflexandroid.models.LocalEncryptedPreferences;
-import hu.logcontrol.mobilflexandroid.taskmanager.CustomThreadPoolManager;
-import hu.logcontrol.mobilflexandroid.taskmanager.PresenterThreadCallback;
 
 public class WebViewActivityPresenter implements IWebViewActivityPresenter {
 
-    private IWebViewActivity webViewActivity;
+    private IWebViewActivity iWebViewActivity;
     private Context context;
 
     private AppDataManager appDataManager;
 
-    public WebViewActivityPresenter(IWebViewActivity webViewActivity, Context context) {
-        this.webViewActivity = webViewActivity;
+    public WebViewActivityPresenter(IWebViewActivity iWebViewActivity, Context context) {
+        this.iWebViewActivity = iWebViewActivity;
         this.context = context.getApplicationContext();
     }
 
@@ -43,30 +35,31 @@ public class WebViewActivityPresenter implements IWebViewActivityPresenter {
 
 
     @Override
-    public void openActivityByEnum(ViewEnums viewEnum, int applicationId, int defaultThemeId, int applicationsSize) {
+    public void openActivityByEnum(ViewEnums viewEnum, int applicationId, int applicationsSize) {
         if(viewEnum == null) return;
-        if(webViewActivity == null) return;
+        if(iWebViewActivity == null) return;
 
         Intent intent = null;
 
         switch (viewEnum){
             case LOGIN_ACTIVITY:{
                 intent = new Intent(context, LoginActivity.class);
-                intent.putExtra("defaultThemeId", defaultThemeId);
                 intent.putExtra("applicationId", applicationId);
                 break;
             }
             case PROGRAMS_ACTIVITY:{
                 intent = new Intent(context, ProgramsActivity.class);
-                intent.putExtra("defaultThemeId", defaultThemeId);
-                intent.putExtra("applicationId", applicationId);
                 intent.putExtra("applicationsSize", applicationsSize);
+                break;
+            }
+            case MAIN_ACTIVITY:{
+                intent = new Intent(context, MainActivity.class);
                 break;
             }
         }
 
         if(intent == null) return;
-        if(webViewActivity != null) webViewActivity.openViewByIntent(intent);
+        if(iWebViewActivity != null) iWebViewActivity.openViewByIntent(intent);
     }
 
     @Override
@@ -89,27 +82,73 @@ public class WebViewActivityPresenter implements IWebViewActivityPresenter {
     }
 
     @Override
-    public void getValuesFromSettingsPrefFile(int applicationId, int defaultThemeId) {
+    public void getValuesFromSettingsPrefFile(int applicationId) {
         if(appDataManager == null) return;
-        if(webViewActivity == null) return;
+        if(iWebViewActivity == null) return;
 
-        if(applicationId != -1 && defaultThemeId != -1){
-            String appBarBackgroundColor = appDataManager.getStringValueFromSettingsFile("backgroundColor" + '_' + applicationId + '_' + defaultThemeId);
-            String appBarBackgroundGradientColor = appDataManager.getStringValueFromSettingsFile("backgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
+        if(applicationId != -1){
 
-            Log.e("appBarBackgroundColor", appBarBackgroundColor);
-            Log.e("appBarBackgroundGradientColor", appBarBackgroundGradientColor);
+            int currentSelectedThemeId = appDataManager.getIntValueFromSettingsFile("currentSelectedThemeId" + '_' + applicationId);
 
-            if(appBarBackgroundColor != null && appBarBackgroundGradientColor != null) webViewActivity.changeStateAppbarLayout(appBarBackgroundColor, appBarBackgroundGradientColor);
-            if(appBarBackgroundColor != null && appBarBackgroundGradientColor != null) webViewActivity.changeMobileBarsColors(appBarBackgroundColor, appBarBackgroundGradientColor);
+            String appBarBackgroundColor = appDataManager.getStringValueFromSettingsFile("backgroundColor" + '_' + applicationId + '_' + currentSelectedThemeId);
+            String appBarBackgroundGradientColor = appDataManager.getStringValueFromSettingsFile("backgroundGradientColor" + '_' + applicationId + '_' + currentSelectedThemeId);
 
-            String buttonBackgroundColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundColor" + '_' + applicationId + '_' + defaultThemeId);
-            String buttonBackgroundGradientColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundGradientColor" + '_' + applicationId + '_' + defaultThemeId);
+            if(appBarBackgroundColor != null && appBarBackgroundGradientColor != null) iWebViewActivity.changeStateAppbarLayout(appBarBackgroundColor, appBarBackgroundGradientColor);
+            if(appBarBackgroundColor != null && appBarBackgroundGradientColor != null) iWebViewActivity.changeMobileBarsColors(appBarBackgroundColor, appBarBackgroundGradientColor);
+
+            String buttonBackgroundColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundColor" + '_' + applicationId + '_' + currentSelectedThemeId);
+            String buttonBackgroundGradientColor = appDataManager.getStringValueFromSettingsFile("buttonBackgroundGradientColor" + '_' + applicationId + '_' + currentSelectedThemeId);
 
             if(buttonBackgroundColor != null && buttonBackgroundGradientColor != null) {
-                webViewActivity.changeStateLoginButton( buttonBackgroundColor, buttonBackgroundGradientColor);
+                iWebViewActivity.changeStateLoginButton( buttonBackgroundColor, buttonBackgroundGradientColor);
             }
         }
+    }
+
+    @Override
+    public void getThemesSpinnerValues(int applicationId) {
+        if(appDataManager == null) return;
+        if(iWebViewActivity == null) return;
+
+        HashMap<Integer, Integer> vaulePairs = new HashMap<>();
+
+        String t = appDataManager.getStringValueFromSettingsFile("themesIds" + '_' + applicationId);
+        List<Integer> themesIds = Helper.splitStringToIntList(t, "_");
+
+        int currentSelectedThemeId = appDataManager.getIntValueFromSettingsFile("currentSelectedThemeId" + '_' + applicationId);
+
+        if(themesIds != null){
+            if(themesIds.size() > 1){
+                List<String> themes = new ArrayList<>();
+
+                for (int i = 0; i < themesIds.size(); i++) {
+                    themes.add(appDataManager.getStringValueFromSettingsFile("name" + '_' + applicationId + '_' + themesIds.get(i)));
+                    vaulePairs.put(i, themesIds.get(i));
+                }
+
+                ThemesSpinnerAdapter adapter = null;
+                if(themesIds != null) adapter = new ThemesSpinnerAdapter(context, themes);
+
+                int currentThemeId = -1;
+
+                for (int i = 0; i < themesIds.size(); i++) {
+                    if(themesIds.get(i) == currentSelectedThemeId) currentThemeId = i;
+                }
+
+                iWebViewActivity.initThemesSpinner(adapter, currentThemeId, vaulePairs);
+            }
+            else {
+                iWebViewActivity.hideThemesSpinner();
+            }
+        }
+    }
+
+    @Override
+    public void saveValueToCurrentThemeId(int applicationId, int themesId) {
+        if(appDataManager == null) return;
+
+        appDataManager.saveIntValueToSettinsPrefFile("currentSelectedThemeId" + '_' + applicationId, themesId);
+        getValuesFromSettingsPrefFile(applicationId);
     }
 
     @Override
@@ -121,10 +160,10 @@ public class WebViewActivityPresenter implements IWebViewActivityPresenter {
             Log.e("loginWebApiUrl", loginWebApiUrl);
             if(loginWebApiUrl != null) {
                 if(loginWebApiUrl.contains("https://")) {
-                    webViewActivity.loadLoginWebAPIUrl(loginWebApiUrl);
+                    iWebViewActivity.loadLoginWebAPIUrl(loginWebApiUrl);
                 }
                 else {
-                    webViewActivity.loadLoginWebAPIUrl("https://" + loginWebApiUrl);
+                    iWebViewActivity.loadLoginWebAPIUrl("https://" + loginWebApiUrl);
                 }
             }
         }

@@ -2,13 +2,18 @@ package hu.logcontrol.mobilflexandroid.presenters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
+
 import hu.logcontrol.mobilflexandroid.LoginActivity;
 import hu.logcontrol.mobilflexandroid.ProgramsActivity;
+import hu.logcontrol.mobilflexandroid.WebViewActivity;
 import hu.logcontrol.mobilflexandroid.adapters.LanguagesSpinnerAdapter;
 import hu.logcontrol.mobilflexandroid.datamanager.AppDataManager;
+import hu.logcontrol.mobilflexandroid.enums.DeviceResponse;
 import hu.logcontrol.mobilflexandroid.enums.RepositoryType;
 import hu.logcontrol.mobilflexandroid.enums.ViewEnums;
 import hu.logcontrol.mobilflexandroid.helpers.Helper;
@@ -22,17 +27,19 @@ public class MainActivityPresenter implements IMainActivityPresenter {
 
     private int[] languagesImages;
     private AppDataManager appDataManager;
+    private Handler handler;
 
-    public MainActivityPresenter(IMainActivity iMainActivity, Context context) {
+    public MainActivityPresenter(IMainActivity iMainActivity, Context context, Looper handler) {
         this.iMainActivity = iMainActivity;
         this.context = context.getApplicationContext();
+        this.handler = new Handler(handler);
     }
 
     /* ---------------------------------------------------------------------------------------------------------------------------------------------------------- */
     /* ILoginActivityPresenter interfész függvényei */
 
     @Override
-    public void openActivityByEnum(ViewEnums viewEnum, int applicationNumber) {
+    public void openActivityByEnum(ViewEnums viewEnum, int applicationNumber, int applicationId, int isFromLoginPage) {
         if(viewEnum == null) return;
         if(iMainActivity == null) return;
         if(appDataManager == null) return;
@@ -41,14 +48,24 @@ public class MainActivityPresenter implements IMainActivityPresenter {
 
         switch (viewEnum){
             case LOGIN_ACTIVITY:{
+
                 intent = new Intent(context, LoginActivity.class);
-                intent.putExtra("applicationsSize", applicationNumber);
+                intent.putExtra("applicationId", applicationId);
+                intent.putExtra("isFromLoginPage", isFromLoginPage);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 break;
             }
             case PROGRAMS_ACTIVITY:{
                 intent = new Intent(context, ProgramsActivity.class);
                 intent.putExtra("applicationsSize", applicationNumber);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                break;
+            }
+            case WEBVIEW_ACTIVITY:{
+                intent = new Intent(context, WebViewActivity.class);
+                intent.putExtra("applicationsSize", applicationNumber);
+                intent.putExtra("applicationId", applicationId);
+                intent.putExtra("isFromLoginPage", isFromLoginPage);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 break;
             }
@@ -99,7 +116,7 @@ public class MainActivityPresenter implements IMainActivityPresenter {
     @Override
     public void saveLanguageToSettingsFile(String languageID) {
         if(appDataManager == null) return;
-        appDataManager.saveValueToSettinsPrefFile("CurrentSelectedLanguage", languageID);
+        appDataManager.saveStringValueToSettinsPrefFile("CurrentSelectedLanguage", languageID);
     }
 
     @Override
@@ -122,92 +139,142 @@ public class MainActivityPresenter implements IMainActivityPresenter {
     }
 
     @Override
-    public void initWebAPIServices() {
-        if(appDataManager == null) return;
-        String baseUrl = appDataManager.getStringValueFromSettingsFile("loginWebApiUrl");
-        if(baseUrl != null){
-            appDataManager.createMainWebAPIService(baseUrl);
-        }
-    }
-
-    @Override
     public void startProgram(int delay) {
         if(appDataManager == null) return;
         if(iMainActivity == null) return;
+        if(handler == null) return;
 
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+        handler.postDelayed(() -> {
             String loginWebApiUrl = appDataManager.getStringValueFromSettingsFile("loginWebApiUrl");
-            if(loginWebApiUrl != null){ initCallingWebAPI(); }
+            if(loginWebApiUrl != null && !loginWebApiUrl.equals("")){
+
+                boolean isCreated = appDataManager.createMainWebAPIService(loginWebApiUrl);
+                if(isCreated) initCallingWebAPI();
+            }
+            else {
+                boolean isSaved = saveBaseUrl();
+                if(isSaved) {
+
+                    loginWebApiUrl = appDataManager.getStringValueFromSettingsFile("loginWebApiUrl");
+                    boolean isCreated = appDataManager.createMainWebAPIService(loginWebApiUrl);
+                    if(isCreated) initCallingWebAPI();
+                }
+            }
         }, delay);
     }
 
     private void initCallingWebAPI(){
 
         String message = null;
-        boolean isNetWokAvailable;
 
-        isNetWokAvailable = Helper.isInternetConnection(context);
+        boolean isNetWokAvailable = Helper.isInternetConnection(context);
         if(isNetWokAvailable){
-            message = appDataManager.getMessageFromLanguagesFiles("WC_NETWORK_AVAILABLE", "$");
-            if(message != null) iMainActivity.setTextToMessageTV(message);
+            appDataManager.callMainWebAPI();
 
             message = appDataManager.getMessageFromLanguagesFiles("WC_DATA_RETIREVAL_START", "$");
-            if(message != null) iMainActivity.setTextToMessageTV(message);
-            appDataManager.callMainWebAPI();
+            sendMessageToView(message);
         }
         else {
-            message = appDataManager.getMessageFromLanguagesFiles("WC_NETWORK_NOT_AVAILABLE", "$");
-            if(message != null) iMainActivity.setTextToMessageTV(message);
+            message = appDataManager.getMessageFromLanguagesFiles("WC_DATA_RETIREVAL_START", "$");
+            sendMessageToView(message);
+
+            int applicationNumber = appDataManager.getIntValueFromSettingsFile("applicationsNumber");
+            if(applicationNumber == 1){
+
+                int applicationId = 1;
+                int currentSelectedThemeId = appDataManager.getIntValueFromSettingsFile("currentSelectedThemeId" + '_' + applicationId);
+                int applicationEnabledLoginFlag = appDataManager.getIntValueFromSettingsFile("applicationEnabledLoginFlag" + '_' + applicationId);
+
+                if(applicationEnabledLoginFlag == 0){
+                    openActivityByEnum(ViewEnums.WEBVIEW_ACTIVITY, applicationNumber, applicationId, 0);
+                }
+                else {
+                    openActivityByEnum(ViewEnums.LOGIN_ACTIVITY, applicationNumber, applicationId, 1);
+                }
+            }
+            else {
+                iMainActivity.setProgressRingVisibility(View.INVISIBLE);
+                openActivityByEnum(ViewEnums.PROGRAMS_ACTIVITY, applicationNumber, -1, 2);
+            }
         }
     }
 
     @Override
-    public void sendMessageToPresenter(String resultMessage) {
-        if(resultMessage == null) return;
+    public void sendMessageToView(String message){
+        if(message == null) return;
+        if(iMainActivity == null) return;
+
+        iMainActivity.setTextToMessageTV(message);
+    }
+
+    @Override
+    public void processResultMessage(int resultCode) {
         if(iMainActivity == null) return;
         if(appDataManager == null) return;
 
         String message = null;
 
-        int resultCode = appDataManager.getIntValueFromSettingsFile("resultCode");
-        if(resultCode == -99) {
-            openActivityByEnum(ViewEnums.SETTINSG_ACTIVITY, -1);
-        }
-        // OK
-        else if(resultCode == 0) {
-
-            iMainActivity.setTextToMessageTV(resultMessage);
+        if(resultCode == DeviceResponse.OK) {
 
             int applicationNumber = appDataManager.getIntValueFromSettingsFile("applicationsNumber");
             if(applicationNumber == 1){
-//                openActivityByEnum(ViewEnums.LOGIN_ACTIVITY, 1);
-                openActivityByEnum(ViewEnums.PROGRAMS_ACTIVITY, applicationNumber);
+
+                int applicationId = 1;
+                int currentSelectedThemeId = appDataManager.getIntValueFromSettingsFile("currentSelectedThemeId" + '_' + applicationId);
+                int applicationEnabledLoginFlag = appDataManager.getIntValueFromSettingsFile("applicationEnabledLoginFlag" + '_' + applicationId);
+
+                if(applicationEnabledLoginFlag == 0){
+                    openActivityByEnum(ViewEnums.WEBVIEW_ACTIVITY, applicationNumber, applicationId, 0);
+                }
+                else if(applicationEnabledLoginFlag > 0) {
+                    openActivityByEnum(ViewEnums.LOGIN_ACTIVITY, applicationNumber, applicationId, 1);
+                }
+            }
+            else if(applicationNumber > 1){
+                iMainActivity.setProgressRingVisibility(View.INVISIBLE);
+                openActivityByEnum(ViewEnums.PROGRAMS_ACTIVITY, applicationNumber, -1, 2);
             }
             else {
-                iMainActivity.setProgressringVisibility(View.INVISIBLE);
-                openActivityByEnum(ViewEnums.PROGRAMS_ACTIVITY, applicationNumber);
+                message = appDataManager.getMessageFromLanguagesFiles("WC_BASE_WEBAPI_NO_HAS_APPLICATION", "$");
+                sendMessageToView(message);
             }
         }
-        // DeviceDoesNotExists
-        else if(resultCode == 100) {
+        else if(resultCode == DeviceResponse.DeviceDoesNotExists) {
             message = appDataManager.getMessageFromLanguagesFiles("WC_BASE_WEBAPI_NOT_EXIST", "$");
-            if(message != null) iMainActivity.setTextToMessageTV(message);
+            sendMessageToView(message);
         }
-        // DeviceInactive
-        else if(resultCode == 101) {
+        else if(resultCode == DeviceResponse.DeviceInactive) {
             message = appDataManager.getMessageFromLanguagesFiles("WC_BASE_WEBAPI_INACTIVE_STATE", "$");
-            if(message != null) iMainActivity.setTextToMessageTV(message);
+            sendMessageToView(message);
         }
-        // DeviceAccessDenied
-        else if(resultCode == 102) {
+        else if(resultCode == DeviceResponse.DeviceAccessDenied) {
             message = appDataManager.getMessageFromLanguagesFiles("WC_BASE_WEBAPI_NOT_ALLOWED", "$");
-            if(message != null) iMainActivity.setTextToMessageTV(message);
+            sendMessageToView(message);
         }
     }
 
-    public void saveBaseUrl() {
-        if(iMainActivity == null) return;
-        if(appDataManager == null) return;
-        appDataManager.saveValueToSettinsPrefFile("loginWebApiUrl", "https://api.mobileflex.hu/");
+    public boolean saveBaseUrl() {
+        boolean isSaved = false;
+
+        if(iMainActivity != null && appDataManager != null){
+            Uri uri = Uri.parse("https://api.mobileflex.hu/device");
+
+            String loginWebApiUrl = appDataManager.getStringValueFromSettingsFile("loginWebApiUrl");
+            String serverName = appDataManager.getStringValueFromSettingsFile("ServerName");
+
+            if(loginWebApiUrl == null && serverName == null){
+                appDataManager.saveStringValueToSettinsPrefFile("loginWebApiUrl", "https://" + uri.getHost() +"/");
+                appDataManager.saveStringValueToSettinsPrefFile("ServerName", uri.getPathSegments().get(0));
+
+                loginWebApiUrl = appDataManager.getStringValueFromSettingsFile("loginWebApiUrl");
+                serverName = appDataManager.getStringValueFromSettingsFile("ServerName");
+
+                if(loginWebApiUrl != null && serverName != null){
+                    isSaved = true;
+                }
+            }
+        }
+
+        return isSaved;
     }
 }

@@ -3,13 +3,11 @@ package hu.logcontrol.mobilflexandroid.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import hu.logcontrol.mobilflexandroid.enums.LoginModeIdentifiers;
-
 public class SettingsWebAPIResponseObject {
 
     @SerializedName("loginResponseCode")
     @Expose
-    private int loginModeResponseCode;
+    private int loginResponseCode;
 
     @SerializedName("userId")
     @Expose
@@ -19,14 +17,14 @@ public class SettingsWebAPIResponseObject {
     @Expose
     private String sessionId;
 
-    public SettingsWebAPIResponseObject(int loginModeResponseCode, String userId, String sessionId) {
-        this.loginModeResponseCode = loginModeResponseCode;
+    public SettingsWebAPIResponseObject(int loginResponseCode, String userId, String sessionId) {
+        this.loginResponseCode = loginResponseCode;
         this.userId = userId;
         this.sessionId = sessionId;
     }
 
-    public int getLoginModeResponseCode() {
-        return loginModeResponseCode;
+    public int getLoginResponseCode() {
+        return loginResponseCode;
     }
 
     public String getUserId() {

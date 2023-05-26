@@ -1,5 +1,6 @@
 package hu.logcontrol.mobilflexandroid.adapters;
 
+import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
 import android.widget.ImageButton;
 
@@ -24,8 +25,19 @@ public class LoginModesPagerAdapter extends FragmentStateAdapter {
     private final HashMap<FragmentTypes, Fragment> baseFragmentHashMap = new HashMap<>();
     private final List<ImageButton> imageButtonList = new ArrayList<>();
 
+    private GradientDrawable lowAlphaBackground;
+    private GradientDrawable highAlphaBackground;
+
     public LoginModesPagerAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
         super(fragmentManager, lifecycle);
+    }
+
+    public void setLowAlphaBackground(GradientDrawable lowAlphaBackground) {
+        this.lowAlphaBackground = lowAlphaBackground;
+    }
+
+    public void setHighAlphaBackground(GradientDrawable highAlphaBackground) {
+        this.highAlphaBackground = highAlphaBackground;
     }
 
     @NonNull
@@ -43,7 +55,10 @@ public class LoginModesPagerAdapter extends FragmentStateAdapter {
         this.baseFragmentList.add(fragment);
     }
 
-    public void setCurrentButtonColorByPosition(int position){ Helper.changeButtonColor(imageButtonList, position); }
+    public void setCurrentButtonColorByPosition(int position){
+        if(imageButtonList == null) return;
+        Helper.changeButtonColor(imageButtonList, position, lowAlphaBackground, highAlphaBackground);
+    }
 
     public void addItemToHashMap(FragmentTypes fragmentTypes, Fragment fragment){ baseFragmentHashMap.put(fragmentTypes, fragment); }
 
@@ -51,18 +66,28 @@ public class LoginModesPagerAdapter extends FragmentStateAdapter {
         imageButtonList.add(imageButtons);
     }
 
+    public void setBackgroundToButtons(GradientDrawable g){
+        if(g == null) return;
+        if(imageButtonList == null) return;
+
+        for (int i = 0; i < this.imageButtonList.size(); i++) {
+            imageButtonList.get(i).setBackground(g);
+            imageButtonList.get(i).setImageAlpha(255);
+            imageButtonList.get(i).getBackground().setAlpha(255);
+        }
+    }
+
     public int setCurrentButtonColorByEnum(FragmentTypes fragmentTypes){
-
-        Log.e("baseFragmentHashMap.size()", String.valueOf(baseFragmentHashMap.size()));
-
+        if(baseFragmentHashMap == null) return -1;
+        if(baseFragmentList == null) return -1;
+        if(imageButtonList == null) return -1;
 
         for (Map.Entry<FragmentTypes, Fragment> entry : baseFragmentHashMap.entrySet()){
-
             if(entry.getKey() == fragmentTypes){
                 for (int i = 0; i < baseFragmentList.size(); i++) {
                     if(entry.getValue() != null){
                         if(entry.getValue().equals(baseFragmentList.get(i))){
-                            Helper.changeButtonColor(imageButtonList, i);
+                            Helper.changeButtonColor(imageButtonList, i, lowAlphaBackground, highAlphaBackground);
                             return i;
                         }
                     }
@@ -70,6 +95,7 @@ public class LoginModesPagerAdapter extends FragmentStateAdapter {
                 break;
             }
         }
+
         return -1;
     }
 }
